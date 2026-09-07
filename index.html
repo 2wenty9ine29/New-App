@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no">
+<meta name="color-scheme" content="light">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Price List">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#F6F5F0">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<title>Price List</title>
+<style>
+  :root {
+    color-scheme: light;
+    --paper: #F6F5F0;
+    --surface: #FFFFFF;
+    --ink: #1C1B18;
+    --ink-soft: #5B5A54;
+    --gold: #B8841A;
+    --gold-bright: #C6921C;
+    --gold-soft: #EFDFB8;
+    --green: #1E5C46;
+    --brick: #AD4433;
+    --line: #E6E2D8;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body {
+    margin: 0; padding: 0; height: 100%;
+    background-color: var(--paper);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", Helvetica, Arial, sans-serif;
+    overscroll-behavior-y: none;
+  }
+  button { font-family: inherit; cursor: pointer; }
+  #app { height: 100dvh; display: flex; flex-direction: column; background-color: var(--paper); }
+
+  .top-accent { height: 4px; flex-shrink: 0; background: linear-gradient(90deg, var(--gold-bright) 0 33%, var(--green) 33% 66%, var(--brick) 66% 100%); }
+
+  .screen { flex: 1; display: none; flex-direction: column; overflow: hidden; background-color: var(--paper); }
+  .screen.active { display: flex; }
+
+  header { padding: 18px 20px 12px; flex-shrink: 0; }
+  header h1 { margin: 0; font-size: 22px; font-weight: 650; color: var(--ink); }
+  header p { margin: 4px 0 0; font-size: 13px; color: var(--ink-soft); }
+
+  .scroll-area { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 0 20px; }
+
+  .add-btn-wrap { padding: 0 20px 14px; flex-shrink: 0; }
+  .add-btn {
+    width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;
+    background: var(--gold); color: #fff; border: none; border-radius: 14px;
+    padding: 13px 0; font-size: 15px; font-weight: 600;
+  }
+  .add-btn:active { opacity: 0.85; }
+  .add-btn svg { width: 18px; height: 18px; }
+
+  ul.rows { list-style: none; margin: 0; padding: 0; }
+  .row {
+    display: flex; align-items: center; gap: 10px; padding: 10px 6px; margin: 0 -6px; border-radius: 10px;
+    transition: transform .1s ease, background-color .15s ease;
+  }
+  .row[data-edit]:active, .row[data-add]:active { background: var(--gold-soft); transform: scale(0.98); }
+
+  .avatar {
+    width: 42px; height: 42px; border-radius: 50%; object-fit: cover; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-weight: 650; font-size: 15px;
+  }
+  .avatar.sm { width: 34px; height: 34px; font-size: 13px; }
+
+  .row-name-wrap { flex: 1; min-width: 0; }
+  .row-name { font-size: 14.5px; font-weight: 550; color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .row-name .qty { color: var(--ink-soft); font-weight: 500; font-size: 12.5px; }
+  .row-flag { font-size: 11px; color: var(--gold); margin-top: 1px; }
+
+  /* Manage: bulk (left) / single (right) price pair */
+  .price-pair { display: flex; gap: 12px; flex-shrink: 0; }
+  .price-col { display: flex; flex-direction: column; align-items: flex-end; min-width: 46px; }
+  .price-label { font-size: 9.5px; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.03em; }
+  .price-val { font-size: 13.5px; font-weight: 650; font-variant-numeric: tabular-nums; color: var(--ink); }
+  .price-val.dash { color: var(--line); font-weight: 500; }
+
+  /* Sell + cart: single sale price */
+  .row-price { font-size: 15px; font-weight: 600; font-variant-numeric: tabular-nums; flex-shrink: 0; color: var(--ink); text-align: right; }
+  .row-price.set-price { color: var(--gold); font-weight: 650; font-size: 13px; }
+  .price-tag-bulk { display: block; font-size: 10px; color: var(--ink-soft); font-weight: 500; text-align: right; }
+
+  .icon-btn {
+    width: 30px; height: 30px; border-radius: 50%; border: none; background: transparent;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .icon-btn svg { width: 18px; height: 18px; }
+  .remove-btn { color: var(--brick); }
+  .minus-btn { color: var(--ink-soft); background: var(--paper); }
+  .add-indicator { color: var(--gold); }
+
+  .empty-state { text-align: center; padding: 40px 24px 20px; }
+  .empty-icon {
+    width: 56px; height: 56px; border-radius: 50%; background: var(--gold-soft);
+    display: flex; align-items: center; justify-content: center; margin: 0 auto 14px;
+  }
+  .empty-icon svg { width: 24px; height: 24px; color: var(--gold); }
+  .empty-state p.title { margin: 0; font-weight: 600; font-size: 15px; color: var(--ink); }
+  .empty-state p.body { margin: 4px 0 0; font-size: 13px; color: var(--ink-soft); }
+  .no-match { text-align: center; padding: 18px 0; font-size: 13px; color: var(--ink-soft); }
+
+  /* Sell screen search */
+  .search-wrap { flex-shrink: 0; padding: 0 20px 12px; position: relative; }
+  .search-wrap svg { position: absolute; left: 34px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: var(--ink-soft); pointer-events: none; }
+  #sell-search {
+    width: 100%; padding: 11px 14px 11px 38px; border-radius: 999px; border: 1.5px solid var(--line);
+    background-color: var(--surface); color: var(--ink); -webkit-text-fill-color: var(--ink);
+    -webkit-appearance: none; appearance: none; font-size: 14.5px; outline: none;
+  }
+  #sell-search:focus { border-color: var(--gold); box-shadow: 0 0 0 3px var(--gold-soft); }
+
+  .catalog-wrap { flex-shrink: 0; max-height: 34dvh; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 0 20px; border-bottom: 1px solid var(--line); }
+  .cart-heading { padding: 10px 20px 4px; font-size: 12px; font-weight: 650; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.04em; flex-shrink: 0; }
+
+  .cart-bar {
+    flex-shrink: 0; background: var(--ink); color: #fff; display: flex; align-items: center;
+    justify-content: space-between; padding: 14px 20px calc(14px + env(safe-area-inset-bottom));
+  }
+  .cart-total-label { display: block; font-size: 13px; color: #B8B6AE; }
+  .cart-total-amount { display: inline-block; font-size: 24px; font-weight: 650; color: var(--gold-bright); font-variant-numeric: tabular-nums; }
+  .cart-total-amount.pulse { animation: pulseAnim .28s ease; }
+  @keyframes pulseAnim { 0% { transform: scale(1); } 50% { transform: scale(1.12); } 100% { transform: scale(1); } }
+  .clear-btn {
+    background: transparent; border: 1px solid rgba(255,255,255,0.32); color: #fff;
+    padding: 9px 18px; border-radius: 999px; font-size: 14px; font-weight: 550;
+  }
+  .clear-btn:active { background: rgba(255,255,255,0.12); }
+
+  /* Tab bar */
+  .tabbar {
+    flex-shrink: 0; display: flex; background: var(--surface); border-top: 1px solid var(--line);
+    padding: 4px 0 calc(4px + env(safe-area-inset-bottom));
+  }
+  .tab-btn {
+    flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
+    padding: 7px 0 6px; margin: 0 6px; background: none; border: none; border-radius: 14px;
+    color: var(--ink-soft); font-size: 11px; font-weight: 550; transition: background-color .15s ease, color .15s ease;
+  }
+  .tab-btn svg { width: 21px; height: 21px; }
+  .tab-btn.active { color: var(--gold); background: var(--gold-soft); }
+
+  /* Add/Edit item sheet */
+  #sheet-backdrop { position: fixed; inset: 0; background: rgba(28,27,24,0.4); z-index: 40; }
+  #add-sheet {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 50; background: var(--surface);
+    border-radius: 24px 24px 0 0; padding: 14px 20px calc(24px + env(safe-area-inset-bottom));
+    max-width: 480px; margin: 0 auto; max-height: 88dvh; overflow-y: auto;
+  }
+  .sheet-handle { width: 40px; height: 5px; border-radius: 999px; background: var(--line); margin: 0 auto 18px; }
+  #add-sheet h2 { margin: 0 0 18px; font-size: 17px; font-weight: 650; color: var(--ink); }
+
+  .photo-row { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; }
+  .photo-picker {
+    width: 60px; height: 60px; border-radius: 50%; border: 1.5px dashed var(--line);
+    background: var(--paper); display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden;
+  }
+  .photo-picker svg { width: 20px; height: 20px; color: var(--ink-soft); }
+  .photo-picker img { width: 100%; height: 100%; object-fit: cover; }
+  .photo-hint { font-size: 13px; color: var(--ink-soft); line-height: 1.4; }
+
+  .field-label { display: block; font-size: 13px; color: var(--ink-soft); margin-bottom: 6px; }
+  .field-input {
+    width: 100%; padding: 12px 14px; border-radius: 12px; border: 1px solid var(--line);
+    background-color: var(--paper); color: var(--ink); -webkit-text-fill-color: var(--ink);
+    -webkit-appearance: none; appearance: none;
+    font-size: 15px; margin-bottom: 14px; outline: none;
+  }
+  .field-row { display: flex; gap: 10px; }
+  .field-row .field-col { flex: 1; }
+  .sheet-actions { display: flex; gap: 10px; margin-top: 2px; }
+  .sheet-btn { flex: 1; padding: 13px 0; border-radius: 12px; border: none; font-size: 15px; font-weight: 600; }
+  .sheet-btn.cancel { background: var(--paper); color: var(--ink); }
+  .sheet-btn.save { background: var(--gold); color: #fff; }
+  .delete-link { display: block; width: 100%; text-align: center; background: none; border: none; color: var(--brick); font-size: 14px; font-weight: 550; margin-top: 14px; padding: 4px 0; }
+
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="top-accent"></div>
+
+  <!-- MANAGE SCREEN -->
+  <section id="screen-manage" class="screen">
+    <header>
+      <h1>Price list</h1>
+      <p id="manage-count">0 items</p>
+    </header>
+    <div class="add-btn-wrap">
+      <button class="add-btn" id="add-item-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Add item
+      </button>
+    </div>
+    <div class="scroll-area">
+      <ul class="rows" id="manage-list"></ul>
+      <div class="empty-state" id="manage-empty" hidden>
+        <div class="empty-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        </div>
+        <p class="title">No items yet</p>
+        <p class="body">Add your first item to start building your price list.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SELL SCREEN -->
+  <section id="screen-sell" class="screen">
+    <header>
+      <h1>New sale</h1>
+      <p>Tap an item below to add it to the cart</p>
+    </header>
+    <div class="search-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input id="sell-search" type="text" placeholder="Search items" autocomplete="off">
+    </div>
+    <div class="catalog-wrap">
+      <ul class="rows" id="catalog-list"></ul>
+    </div>
+    <div class="cart-heading">Cart</div>
+    <div class="scroll-area">
+      <ul class="rows" id="cart-list"></ul>
+      <div class="empty-state" id="cart-empty">
+        <div class="empty-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 2-1.58l1.65-7.42H5.12"/></svg>
+        </div>
+        <p class="title">Cart is empty</p>
+        <p class="body">Tap an item above to add it to this sale.</p>
+      </div>
+    </div>
+    <div class="cart-bar">
+      <div>
+        <span class="cart-total-label">Total</span>
+        <span class="cart-total-amount" id="cart-total">¢0.00</span>
+      </div>
+      <button class="clear-btn" id="clear-btn">Clear</button>
+    </div>
+  </section>
+
+  <!-- TAB BAR -->
+  <nav class="tabbar">
+    <button class="tab-btn" data-tab="manage">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"/><circle cx="7.5" cy="7.5" r="1.5" fill="currentColor" stroke="none"/></svg>
+      Manage
+    </button>
+    <button class="tab-btn" data-tab="sell">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 2-1.58l1.65-7.42H5.12"/></svg>
+      Sell
+    </button>
+  </nav>
+</div>
+
+<!-- ADD/EDIT ITEM SHEET -->
+<div id="sheet-backdrop" hidden></div>
+<div id="add-sheet" hidden>
+  <div class="sheet-handle"></div>
+  <h2 id="sheet-title">Add item</h2>
+  <div class="photo-row">
+    <label class="photo-picker" id="photo-picker">
+      <input type="file" accept="image/*" id="photo-input" hidden>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+    </label>
+    <p class="photo-hint">Add a photo<br>(optional)</p>
+  </div>
+  <label class="field-label">Item name</label>
+  <input class="field-input" id="item-name-input" type="text" placeholder="e.g. Kelewele">
+  <div class="field-row">
+    <div class="field-col">
+      <label class="field-label">Bulk price (¢)</label>
+      <input class="field-input" id="item-bulk-input" type="number" inputmode="decimal" placeholder="0.00">
+    </div>
+    <div class="field-col">
+      <label class="field-label">Single price (¢)</label>
+      <input class="field-input" id="item-single-input" type="number" inputmode="decimal" placeholder="0.00">
+    </div>
+  </div>
+  <div class="sheet-actions">
+    <button class="sheet-btn cancel" id="sheet-cancel-btn">Cancel</button>
+    <button class="sheet-btn save" id="sheet-save-btn">Save item</button>
+  </div>
+  <button class="delete-link" id="sheet-delete-btn" hidden>Delete item</button>
+</div>
+
+<script>
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", function () {
+      navigator.serviceWorker.register("./sw.js").catch(function () {});
+    });
+  }
+  var AVATAR_PALETTE = ["#C6921C", "#1E5C46", "#AD4433", "#2B6E6B", "#8C6A3F"];
+  var STORAGE_KEY = "priceListItems_v3";
+  var CART_STORAGE_KEY = "priceListCart_v1";
+
+  var defaultItems = [
+    {id:1,name:"Angel Cola",bulk:41.00,single:4.00},
+    {id:2,name:"Awake 1L (Large)",bulk:8.00,single:null},
+    {id:3,name:"Awake (Tiny Bottles)",bulk:25.00,single:null},
+    {id:4,name:"Awake (Small)",bulk:35.00,single:3.00},
+    {id:5,name:"Awake (Medium)",bulk:45.00,single:4.00},
+    {id:6,name:"Bel Active",bulk:50.00,single:null},
+    {id:7,name:"Bel Aqua (Small)",bulk:35.00,single:null},
+    {id:8,name:"Bel Aqua (Medium)",bulk:45.00,single:null},
+    {id:9,name:"Bel Aqua (1 Litre)",bulk:45.00,single:null},
+    {id:10,name:"Bel Cola",bulk:45.00,single:4.00},
+    {id:11,name:"Beta Malt",bulk:95.00,single:null},
+    {id:12,name:"Bigoo",bulk:50.00,single:4.00},
+    {id:13,name:"Breeze",bulk:47.00,single:null},
+    {id:14,name:"Can Coke",bulk:165.00,single:null},
+    {id:15,name:"Can Fanta",bulk:165.00,single:null},
+    {id:16,name:"Can Malt Ghana (Slim)",bulk:240.00,single:14.00},
+    {id:17,name:"Can Malt Nigeria",bulk:190.00,single:10.00},
+    {id:18,name:"Ceres (Medium)",bulk:16.00,single:null},
+    {id:19,name:"Ceres (Large)",bulk:35.00,single:null},
+    {id:20,name:"ChocoMalt",bulk:75.00,single:null},
+    {id:21,name:"Coke Bottle (Large)",bulk:25.00,single:null},
+    {id:22,name:"Coke Bottle (Medium, 450ml)",bulk:90.00,single:null},
+    {id:23,name:"Coke Bottle (Small)",bulk:65.00,single:null},
+    {id:24,name:"Communion Wine",bulk:40.00,single:null},
+    {id:25,name:"Dj Cocktail",bulk:40.00,single:null},
+    {id:26,name:"Don Simon (Large, 1L)",bulk:30.00,single:30.00},
+    {id:27,name:"Don Simon (Medium)",bulk:17.00,single:null},
+    {id:28,name:"Eden (Medium)",bulk:45.00,single:null},
+    {id:29,name:"Fanta Bottle",bulk:65.00,single:9.00},
+    {id:30,name:"Fruitful Grapes",bulk:15.00,single:null},
+    {id:31,name:"Jingo",bulk:40.00,single:null},
+    {id:32,name:"Kaesar",bulk:50.00,single:null},
+    {id:33,name:"Kalyppo",bulk:97.00,single:5.00},
+    {id:34,name:"Kangen (Small)",bulk:30.00,single:null},
+    {id:35,name:"Kangen (Big)",bulk:30.00,single:null},
+    {id:36,name:"Lucozade (6 pieces)",bulk:80.00,single:null},
+    {id:37,name:"Malt Guinness Bottle",bulk:120.00,single:null},
+    {id:38,name:"Multi Fruit (Big Red)",bulk:75.00,single:null},
+    {id:39,name:"Multi Fruit (Small)",bulk:null,single:null},
+    {id:40,name:"Multi Fruit Kiki (6)",bulk:20.00,single:null},
+    {id:41,name:"Niche",bulk:null,single:6.00},
+    {id:42,name:"Perla",bulk:35.00,single:null},
+    {id:43,name:"PET Malt",bulk:120.00,single:null},
+    {id:44,name:"Planet",bulk:42.00,single:4.00},
+    {id:45,name:"Puma",bulk:42.00,single:null},
+    {id:46,name:"Rendez Vous",bulk:35.00,single:null},
+    {id:47,name:"Royal Apple and Drinks",bulk:45.00,single:null},
+    {id:48,name:"Run",bulk:72.00,single:null},
+    {id:49,name:"Squeeze",bulk:50.00,single:4.00},
+    {id:50,name:"Storm (Big)",bulk:75.00,single:7.00},
+    {id:51,name:"Storm (Small)",bulk:52.00,single:5.00},
+    {id:52,name:"Tampico (Medium)",bulk:67.00,single:null},
+    {id:53,name:"U-Fresh Choco or Soy",bulk:67.00,single:null},
+    {id:54,name:"U-Fresh Grapes (Medium)",bulk:38.00,single:null},
+    {id:55,name:"Verna 36 (Small)",bulk:60.00,single:null},
+    {id:56,name:"Vitamilk (Singles-14)",bulk:80.00,single:14.00},
+    {id:57,name:"Vitamilk Kallypo Champion (25 per 6)",bulk:null,single:25.00},
+    {id:58,name:"Voltic (Medium)",bulk:35.00,single:null},
+    {id:59,name:"Voltic (Big)",bulk:35.00,single:null},
+    {id:60,name:"Wheat Drink (Medium)",bulk:160.00,single:null},
+    {id:61,name:"5 Star",bulk:47.00,single:5.00}
+  ];
+  defaultItems.forEach(function(i){ i.photo = null; });
+
+  var items = loadItems();
+  var cart = loadCart();
+  var pendingPhoto = null;
+  var editingId = null;
+  var sellSearchQuery = "";
+  var lastTotal = -1;
+
+  function loadItems() {
+    try {
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) return JSON.parse(raw);
+    } catch (e) {}
+    return defaultItems.slice();
+  }
+  function saveItems() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(items)); } catch (e) {}
+  }
+  function loadCart() {
+    try {
+      var raw = localStorage.getItem(CART_STORAGE_KEY);
+      if (raw) return JSON.parse(raw);
+    } catch (e) {}
+    return {};
+  }
+  function saveCart() {
+    try { localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart)); } catch (e) {}
+  }
+  function escapeHtml(str) {
+    return String(str).replace(/[&<>"']/g, function (m) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m];
+    });
+  }
+  function formatCedis(amount) {
+    var fixed = amount.toFixed(2);
+    var parts = fixed.split(".");
+    var withCommas = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    return withCommas + "." + parts[1];
+  }
+  function avatarColor(name) {
+    var sum = 0;
+    for (var i = 0; i < name.length; i++) sum += name.charCodeAt(i);
+    return AVATAR_PALETTE[sum % AVATAR_PALETTE.length];
+  }
+  function avatarHtml(name, photo, sizeClass) {
+    if (photo) return '<img class="avatar ' + sizeClass + '" src="' + photo + '" alt="">';
+    return '<div class="avatar ' + sizeClass + '" style="background:' + avatarColor(name) + '">' +
+      escapeHtml(name.trim().charAt(0).toUpperCase()) + '</div>';
+  }
+  // Which price to charge for one unit during a sale, and whether it's a bulk fallback.
+  function effectivePrice(item) {
+    if (item.single !== null && item.single !== undefined) return { value: item.single, isBulk: false };
+    if (item.bulk !== null && item.bulk !== undefined) return { value: item.bulk, isBulk: true };
+    return { value: null, isBulk: false };
+  }
+
+  function renderManageList() {
+    var ul = document.getElementById("manage-list");
+    var empty = document.getElementById("manage-empty");
+    document.getElementById("manage-count").textContent = items.length + (items.length === 1 ? " item" : " items");
+    if (items.length === 0) { ul.innerHTML = ""; empty.hidden = false; return; }
+    empty.hidden = true;
+    ul.innerHTML = items.map(function (item) {
+      var bulkVal = (item.bulk !== null && item.bulk !== undefined) ? "¢" + formatCedis(item.bulk) : "—";
+      var singleVal = (item.single !== null && item.single !== undefined) ? "¢" + formatCedis(item.single) : "—";
+      return '<li class="row" data-edit="' + item.id + '">' +
+        avatarHtml(item.name, item.photo, "") +
+        '<div class="row-name-wrap"><div class="row-name">' + escapeHtml(item.name) + '</div></div>' +
+        '<div class="price-pair">' +
+          '<div class="price-col"><span class="price-label">Bulk</span><span class="price-val' + (bulkVal === "—" ? " dash" : "") + '">' + bulkVal + '</span></div>' +
+          '<div class="price-col"><span class="price-label">Single</span><span class="price-val' + (singleVal === "—" ? " dash" : "") + '">' + singleVal + '</span></div>' +
+        '</div>' +
+        '<button class="icon-btn remove-btn" data-remove="' + item.id + '" aria-label="Remove ' + escapeHtml(item.name) + '">' +
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +
+        '</button></li>';
+    }).join("");
+  }
+
+  function renderCatalogList() {
+    var ul = document.getElementById("catalog-list");
+    var query = sellSearchQuery.trim().toLowerCase();
+    var filtered = items.filter(function (item) { return item.name.toLowerCase().indexOf(query) !== -1; });
+    if (filtered.length === 0) {
+      ul.innerHTML = '<li class="no-match">No items match "' + escapeHtml(sellSearchQuery) + '"</li>';
+      return;
+    }
+    ul.innerHTML = filtered.map(function (item) {
+      var eff = effectivePrice(item);
+      var priceHtml;
+      if (eff.value === null) {
+        priceHtml = '<span class="row-price set-price">Set price</span>';
+      } else {
+        priceHtml = '<span class="row-price">¢' + formatCedis(eff.value) + '</span>' + (eff.isBulk ? '<span class="price-tag-bulk">bulk</span>' : '');
+      }
+      return '<li class="row" data-add="' + item.id + '">' +
+        avatarHtml(item.name, item.photo, "") +
+        '<div class="row-name-wrap"><div class="row-name">' + escapeHtml(item.name) + '</div></div>' +
+        '<div>' + priceHtml + '</div>' +
+        '<span class="icon-btn add-indicator" aria-hidden="true">' +
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>' +
+        '</span></li>';
+    }).join("");
+  }
+
+  function renderCart() {
+    var list = document.getElementById("cart-list");
+    var empty = document.getElementById("cart-empty");
+    var ids = Object.keys(cart).filter(function (id) { return items.find(function (i) { return i.id === Number(id); }); });
+    if (ids.length === 0) { list.innerHTML = ""; empty.hidden = false; }
+    else {
+      empty.hidden = true;
+      list.innerHTML = ids.map(function (id) {
+        var item = items.find(function (i) { return i.id === Number(id); });
+        var qty = cart[id];
+        var eff = effectivePrice(item);
+        var unit = eff.value === null ? 0 : eff.value;
+        return '<li class="row">' +
+          avatarHtml(item.name, item.photo, "sm") +
+          '<div class="row-name-wrap"><div class="row-name">' + escapeHtml(item.name) + ' <span class="qty">× ' + qty + '</span></div></div>' +
+          '<div><span class="row-price">¢' + formatCedis(unit * qty) + '</span>' + (eff.isBulk ? '<span class="price-tag-bulk">bulk</span>' : '') + '</div>' +
+          '<button class="icon-btn minus-btn" data-minus="' + id + '" aria-label="Remove one ' + escapeHtml(item.name) + '">' +
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/></svg>' +
+          '</button></li>';
+      }).join("");
+    }
+    var total = ids.reduce(function (sum, id) {
+      var item = items.find(function (i) { return i.id === Number(id); });
+      var eff = effectivePrice(item);
+      var unit = eff.value === null ? 0 : eff.value;
+      return sum + unit * cart[id];
+    }, 0);
+    var totalEl = document.getElementById("cart-total");
+    totalEl.textContent = "¢" + formatCedis(total);
+    if (lastTotal !== -1 && total !== lastTotal) {
+      totalEl.classList.remove("pulse");
+      void totalEl.offsetWidth;
+      totalEl.classList.add("pulse");
+    }
+    lastTotal = total;
+  }
+
+  function removeItem(id) {
+    items = items.filter(function (i) { return i.id !== id; });
+    delete cart[String(id)];
+    saveItems();
+    saveCart();
+    renderManageList();
+    renderCatalogList();
+    renderCart();
+  }
+  function addToCart(id) {
+    var item = items.find(function (i) { return i.id === id; });
+    if (!item) return;
+    var eff = effectivePrice(item);
+    if (eff.value === null) { openEditSheet(id); return; }
+    var key = String(id);
+    cart[key] = (cart[key] || 0) + 1;
+    saveCart();
+    renderCart();
+  }
+  function decrementCart(id) {
+    var key = String(id);
+    if (!cart[key]) return;
+    cart[key]--;
+    if (cart[key] <= 0) delete cart[key];
+    saveCart();
+    renderCart();
+  }
+  function clearCart() { cart = {}; saveCart(); renderCart(); }
+
+  function switchTab(tab) {
+    document.getElementById("screen-manage").classList.toggle("active", tab === "manage");
+    document.getElementById("screen-sell").classList.toggle("active", tab === "sell");
+    document.querySelectorAll(".tab-btn").forEach(function (b) {
+      b.classList.toggle("active", b.dataset.tab === tab);
+    });
+  }
+
+  function openAddSheet() {
+    editingId = null;
+    document.getElementById("sheet-title").textContent = "Add item";
+    document.getElementById("sheet-delete-btn").hidden = true;
+    document.getElementById("sheet-backdrop").hidden = false;
+    document.getElementById("add-sheet").hidden = false;
+  }
+  function openEditSheet(id) {
+    var item = items.find(function (i) { return i.id === id; });
+    if (!item) return;
+    editingId = id;
+    document.getElementById("sheet-title").textContent = "Edit item";
+    document.getElementById("item-name-input").value = item.name;
+    document.getElementById("item-bulk-input").value = (item.bulk !== null && item.bulk !== undefined) ? item.bulk : "";
+    document.getElementById("item-single-input").value = (item.single !== null && item.single !== undefined) ? item.single : "";
+    pendingPhoto = item.photo;
+    if (item.photo) {
+      document.getElementById("photo-picker").innerHTML = '<img src="' + item.photo + '" alt="">' +
+        '<input type="file" accept="image/*" id="photo-input" hidden>';
+      bindPhotoInput();
+    }
+    document.getElementById("sheet-delete-btn").hidden = false;
+    document.getElementById("sheet-backdrop").hidden = false;
+    document.getElementById("add-sheet").hidden = false;
+  }
+  function closeSheet() {
+    document.getElementById("sheet-backdrop").hidden = true;
+    document.getElementById("add-sheet").hidden = true;
+    document.getElementById("item-name-input").value = "";
+    document.getElementById("item-bulk-input").value = "";
+    document.getElementById("item-single-input").value = "";
+    document.getElementById("photo-picker").innerHTML =
+      '<input type="file" accept="image/*" id="photo-input" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>';
+    pendingPhoto = null;
+    editingId = null;
+    bindPhotoInput();
+  }
+  function parsePriceField(id) {
+    var raw = document.getElementById(id).value;
+    if (raw === "" || raw === null) return null;
+    var num = parseFloat(raw);
+    return isNaN(num) || num < 0 ? null : num;
+  }
+  function handleSheetSave() {
+    var name = document.getElementById("item-name-input").value.trim();
+    if (!name) return;
+    var bulk = parsePriceField("item-bulk-input");
+    var single = parsePriceField("item-single-input");
+    if (editingId !== null) {
+      var idx = items.findIndex(function (i) { return i.id === editingId; });
+      if (idx !== -1) items[idx] = { id: editingId, name: name, bulk: bulk, single: single, photo: pendingPhoto };
+    } else {
+      items.push({ id: Date.now(), name: name, bulk: bulk, single: single, photo: pendingPhoto });
+    }
+    saveItems();
+    renderManageList();
+    renderCatalogList();
+    renderCart();
+    closeSheet();
+  }
+  function handleSheetDelete() {
+    if (editingId === null) return;
+    removeItem(editingId);
+    closeSheet();
+  }
+  function bindPhotoInput() {
+    var input = document.getElementById("photo-input");
+    input.addEventListener("change", function (e) {
+      var file = e.target.files && e.target.files[0];
+      if (!file) return;
+      var reader = new FileReader();
+      reader.onload = function () {
+        pendingPhoto = reader.result;
+        document.getElementById("photo-picker").innerHTML = '<img src="' + pendingPhoto + '" alt="">';
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  document.addEventListener("click", function (e) {
+    var removeBtn = e.target.closest("[data-remove]");
+    if (removeBtn) return removeItem(Number(removeBtn.dataset.remove));
+
+    var minusBtn = e.target.closest("[data-minus]");
+    if (minusBtn) return decrementCart(Number(minusBtn.dataset.minus));
+
+    var addRow = e.target.closest("[data-add]");
+    if (addRow) return addToCart(Number(addRow.dataset.add));
+
+    var editRow = e.target.closest("[data-edit]");
+    if (editRow) return openEditSheet(Number(editRow.dataset.edit));
+
+    var tabBtn = e.target.closest(".tab-btn");
+    if (tabBtn) return switchTab(tabBtn.dataset.tab);
+
+    if (e.target.closest("#add-item-btn")) return openAddSheet();
+    if (e.target.closest("#sheet-cancel-btn")) return closeSheet();
+    if (e.target.closest("#sheet-save-btn")) return handleSheetSave();
+    if (e.target.closest("#sheet-delete-btn")) return handleSheetDelete();
+    if (e.target.closest("#clear-btn")) return clearCart();
+    if (e.target === document.getElementById("sheet-backdrop")) return closeSheet();
+  });
+
+  document.getElementById("sell-search").addEventListener("input", function (e) {
+    sellSearchQuery = e.target.value;
+    renderCatalogList();
+  });
+
+  bindPhotoInput();
+  renderManageList();
+  renderCatalogList();
+  renderCart();
+  switchTab("sell");
+</script>
+</body>
+</html>
