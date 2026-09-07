@@ -181,6 +181,144 @@
   .sheet-btn.save { background: var(--gold); color: #fff; }
   .delete-link { display: block; width: 100%; text-align: center; background: none; border: none; color: var(--brick); font-size: 14px; font-weight: 550; margin-top: 14px; padding: 4px 0; }
 
+
+  /* Lively Sell catalog */
+  .search-wrap { padding-top: 2px; }
+  #sell-search {
+    box-shadow: 0 4px 14px rgba(28,27,24,0.05);
+    transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease;
+  }
+  #sell-search:focus { transform: translateY(-1px); }
+  .catalog-wrap {
+    max-height: 40dvh;
+    padding: 0 14px 10px;
+    border-bottom: 1px solid var(--line);
+  }
+  .sale-columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .sale-column {
+    min-width: 0;
+    background: rgba(255,255,255,.62);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 5px 16px rgba(28,27,24,.035);
+  }
+  .sale-column-heading {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 10px 8px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--line);
+  }
+  .sale-column-heading strong {
+    display: block;
+    font-size: 13px;
+    line-height: 1.1;
+  }
+  .sale-column-heading small {
+    display: block;
+    margin-top: 2px;
+    color: var(--ink-soft);
+    font-size: 9px;
+  }
+  .sale-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .bulk-dot { background: var(--green); box-shadow: 0 0 0 4px rgba(30,92,70,.10); }
+  .single-dot { background: var(--gold-bright); box-shadow: 0 0 0 4px rgba(198,146,28,.12); }
+
+  .sale-column ul.rows { padding: 3px 8px 7px; }
+  .sale-column .row {
+    gap: 7px;
+    padding: 8px 3px;
+    margin: 0;
+    border-bottom: 1px solid rgba(230,226,216,.65);
+    min-height: 56px;
+    cursor: pointer;
+  }
+  .sale-column .row:last-child { border-bottom: none; }
+  .sale-column .row:hover { background: var(--gold-soft); transform: translateY(-1px); }
+  .sale-column .row:active { transform: scale(.975); }
+  .sale-column .avatar { width: 34px; height: 34px; font-size: 12px; }
+  .sale-column .row-name { font-size: 12px; }
+  .sale-column .row-price { font-size: 12px; }
+  .sale-column .price-tag-bulk {
+    font-size: 8px;
+    color: var(--green);
+  }
+  .single-price-tag { color: var(--gold) !important; }
+  .sale-column .add-indicator {
+    width: 25px;
+    height: 25px;
+    background: var(--paper);
+    transition: transform .18s ease, background .18s ease;
+  }
+  .sale-column .row:hover .add-indicator {
+    transform: rotate(90deg);
+    background: var(--gold-soft);
+  }
+  .sale-column .unavailable {
+    opacity: .42;
+    cursor: not-allowed;
+  }
+  .sale-column .unavailable .add-indicator { color: var(--ink-soft); }
+  .sale-column .no-match {
+    padding: 18px 5px;
+    font-size: 11px;
+  }
+  .cart-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .cart-heading::after {
+    content: "Saved automatically";
+    text-transform: none;
+    letter-spacing: 0;
+    font-size: 9px;
+    color: var(--green);
+    background: rgba(30,92,70,.08);
+    padding: 4px 7px;
+    border-radius: 999px;
+  }
+  .cart-row {
+    animation: cartIn .2s ease both;
+  }
+  @keyframes cartIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .sale-mode {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 2px;
+    font-size: 9px;
+    color: var(--ink-soft);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+  }
+  .sale-mode.bulk-mode { color: var(--green); }
+  .sale-mode.single-mode { color: var(--gold); }
+
+  @media (max-width: 390px) {
+    .sale-columns { gap: 7px; }
+    .sale-column .avatar { width: 30px; height: 30px; font-size: 11px; }
+    .sale-column .row { gap: 5px; min-height: 52px; }
+    .sale-column .row-name { font-size: 11px; }
+    .sale-column .row-price { font-size: 11px; }
+    .sale-column .add-indicator { width: 22px; height: 22px; }
+  }
+  @media (min-width: 700px) {
+    .catalog-wrap { max-height: 46dvh; }
+    .sale-column .row-name { font-size: 13px; }
+    .sale-column .row-price { font-size: 13px; }
+  }
+
   [hidden] { display: none !important; }
 </style>
 </head>
@@ -223,7 +361,22 @@
       <input id="sell-search" type="text" placeholder="Search items" autocomplete="off">
     </div>
     <div class="catalog-wrap">
-      <ul class="rows" id="catalog-list"></ul>
+      <div class="sale-columns">
+        <div class="sale-column bulk-column">
+          <div class="sale-column-heading">
+            <span class="sale-dot bulk-dot"></span>
+            <div><strong>Bulk</strong><small>Wholesale price</small></div>
+          </div>
+          <ul class="rows" id="bulk-catalog-list"></ul>
+        </div>
+        <div class="sale-column singles-column">
+          <div class="sale-column-heading">
+            <span class="sale-dot single-dot"></span>
+            <div><strong>Singles</strong><small>Per item price</small></div>
+          </div>
+          <ul class="rows" id="single-catalog-list"></ul>
+        </div>
+      </div>
     </div>
     <div class="cart-heading">Cart</div>
     <div class="scroll-area">
@@ -384,7 +537,10 @@
   function loadCart() {
     try {
       var raw = localStorage.getItem(CART_STORAGE_KEY);
-      if (raw) return JSON.parse(raw);
+      if (raw) {
+        var parsed = JSON.parse(raw);
+        if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) return parsed;
+      }
     } catch (e) {}
     return {};
   }
@@ -397,7 +553,7 @@
     });
   }
   function formatCedis(amount) {
-    var fixed = amount.toFixed(2);
+    var fixed = Number(amount).toFixed(2);
     var parts = fixed.split(".");
     var withCommas = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     return withCommas + "." + parts[1];
@@ -412,11 +568,32 @@
     return '<div class="avatar ' + sizeClass + '" style="background:' + avatarColor(name) + '">' +
       escapeHtml(name.trim().charAt(0).toUpperCase()) + '</div>';
   }
-  // Which price to charge for one unit during a sale, and whether it's a bulk fallback.
-  function effectivePrice(item) {
-    if (item.single !== null && item.single !== undefined) return { value: item.single, isBulk: false };
-    if (item.bulk !== null && item.bulk !== undefined) return { value: item.bulk, isBulk: true };
-    return { value: null, isBulk: false };
+
+  // Bulk is the default sale mode. Singles are explicitly selected from the right column.
+  function priceForMode(item, mode) {
+    var value = mode === "single" ? item.single : item.bulk;
+    return (value !== null && value !== undefined && !isNaN(Number(value))) ? Number(value) : null;
+  }
+  function cartKey(id, mode) {
+    return String(id) + "|" + mode;
+  }
+  function parseCartKey(key) {
+    var parts = String(key).split("|");
+    return { id: Number(parts[0]), mode: parts[1] === "single" ? "single" : "bulk" };
+  }
+  function migrateLegacyCart() {
+    // Older versions stored only the item ID. Treat those entries as bulk, preserving the old default.
+    var changed = false;
+    Object.keys(cart).forEach(function(key) {
+      if (key.indexOf("|") === -1) {
+        var qty = Number(cart[key]);
+        var newKey = cartKey(Number(key), "bulk");
+        if (!isNaN(qty) && qty > 0 && !cart[newKey]) cart[newKey] = qty;
+        delete cart[key];
+        changed = true;
+      }
+    });
+    if (changed) saveCart();
   }
 
   function renderManageList() {
@@ -426,8 +603,8 @@
     if (items.length === 0) { ul.innerHTML = ""; empty.hidden = false; return; }
     empty.hidden = true;
     ul.innerHTML = items.map(function (item) {
-      var bulkVal = (item.bulk !== null && item.bulk !== undefined) ? "¢" + formatCedis(item.bulk) : "—";
-      var singleVal = (item.single !== null && item.single !== undefined) ? "¢" + formatCedis(item.single) : "—";
+      var bulkVal = priceForMode(item, "bulk") !== null ? "¢" + formatCedis(priceForMode(item, "bulk")) : "—";
+      var singleVal = priceForMode(item, "single") !== null ? "¢" + formatCedis(priceForMode(item, "single")) : "—";
       return '<li class="row" data-edit="' + item.id + '">' +
         avatarHtml(item.name, item.photo, "") +
         '<div class="row-name-wrap"><div class="row-name">' + escapeHtml(item.name) + '</div></div>' +
@@ -441,58 +618,70 @@
     }).join("");
   }
 
+  function catalogRow(item, mode) {
+    var value = priceForMode(item, mode);
+    var unavailable = value === null;
+    var priceHtml = unavailable
+      ? '<span class="row-price set-price">Unavailable</span>'
+      : '<span class="row-price">¢' + formatCedis(value) + '</span>';
+    var tag = mode === "bulk"
+      ? '<span class="price-tag-bulk">bulk</span>'
+      : '<span class="price-tag-bulk single-price-tag">single</span>';
+    return '<li class="row ' + (unavailable ? 'unavailable' : '') + '" data-add="' + item.id + '" data-mode="' + mode + '" aria-disabled="' + unavailable + '">' +
+      avatarHtml(item.name, item.photo, "") +
+      '<div class="row-name-wrap"><div class="row-name">' + escapeHtml(item.name) + '</div></div>' +
+      '<div>' + priceHtml + (!unavailable ? tag : '') + '</div>' +
+      '<span class="icon-btn add-indicator" aria-hidden="true">' +
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>' +
+      '</span></li>';
+  }
+
   function renderCatalogList() {
-    var ul = document.getElementById("catalog-list");
     var query = sellSearchQuery.trim().toLowerCase();
     var filtered = items.filter(function (item) { return item.name.toLowerCase().indexOf(query) !== -1; });
+    var bulkUl = document.getElementById("bulk-catalog-list");
+    var singleUl = document.getElementById("single-catalog-list");
     if (filtered.length === 0) {
-      ul.innerHTML = '<li class="no-match">No items match "' + escapeHtml(sellSearchQuery) + '"</li>';
+      var msg = '<li class="no-match">No items found</li>';
+      bulkUl.innerHTML = msg;
+      singleUl.innerHTML = msg;
       return;
     }
-    ul.innerHTML = filtered.map(function (item) {
-      var eff = effectivePrice(item);
-      var priceHtml;
-      if (eff.value === null) {
-        priceHtml = '<span class="row-price set-price">Set price</span>';
-      } else {
-        priceHtml = '<span class="row-price">¢' + formatCedis(eff.value) + '</span>' + (eff.isBulk ? '<span class="price-tag-bulk">bulk</span>' : '');
-      }
-      return '<li class="row" data-add="' + item.id + '">' +
-        avatarHtml(item.name, item.photo, "") +
-        '<div class="row-name-wrap"><div class="row-name">' + escapeHtml(item.name) + '</div></div>' +
-        '<div>' + priceHtml + '</div>' +
-        '<span class="icon-btn add-indicator" aria-hidden="true">' +
-        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>' +
-        '</span></li>';
-    }).join("");
+    bulkUl.innerHTML = filtered.map(function(item) { return catalogRow(item, "bulk"); }).join("");
+    singleUl.innerHTML = filtered.map(function(item) { return catalogRow(item, "single"); }).join("");
   }
 
   function renderCart() {
     var list = document.getElementById("cart-list");
     var empty = document.getElementById("cart-empty");
-    var ids = Object.keys(cart).filter(function (id) { return items.find(function (i) { return i.id === Number(id); }); });
-    if (ids.length === 0) { list.innerHTML = ""; empty.hidden = false; }
+    var entries = Object.keys(cart).map(function(key) {
+      var parsed = parseCartKey(key);
+      var item = items.find(function(i) { return i.id === parsed.id; });
+      var qty = Number(cart[key]);
+      return item && qty > 0 ? { key:key, item:item, mode:parsed.mode, qty:qty } : null;
+    }).filter(Boolean);
+
+    if (entries.length === 0) { list.innerHTML = ""; empty.hidden = false; }
     else {
       empty.hidden = true;
-      list.innerHTML = ids.map(function (id) {
-        var item = items.find(function (i) { return i.id === Number(id); });
-        var qty = cart[id];
-        var eff = effectivePrice(item);
-        var unit = eff.value === null ? 0 : eff.value;
-        return '<li class="row">' +
-          avatarHtml(item.name, item.photo, "sm") +
-          '<div class="row-name-wrap"><div class="row-name">' + escapeHtml(item.name) + ' <span class="qty">× ' + qty + '</span></div></div>' +
-          '<div><span class="row-price">¢' + formatCedis(unit * qty) + '</span>' + (eff.isBulk ? '<span class="price-tag-bulk">bulk</span>' : '') + '</div>' +
-          '<button class="icon-btn minus-btn" data-minus="' + id + '" aria-label="Remove one ' + escapeHtml(item.name) + '">' +
+      list.innerHTML = entries.map(function (entry) {
+        var unit = priceForMode(entry.item, entry.mode);
+        var subtotal = unit === null ? 0 : unit * entry.qty;
+        return '<li class="row cart-row">' +
+          avatarHtml(entry.item.name, entry.item.photo, "sm") +
+          '<div class="row-name-wrap"><div class="row-name">' + escapeHtml(entry.item.name) +
+            ' <span class="qty">× ' + entry.qty + '</span></div>' +
+            '<span class="sale-mode ' + (entry.mode === "bulk" ? "bulk-mode" : "single-mode") + '">' + entry.mode + '</span></div>' +
+          '<div><span class="row-price">¢' + formatCedis(subtotal) + '</span></div>' +
+          '<button class="icon-btn minus-btn" data-minus="' + escapeHtml(entry.key) + '" aria-label="Remove one ' + escapeHtml(entry.item.name) + '">' +
           '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/></svg>' +
           '</button></li>';
       }).join("");
     }
-    var total = ids.reduce(function (sum, id) {
-      var item = items.find(function (i) { return i.id === Number(id); });
-      var eff = effectivePrice(item);
-      var unit = eff.value === null ? 0 : eff.value;
-      return sum + unit * cart[id];
+
+    var total = entries.reduce(function (sum, entry) {
+      var unit = priceForMode(entry.item, entry.mode);
+      return sum + (unit === null ? 0 : unit * entry.qty);
     }, 0);
     var totalEl = document.getElementById("cart-total");
     totalEl.textContent = "¢" + formatCedis(total);
@@ -513,20 +702,19 @@
     renderCatalogList();
     renderCart();
   }
-  function addToCart(id) {
+  function addToCart(id, mode) {
     var item = items.find(function (i) { return i.id === id; });
     if (!item) return;
-    var eff = effectivePrice(item);
-    if (eff.value === null) { openEditSheet(id); return; }
-    var key = String(id);
-    cart[key] = (cart[key] || 0) + 1;
+    var unit = priceForMode(item, mode);
+    if (unit === null) return;
+    var key = cartKey(id, mode);
+    cart[key] = (Number(cart[key]) || 0) + 1;
     saveCart();
     renderCart();
   }
-  function decrementCart(id) {
-    var key = String(id);
+  function decrementCart(key) {
     if (!cart[key]) return;
-    cart[key]--;
+    cart[key] = Number(cart[key]) - 1;
     if (cart[key] <= 0) delete cart[key];
     saveCart();
     renderCart();
@@ -625,10 +813,13 @@
     if (removeBtn) return removeItem(Number(removeBtn.dataset.remove));
 
     var minusBtn = e.target.closest("[data-minus]");
-    if (minusBtn) return decrementCart(Number(minusBtn.dataset.minus));
+    if (minusBtn) return decrementCart(minusBtn.dataset.minus);
 
     var addRow = e.target.closest("[data-add]");
-    if (addRow) return addToCart(Number(addRow.dataset.add));
+    if (addRow) {
+      if (addRow.dataset.mode && addRow.getAttribute("aria-disabled") === "true") return;
+      return addToCart(Number(addRow.dataset.add), addRow.dataset.mode || "bulk");
+    }
 
     var editRow = e.target.closest("[data-edit]");
     if (editRow) return openEditSheet(Number(editRow.dataset.edit));
@@ -649,6 +840,7 @@
     renderCatalogList();
   });
 
+  migrateLegacyCart();
   bindPhotoInput();
   renderManageList();
   renderCatalogList();
