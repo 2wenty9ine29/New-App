@@ -729,6 +729,7 @@
 
   var items = loadItems();
   var cart = loadCart();
+  var cartOrder = loadJson('price-list-cart-order-v1', []);
   var clearedCarts = loadJson('price-list-cleared-carts-v1', []);
   var receipts = loadJson('price-list-receipts-v1', []);
   var receiptCounter = Number(localStorage.getItem('price-list-receipt-counter-v1') || 0);
