@@ -72,7 +72,9 @@
   .avatar.sm { width: 34px; height: 34px; font-size: 13px; }
 
   .row-name-wrap { flex: 1; min-width: 0; }
-  .row-name { font-size: 14.5px; font-weight: 550; color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .row-name { font-size: 14.5px; font-weight: 550; color: var(--ink); line-height: 1.2; overflow-wrap: anywhere; word-break: normal; }
+  .row-name-main { display: block; }
+  .row-name-size { display: block; margin-top: 2px; font-size: 11px; line-height: 1.15; color: var(--ink-soft); font-weight: 500; }
   .row-name .qty { color: var(--ink-soft); font-weight: 500; font-size: 12.5px; }
   .row-flag { font-size: 11px; color: var(--gold); margin-top: 1px; }
 
@@ -232,6 +234,7 @@
 
   .sale-column ul.rows { padding: 3px 8px 7px; }
   .sale-column .row {
+    align-items: flex-start;
     gap: 7px;
     padding: 8px 3px;
     margin: 0;
@@ -242,8 +245,9 @@
   .sale-column .row:last-child { border-bottom: none; }
   .sale-column .row:hover { background: var(--gold-soft); transform: translateY(-1px); }
   .sale-column .row:active { transform: scale(.975); }
-  .sale-column .avatar { width: 34px; height: 34px; font-size: 12px; }
-  .sale-column .row-name { font-size: 12px; }
+  .sale-column .avatar { width: 34px; height: 34px; font-size: 12px; margin-top: 1px; }
+  .sale-column .row-name { font-size: 12.5px; }
+  .sale-column .row-name-size { font-size: 10px; }
   .sale-column .row-price { font-size: 12px; }
   .sale-column .price-tag-bulk {
     font-size: 8px;
@@ -252,6 +256,7 @@
   .single-price-tag { color: var(--gold) !important; }
   .sale-column .add-indicator {
     width: 25px;
+    margin-top: 3px;
     height: 25px;
     background: var(--paper);
     transition: transform .18s ease, background .18s ease;
@@ -269,6 +274,24 @@
     padding: 18px 5px;
     font-size: 11px;
   }
+
+  /* Fractional bulk selector */
+  #fraction-backdrop { position: fixed; inset: 0; background: rgba(28,27,24,.42); z-index: 60; }
+  #fraction-sheet {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 70; background: var(--surface);
+    border-radius: 24px 24px 0 0; padding: 14px 20px calc(24px + env(safe-area-inset-bottom));
+    max-width: 480px; margin: 0 auto; box-shadow: 0 -12px 30px rgba(28,27,24,.12);
+  }
+  .fraction-handle { width: 40px; height: 5px; border-radius: 999px; background: var(--line); margin: 0 auto 16px; }
+  #fraction-sheet h2 { margin: 0; font-size: 17px; font-weight: 650; line-height: 1.25; }
+  #fraction-sheet p { margin: 4px 0 16px; font-size: 13px; color: var(--ink-soft); }
+  .fraction-options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .fraction-btn { border: 1px solid var(--line); background: var(--paper); color: var(--ink); border-radius: 14px; padding: 13px 7px; font-size: 14px; font-weight: 650; transition: transform .12s ease, background-color .15s ease, border-color .15s ease; }
+  .fraction-btn:active { transform: scale(.97); background: var(--gold-soft); border-color: var(--gold); }
+  .fraction-price { display: block; margin-top: 3px; font-size: 11px; font-weight: 500; color: var(--ink-soft); }
+  .fraction-cancel { width: 100%; margin-top: 10px; border: 0; background: transparent; color: var(--ink-soft); padding: 10px; font-size: 14px; font-weight: 550; }
+  .fraction-badge { display: inline-flex; align-items: center; padding: 3px 7px; border-radius: 999px; margin-top: 3px; background: rgba(30,92,70,.08); color: var(--green); font-size: 8px; font-weight: 700; letter-spacing: .03em; }
+  .sale-mode.fraction-mode { color: var(--green); }
   .cart-heading {
     display: flex;
     align-items: center;
@@ -309,7 +332,8 @@
     .sale-columns { gap: 7px; }
     .sale-column .avatar { width: 30px; height: 30px; font-size: 11px; }
     .sale-column .row { gap: 5px; min-height: 52px; }
-    .sale-column .row-name { font-size: 11px; }
+    .sale-column .row-name { font-size: 11.5px; }
+    .sale-column .row-name-size { font-size: 9.5px; }
     .sale-column .row-price { font-size: 11px; }
     .sale-column .add-indicator { width: 22px; height: 22px; }
   }
@@ -409,6 +433,20 @@
       Sell
     </button>
   </nav>
+</div>
+
+<!-- FRACTIONAL BULK SHEET -->
+<div id="fraction-backdrop" hidden></div>
+<div id="fraction-sheet" hidden>
+  <div class="fraction-handle"></div>
+  <h2 id="fraction-title">Choose bulk size</h2>
+  <p id="fraction-subtitle">Select how much of the full bulk you want to sell.</p>
+  <div class="fraction-options">
+    <button class="fraction-btn" data-fraction="1">Full BULK<span class="fraction-price" id="fraction-price-1"></span></button>
+    <button class="fraction-btn" data-fraction="0.5">½ BULK<span class="fraction-price" id="fraction-price-05"></span></button>
+    <button class="fraction-btn" data-fraction="0.25">¼ BULK<span class="fraction-price" id="fraction-price-025"></span></button>
+  </div>
+  <button class="fraction-cancel" id="fraction-cancel-btn">Cancel</button>
 </div>
 
 <!-- ADD/EDIT ITEM SHEET -->
@@ -569,33 +607,72 @@
       escapeHtml(name.trim().charAt(0).toUpperCase()) + '</div>';
   }
 
-  // Bulk is the default sale mode. Singles are explicitly selected from the right column.
-  function priceForMode(item, mode) {
+  // Bulk is the default sale mode. Fractional bulk is available only for selected products.
+  function isFractionalBulkProduct(item) {
+    var name = String(item.name || '').trim().toLowerCase();
+    return name === 'kalyppo' || name === 'u-fresh soy' || name === 'u-fresh choco or soy' || name === 'canned drinks' || name.indexOf('can ') === 0;
+  }
+  function priceForMode(item, mode, fraction) {
     var value = mode === "single" ? item.single : item.bulk;
+    if (mode === "bulk" && fraction !== undefined) value = value == null ? null : Number(value) * Number(fraction);
     return (value !== null && value !== undefined && !isNaN(Number(value))) ? Number(value) : null;
   }
-  function cartKey(id, mode) {
-    return String(id) + "|" + mode;
+  function cartKey(id, mode, fraction) {
+    return String(id) + '|' + mode + '|' + (mode === 'bulk' ? Number(fraction || 1) : 1);
   }
   function parseCartKey(key) {
-    var parts = String(key).split("|");
-    return { id: Number(parts[0]), mode: parts[1] === "single" ? "single" : "bulk" };
+    var parts = String(key).split('|');
+    var mode = parts[1] === 'single' ? 'single' : 'bulk';
+    var fraction = mode === 'bulk' ? Number(parts[2] === undefined ? 1 : parts[2]) : 1;
+    if (![1, 0.5, 0.25].includes(fraction)) fraction = 1;
+    return { id: Number(parts[0]), mode: mode, fraction: fraction };
   }
   function migrateLegacyCart() {
-    // Older versions stored only the item ID. Treat those entries as bulk, preserving the old default.
     var changed = false;
+    var normalized = {};
     Object.keys(cart).forEach(function(key) {
-      if (key.indexOf("|") === -1) {
-        var qty = Number(cart[key]);
-        var newKey = cartKey(Number(key), "bulk");
-        if (!isNaN(qty) && qty > 0 && !cart[newKey]) cart[newKey] = qty;
-        delete cart[key];
-        changed = true;
-      }
+      var parsed = parseCartKey(key);
+      var qty = Number(cart[key]);
+      if (isNaN(parsed.id) || isNaN(qty) || qty <= 0) { changed = true; return; }
+      var newKey = cartKey(parsed.id, parsed.mode, parsed.fraction);
+      normalized[newKey] = (Number(normalized[newKey]) || 0) + qty;
+      if (newKey !== key) changed = true;
     });
+    cart = normalized;
     if (changed) saveCart();
   }
-
+  function productNameHtml(name) {
+    var raw = String(name || '');
+    var match = raw.match(/^(.*?)\s*\(([^)]+)\)\s*$/);
+    if (match) return '<span class="row-name-main">' + escapeHtml(match[1]) + '</span><span class="row-name-size">' + escapeHtml(match[2]) + '</span>';
+    return '<span class="row-name-main">' + escapeHtml(raw) + '</span>';
+  }
+  var fractionItemId = null;
+  function openFractionSheet(id) {
+    var item = items.find(function(i) { return i.id === id; });
+    if (!item || !isFractionalBulkProduct(item) || priceForMode(item, 'bulk') === null) return;
+    fractionItemId = id;
+    document.getElementById('fraction-title').textContent = item.name;
+    document.getElementById('fraction-price-1').textContent = '¢' + formatCedis(priceForMode(item, 'bulk', 1));
+    document.getElementById('fraction-price-05').textContent = '¢' + formatCedis(priceForMode(item, 'bulk', 0.5));
+    document.getElementById('fraction-price-025').textContent = '¢' + formatCedis(priceForMode(item, 'bulk', 0.25));
+    document.getElementById('fraction-backdrop').hidden = false;
+    document.getElementById('fraction-sheet').hidden = false;
+  }
+  function closeFractionSheet() {
+    document.getElementById('fraction-backdrop').hidden = true;
+    document.getElementById('fraction-sheet').hidden = true;
+    fractionItemId = null;
+  }
+  function addBulkFractionToCart(id, fraction) {
+    var item = items.find(function(i) { return i.id === id; });
+    if (!item || !isFractionalBulkProduct(item)) return;
+    var unit = priceForMode(item, 'bulk', fraction);
+    if (unit === null) return;
+    var key = cartKey(id, 'bulk', fraction);
+    cart[key] = (Number(cart[key]) || 0) + 1;
+    saveCart(); renderCart(); closeFractionSheet();
+  }
   function renderManageList() {
     var ul = document.getElementById("manage-list");
     var empty = document.getElementById("manage-empty");
@@ -607,7 +684,7 @@
       var singleVal = priceForMode(item, "single") !== null ? "¢" + formatCedis(priceForMode(item, "single")) : "—";
       return '<li class="row" data-edit="' + item.id + '">' +
         avatarHtml(item.name, item.photo, "") +
-        '<div class="row-name-wrap"><div class="row-name">' + escapeHtml(item.name) + '</div></div>' +
+        '<div class="row-name-wrap"><div class="row-name">' + productNameHtml(item.name) + '</div></div>' +
         '<div class="price-pair">' +
           '<div class="price-col"><span class="price-label">Bulk</span><span class="price-val' + (bulkVal === "—" ? " dash" : "") + '">' + bulkVal + '</span></div>' +
           '<div class="price-col"><span class="price-label">Single</span><span class="price-val' + (singleVal === "—" ? " dash" : "") + '">' + singleVal + '</span></div>' +
@@ -629,7 +706,7 @@
       : '<span class="price-tag-bulk single-price-tag">single</span>';
     return '<li class="row ' + (unavailable ? 'unavailable' : '') + '" data-add="' + item.id + '" data-mode="' + mode + '" aria-disabled="' + unavailable + '">' +
       avatarHtml(item.name, item.photo, "") +
-      '<div class="row-name-wrap"><div class="row-name">' + escapeHtml(item.name) + '</div></div>' +
+      '<div class="row-name-wrap"><div class="row-name">' + productNameHtml(item.name) + '</div></div>' +
       '<div>' + priceHtml + (!unavailable ? tag : '') + '</div>' +
       '<span class="icon-btn add-indicator" aria-hidden="true">' +
       '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>' +
@@ -658,20 +735,21 @@
       var parsed = parseCartKey(key);
       var item = items.find(function(i) { return i.id === parsed.id; });
       var qty = Number(cart[key]);
-      return item && qty > 0 ? { key:key, item:item, mode:parsed.mode, qty:qty } : null;
+      return item && qty > 0 ? { key:key, item:item, mode:parsed.mode, fraction:parsed.fraction, qty:qty } : null;
     }).filter(Boolean);
 
     if (entries.length === 0) { list.innerHTML = ""; empty.hidden = false; }
     else {
       empty.hidden = true;
       list.innerHTML = entries.map(function (entry) {
-        var unit = priceForMode(entry.item, entry.mode);
+        var unit = priceForMode(entry.item, entry.mode, entry.fraction);
         var subtotal = unit === null ? 0 : unit * entry.qty;
         return '<li class="row cart-row">' +
           avatarHtml(entry.item.name, entry.item.photo, "sm") +
-          '<div class="row-name-wrap"><div class="row-name">' + escapeHtml(entry.item.name) +
-            ' <span class="qty">× ' + entry.qty + '</span></div>' +
-            '<span class="sale-mode ' + (entry.mode === "bulk" ? "bulk-mode" : "single-mode") + '">' + entry.mode + '</span></div>' +
+          '<div class="row-name-wrap"><div class="row-name">' + productNameHtml(entry.item.name) + '</div>' +
+            '<span class="sale-mode ' + (entry.mode === "bulk" ? "bulk-mode" : "single-mode") + (entry.mode === "bulk" && entry.fraction !== 1 ? " fraction-mode" : "") + '">' +
+              (entry.mode === "bulk" ? (entry.fraction === 0.5 ? "½ BULK" : entry.fraction === 0.25 ? "¼ BULK" : "Full BULK") : "SINGLE") +
+              ' × ' + entry.qty + '</span></div>' +
           '<div><span class="row-price">¢' + formatCedis(subtotal) + '</span></div>' +
           '<button class="icon-btn minus-btn" data-minus="' + escapeHtml(entry.key) + '" aria-label="Remove one ' + escapeHtml(entry.item.name) + '">' +
           '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/></svg>' +
@@ -680,7 +758,7 @@
     }
 
     var total = entries.reduce(function (sum, entry) {
-      var unit = priceForMode(entry.item, entry.mode);
+      var unit = priceForMode(entry.item, entry.mode, entry.fraction);
       return sum + (unit === null ? 0 : unit * entry.qty);
     }, 0);
     var totalEl = document.getElementById("cart-total");
@@ -695,7 +773,7 @@
 
   function removeItem(id) {
     items = items.filter(function (i) { return i.id !== id; });
-    delete cart[String(id)];
+    Object.keys(cart).forEach(function(key) { if (parseCartKey(key).id === id) delete cart[key]; });
     saveItems();
     saveCart();
     renderManageList();
@@ -707,7 +785,7 @@
     if (!item) return;
     var unit = priceForMode(item, mode);
     if (unit === null) return;
-    var key = cartKey(id, mode);
+    var key = cartKey(id, mode, 1);
     cart[key] = (Number(cart[key]) || 0) + 1;
     saveCart();
     renderCart();
@@ -815,10 +893,19 @@
     var minusBtn = e.target.closest("[data-minus]");
     if (minusBtn) return decrementCart(minusBtn.dataset.minus);
 
+    var fractionBtn = e.target.closest('[data-fraction]');
+    if (fractionBtn && fractionItemId !== null) return addBulkFractionToCart(fractionItemId, Number(fractionBtn.dataset.fraction));
+
+    if (e.target.closest('#fraction-cancel-btn') || e.target === document.getElementById('fraction-backdrop')) return closeFractionSheet();
+
     var addRow = e.target.closest("[data-add]");
     if (addRow) {
       if (addRow.dataset.mode && addRow.getAttribute("aria-disabled") === "true") return;
-      return addToCart(Number(addRow.dataset.add), addRow.dataset.mode || "bulk");
+      var id = Number(addRow.dataset.add);
+      var mode = addRow.dataset.mode || 'bulk';
+      var item = items.find(function(i) { return i.id === id; });
+      if (mode === 'bulk' && item && isFractionalBulkProduct(item)) return openFractionSheet(id);
+      return addToCart(id, mode);
     }
 
     var editRow = e.target.closest("[data-edit]");
