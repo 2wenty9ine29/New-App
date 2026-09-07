@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no">
-<meta name="color-scheme" content="light">
+<meta name="color-scheme" content="light dark">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Price List">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="theme-color" content="#F6F5F0">
+<meta name="theme-color" content="#F6F5F0" id="theme-color-meta">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-180.png">
 <title>Price List</title>
@@ -26,6 +26,17 @@
     --brick: #AD4433;
     --line: #E6E2D8;
   }
+  body.dark {
+    --paper: #171715; --surface: #23231F; --ink: #F2F0E8; --ink-soft: #B7B4AA;
+    --gold: #D5A33A; --gold-bright: #E1B14A; --gold-soft: #3B321F; --green: #6EAD91;
+    --brick: #E06B59; --line: #3A3933;
+  }
+  body.dark .sale-column { background: rgba(35,35,31,.9); }
+  body.dark .sale-column-heading { background: var(--surface); }
+  body.dark .minus-btn, body.dark .add-indicator { background: #2D2C27; }
+  body.dark .row[data-edit]:active, body.dark .row[data-add]:active { background: #3B321F; }
+  body.dark .empty-icon { background: #3B321F; }
+  body.dark #sell-search { box-shadow: 0 4px 14px rgba(0,0,0,.2); }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   html, body {
     margin: 0; padding: 0; height: 100%;
@@ -72,7 +83,7 @@
   .avatar.sm { width: 34px; height: 34px; font-size: 13px; }
 
   .row-name-wrap { flex: 1; min-width: 0; }
-  .row-name { font-size: 14.5px; font-weight: 550; color: var(--ink); line-height: 1.2; overflow-wrap: anywhere; word-break: normal; }
+  .row-name { font-size: 14.5px; font-weight: 550; color: var(--ink); line-height: 1.2; overflow-wrap: break-word; word-break: normal; }
   .row-name-main { display: block; }
   .row-name-size { display: block; margin-top: 2px; font-size: 11px; line-height: 1.15; color: var(--ink-soft); font-weight: 500; }
   .row-name .qty { color: var(--ink-soft); font-weight: 500; font-size: 12.5px; }
@@ -113,12 +124,19 @@
   .search-wrap { flex-shrink: 0; padding: 0 20px 12px; position: relative; }
   .search-wrap svg { position: absolute; left: 34px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: var(--ink-soft); pointer-events: none; }
   #sell-search {
-    width: 100%; padding: 11px 14px 11px 38px; border-radius: 999px; border: 1.5px solid var(--line);
+    width: 100%; padding: 11px 40px 11px 38px; border-radius: 999px; border: 1.5px solid var(--line);
     background-color: var(--surface); color: var(--ink); -webkit-text-fill-color: var(--ink);
     -webkit-appearance: none; appearance: none; font-size: 14.5px; outline: none;
   }
   #sell-search:focus { border-color: var(--gold); box-shadow: 0 0 0 3px var(--gold-soft); }
 
+  .search-clear {
+    position: absolute; right: 31px; top: 50%; transform: translateY(-50%);
+    width: 24px; height: 24px; border: 0; border-radius: 50%; background: var(--line);
+    color: var(--ink-soft); display: none; align-items: center; justify-content: center;
+    font-size: 16px; line-height: 1; padding: 0; z-index: 2;
+  }
+  .search-clear.visible { display: flex; }
   .catalog-wrap { flex-shrink: 0; max-height: 34dvh; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 0 20px; border-bottom: 1px solid var(--line); }
   .cart-heading { padding: 10px 20px 4px; font-size: 12px; font-weight: 650; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.04em; flex-shrink: 0; }
 
@@ -135,6 +153,28 @@
     padding: 9px 18px; border-radius: 999px; font-size: 14px; font-weight: 550;
   }
   .clear-btn:active { background: rgba(255,255,255,0.12); }
+  .cart-actions { display: flex; align-items: center; gap: 8px; }
+  .complete-btn { background: var(--gold); border: 0; color: #fff; padding: 10px 14px; border-radius: 999px; font-size: 13px; font-weight: 650; }
+  .complete-btn:disabled { opacity: .4; }
+  .utility-bar { display:flex; gap:8px; padding: 8px 20px 0; flex-shrink:0; flex-wrap:wrap; }
+  .utility-btn { border:1px solid var(--line); background:var(--surface); color:var(--ink); border-radius:999px; padding:7px 11px; font-size:12px; font-weight:600; }
+  .utility-btn:active { background:var(--gold-soft); }
+  .theme-toggle { margin-left:auto; }
+  .restore-panel { padding: 8px 20px 0; flex-shrink:0; }
+  .restore-row { display:flex; align-items:center; justify-content:space-between; gap:8px; padding:8px 10px; border:1px solid var(--line); border-radius:12px; background:var(--surface); font-size:12px; color:var(--ink-soft); }
+  .restore-row button { border:0; background:none; color:var(--gold); font-weight:700; padding:4px; }
+  .receipt-panel { position:fixed; inset:0; z-index:100; background:rgba(0,0,0,.45); display:flex; align-items:flex-end; justify-content:center; }
+  .receipt-card { width:min(480px,100%); background:var(--surface); color:var(--ink); border-radius:24px 24px 0 0; padding:22px 20px calc(24px + env(safe-area-inset-bottom)); }
+  .receipt-card h2 { margin:0 0 5px; font-size:20px; }
+  .receipt-number { color:var(--gold); font-weight:750; font-size:14px; }
+  .receipt-total { font-size:28px; font-weight:750; margin:12px 0 18px; }
+  .receipt-actions { display:flex; gap:10px; }
+  .receipt-actions button { flex:1; border:0; border-radius:12px; padding:12px; font-size:14px; font-weight:650; }
+  .receipt-actions .primary { background:var(--gold); color:#fff; }
+  .receipt-actions .secondary { background:var(--paper); color:var(--ink); }
+  .toast { position:fixed; left:50%; bottom:calc(90px + env(safe-area-inset-bottom)); transform:translateX(-50%) translateY(10px); background:var(--ink); color:var(--paper); padding:9px 13px; border-radius:999px; font-size:12px; opacity:0; pointer-events:none; transition:.2s ease; z-index:120; }
+  .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+  .qty-edit { width:48px; padding:3px 5px; border:1px solid var(--gold); border-radius:7px; background:var(--surface); color:var(--ink); font:inherit; text-align:center; }
 
   /* Tab bar */
   .tabbar {
@@ -236,7 +276,7 @@
   .sale-column .row {
     align-items: flex-start;
     gap: 7px;
-    padding: 8px 3px;
+    padding: 9px 3px;
     margin: 0;
     border-bottom: 1px solid rgba(230,226,216,.65);
     min-height: 56px;
@@ -246,14 +286,23 @@
   .sale-column .row:hover { background: var(--gold-soft); transform: translateY(-1px); }
   .sale-column .row:active { transform: scale(.975); }
   .sale-column .avatar { width: 34px; height: 34px; font-size: 12px; margin-top: 1px; }
-  .sale-column .row-name { font-size: 12.5px; }
-  .sale-column .row-name-size { font-size: 10px; }
+  .sale-column .row-name { font-size: 13.5px; line-height: 1.18; overflow-wrap: break-word; word-break: normal; }
+  .sale-column .row-name-main { display: block; }
+  .sale-column .row-name-size { display: inline-flex; align-items: center; width: fit-content; max-width: 100%; margin-top: 4px; padding: 2px 6px; border-radius: 999px; background: rgba(28,27,24,.06); color: var(--ink-soft); font-size: 9px; line-height: 1.15; font-weight: 650; }
   .sale-column .row-price { font-size: 12px; }
-  .sale-column .price-tag-bulk {
-    font-size: 8px;
-    color: var(--green);
+  .sale-column .catalog-price {
+    flex-shrink: 0;
+    min-width: 50px;
+    padding-top: 1px;
   }
-  .single-price-tag { color: var(--gold) !important; }
+  .sale-column .catalog-status {
+    display: block;
+    margin-top: 4px;
+    font-size: 9px;
+    line-height: 1.1;
+    font-weight: 650;
+    color: var(--gold);
+  }
   .sale-column .add-indicator {
     width: 25px;
     margin-top: 3px;
@@ -332,10 +381,29 @@
     .sale-columns { gap: 7px; }
     .sale-column .avatar { width: 30px; height: 30px; font-size: 11px; }
     .sale-column .row { gap: 5px; min-height: 52px; }
-    .sale-column .row-name { font-size: 11.5px; }
-    .sale-column .row-name-size { font-size: 9.5px; }
+    .sale-column .row-name { font-size: 12px; }
+    .sale-column .row-name-size { font-size: 9px; }
     .sale-column .row-price { font-size: 11px; }
+    .sale-column .catalog-price { min-width: 44px; }
     .sale-column .add-indicator { width: 22px; height: 22px; }
+  }
+
+  /* At browser zoom levels where two columns become too narrow, stack the
+     sections so product names remain readable instead of wrapping letter-by-letter. */
+  @media (max-width: 360px) {
+    .sale-columns { grid-template-columns: 1fr; gap: 12px; }
+    .catalog-wrap { max-height: 48dvh; }
+    .sale-column-heading { padding: 11px 12px 9px; }
+    .sale-column-heading strong { font-size: 14px; }
+    .sale-column-heading small { font-size: 10px; }
+    .sale-column ul.rows { padding: 3px 10px 8px; }
+    .sale-column .row { gap: 9px; padding: 10px 4px; min-height: 58px; }
+    .sale-column .avatar { width: 36px; height: 36px; font-size: 12px; }
+    .sale-column .row-name { font-size: 14px; line-height: 1.2; }
+    .sale-column .row-name-size { font-size: 9.5px; }
+    .sale-column .row-price { font-size: 12.5px; }
+    .sale-column .catalog-price { min-width: 54px; }
+    .sale-column .add-indicator { width: 26px; height: 26px; }
   }
   @media (min-width: 700px) {
     .catalog-wrap { max-height: 46dvh; }
@@ -383,6 +451,7 @@
     <div class="search-wrap">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
       <input id="sell-search" type="text" placeholder="Search items" autocomplete="off">
+      <button class="search-clear" id="search-clear" aria-label="Clear search">×</button>
     </div>
     <div class="catalog-wrap">
       <div class="sale-columns">
@@ -402,6 +471,11 @@
         </div>
       </div>
     </div>
+    <div class="utility-bar">
+      <button class="utility-btn" id="repeat-last-btn" hidden>↻ Repeat last sale</button>
+      <button class="utility-btn theme-toggle" id="theme-toggle">☾ Dark mode</button>
+    </div>
+    <div class="restore-panel" id="restore-panel" hidden></div>
     <div class="cart-heading">Cart</div>
     <div class="scroll-area">
       <ul class="rows" id="cart-list"></ul>
@@ -418,9 +492,25 @@
         <span class="cart-total-label">Total</span>
         <span class="cart-total-amount" id="cart-total">¢0.00</span>
       </div>
-      <button class="clear-btn" id="clear-btn">Clear</button>
+      <div class="cart-actions">
+        <button class="clear-btn" id="clear-btn">Clear</button>
+        <button class="complete-btn" id="complete-btn" disabled>Checkout</button>
+      </div>
     </div>
   </section>
+
+  <div class="receipt-panel" id="receipt-panel" hidden>
+    <div class="receipt-card">
+      <h2>Sale completed ✓</h2>
+      <div class="receipt-number" id="receipt-number">Receipt #0001</div>
+      <div class="receipt-total" id="receipt-total">¢0.00</div>
+      <div class="receipt-actions">
+        <button class="secondary" id="receipt-close-btn">Close</button>
+        <button class="primary" id="receipt-repeat-btn">Repeat sale</button>
+      </div>
+    </div>
+  </div>
+  <div class="toast" id="toast"></div>
 
   <!-- TAB BAR -->
   <nav class="tabbar">
@@ -557,6 +647,10 @@
 
   var items = loadItems();
   var cart = loadCart();
+  var clearedCarts = loadJson('price-list-cleared-carts-v1', []);
+  var lastSale = loadJson('price-list-last-sale-v1', null);
+  var receiptCounter = Number(localStorage.getItem('price-list-receipt-counter-v1') || 0);
+  var darkMode = localStorage.getItem('price-list-dark-mode-v1') === '1';
   var pendingPhoto = null;
   var editingId = null;
   var sellSearchQuery = "";
@@ -584,6 +678,21 @@
   }
   function saveCart() {
     try { localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart)); } catch (e) {}
+  }
+  function loadJson(key, fallback) {
+    try { var raw = localStorage.getItem(key); return raw ? JSON.parse(raw) : fallback; } catch (e) { return fallback; }
+  }
+  function saveJson(key, value) { try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) {} }
+  function cartSnapshot() { return JSON.parse(JSON.stringify(cart)); }
+  function cartEntriesForSnapshot(snapshot) {
+    return Object.keys(snapshot || {}).filter(function(k){ return Number(snapshot[k]) > 0; }).map(function(k){
+      var parsed=parseCartKey(k), item=items.find(function(i){return i.id===parsed.id;});
+      return item ? {key:k,item:item,mode:parsed.mode,fraction:parsed.fraction,qty:Number(snapshot[k])} : null;
+    }).filter(Boolean);
+  }
+  function showToast(message) {
+    var t=document.getElementById('toast'); t.textContent=message; t.classList.add('show');
+    clearTimeout(showToast.timer); showToast.timer=setTimeout(function(){t.classList.remove('show');},1800);
   }
   function escapeHtml(str) {
     return String(str).replace(/[&<>"']/g, function (m) {
@@ -699,23 +808,28 @@
     var value = priceForMode(item, mode);
     var unavailable = value === null;
     var priceHtml = unavailable
-      ? '<span class="row-price set-price">Unavailable</span>'
+      ? '<span class="row-price set-price">N/A</span>'
       : '<span class="row-price">¢' + formatCedis(value) + '</span>';
-    var tag = mode === "bulk"
-      ? '<span class="price-tag-bulk">bulk</span>'
-      : '<span class="price-tag-bulk single-price-tag">single</span>';
     return '<li class="row ' + (unavailable ? 'unavailable' : '') + '" data-add="' + item.id + '" data-mode="' + mode + '" aria-disabled="' + unavailable + '">' +
       avatarHtml(item.name, item.photo, "") +
-      '<div class="row-name-wrap"><div class="row-name">' + productNameHtml(item.name) + '</div></div>' +
-      '<div>' + priceHtml + (!unavailable ? tag : '') + '</div>' +
+      '<div class="row-name-wrap"><div class="row-name">' + productNameHtml(item.name) + '</div>' +
+      (unavailable ? '<span class="catalog-status">N/A</span>' : '') +
+      '</div>' +
+      '<div class="catalog-price">' + priceHtml + '</div>' +
       '<span class="icon-btn add-indicator" aria-hidden="true">' +
       '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>' +
       '</span></li>';
   }
 
+  function normalizeSearchText(text) {
+    return String(text || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+  }
+
   function renderCatalogList() {
-    var query = sellSearchQuery.trim().toLowerCase();
-    var filtered = items.filter(function (item) { return item.name.toLowerCase().indexOf(query) !== -1; });
+    var query = normalizeSearchText(sellSearchQuery);
+    var filtered = items.filter(function (item) {
+      return normalizeSearchText(item.name).indexOf(query) !== -1;
+    });
     var bulkUl = document.getElementById("bulk-catalog-list");
     var singleUl = document.getElementById("single-catalog-list");
     if (filtered.length === 0) {
@@ -749,7 +863,7 @@
           '<div class="row-name-wrap"><div class="row-name">' + productNameHtml(entry.item.name) + '</div>' +
             '<span class="sale-mode ' + (entry.mode === "bulk" ? "bulk-mode" : "single-mode") + (entry.mode === "bulk" && entry.fraction !== 1 ? " fraction-mode" : "") + '">' +
               (entry.mode === "bulk" ? (entry.fraction === 0.5 ? "½ BULK" : entry.fraction === 0.25 ? "¼ BULK" : "Full BULK") : "SINGLE") +
-              ' × ' + entry.qty + '</span></div>' +
+              ' × <span class="qty-tap" data-qty="' + escapeHtml(entry.key) + '" title="Tap to edit quantity">' + entry.qty + '</span></span></div>' +
           '<div><span class="row-price">¢' + formatCedis(subtotal) + '</span></div>' +
           '<button class="icon-btn minus-btn" data-minus="' + escapeHtml(entry.key) + '" aria-label="Remove one ' + escapeHtml(entry.item.name) + '">' +
           '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/></svg>' +
@@ -763,6 +877,7 @@
     }, 0);
     var totalEl = document.getElementById("cart-total");
     totalEl.textContent = "¢" + formatCedis(total);
+    document.getElementById('complete-btn').disabled = entries.length === 0;
     if (lastTotal !== -1 && total !== lastTotal) {
       totalEl.classList.remove("pulse");
       void totalEl.offsetWidth;
@@ -797,7 +912,47 @@
     saveCart();
     renderCart();
   }
-  function clearCart() { cart = {}; saveCart(); renderCart(); }
+  function renderRestorePanel() {
+    var panel=document.getElementById('restore-panel');
+    if (!clearedCarts.length) { panel.hidden=true; panel.innerHTML=''; return; }
+    panel.hidden=false;
+    panel.innerHTML = '<div class="restore-row"><span>Last cleared sale saved</span><button id="restore-last-clear">↶ Restore</button></div>';
+  }
+  function restoreCleared(index) {
+    var snap=clearedCarts[index]; if (!snap) return;
+    cart=JSON.parse(JSON.stringify(snap)); saveCart(); renderCart(); renderRestorePanel(); showToast('Sale restored');
+  }
+  function clearCart() {
+    if (Object.keys(cart).length) {
+      clearedCarts.unshift(cartSnapshot()); clearedCarts=clearedCarts.slice(0,2); saveJson('price-list-cleared-carts-v1', clearedCarts);
+    }
+    cart = {}; saveCart(); renderCart(); renderRestorePanel();
+  }
+  function repeatSale(snapshot) {
+    if (!snapshot) return; cart=JSON.parse(JSON.stringify(snapshot)); saveCart(); renderCart(); switchTab('sell'); showToast('Last sale added');
+  }
+  function completeSale() {
+    var entries=cartEntriesForSnapshot(cart); if (!entries.length) return;
+    var total=entries.reduce(function(sum,e){var u=priceForMode(e.item,e.mode,e.fraction); return sum+(u===null?0:u*e.qty);},0);
+    lastSale=cartSnapshot(); saveJson('price-list-last-sale-v1',lastSale);
+    receiptCounter += 1; localStorage.setItem('price-list-receipt-counter-v1', String(receiptCounter));
+    var receiptNo='Receipt #' + String(receiptCounter).padStart(4,'0');
+    document.getElementById('receipt-number').textContent=receiptNo;
+    document.getElementById('receipt-total').textContent='¢'+formatCedis(total);
+    document.getElementById('receipt-panel').hidden=false;
+    cart={}; saveCart(); renderCart(); updateRepeatButton(); renderRestorePanel();
+  }
+  function updateRepeatButton() { document.getElementById('repeat-last-btn').hidden=!lastSale; }
+  function applyTheme() {
+    document.body.classList.toggle('dark', darkMode);
+    document.getElementById('theme-toggle').textContent=darkMode?'☀ Light mode':'☾ Dark mode';
+    document.getElementById('theme-color-meta').setAttribute('content', darkMode?'#171715':'#F6F5F0');
+    try { localStorage.setItem('price-list-dark-mode-v1', darkMode?'1':'0'); } catch(e){}
+  }
+  function editCartQuantity(key, value) {
+    var n=parseInt(value,10); if (isNaN(n) || n<0) return renderCart();
+    if (n===0) delete cart[key]; else cart[key]=n; saveCart(); renderCart();
+  }
 
   function switchTab(tab) {
     document.getElementById("screen-manage").classList.toggle("active", tab === "manage");
@@ -919,19 +1074,41 @@
     if (e.target.closest("#sheet-save-btn")) return handleSheetSave();
     if (e.target.closest("#sheet-delete-btn")) return handleSheetDelete();
     if (e.target.closest("#clear-btn")) return clearCart();
+    if (e.target.closest("#complete-btn")) return completeSale();
+    if (e.target.closest("#theme-toggle")) { darkMode=!darkMode; applyTheme(); return; }
+    if (e.target.closest("#repeat-last-btn")) return repeatSale(lastSale);
+    if (e.target.closest("#restore-last-clear")) return restoreCleared(0);
+    if (e.target.closest("#receipt-close-btn")) { document.getElementById('receipt-panel').hidden=true; return; }
+    if (e.target.closest("#receipt-repeat-btn")) { document.getElementById('receipt-panel').hidden=true; return repeatSale(lastSale); }
+    var qtyTap=e.target.closest('[data-qty]');
+    if (qtyTap) {
+      var key=qtyTap.dataset.qty; var input=document.createElement('input'); input.className='qty-edit'; input.type='number'; input.inputMode='numeric'; input.min='0'; input.value=cart[key]||1;
+      qtyTap.replaceWith(input); input.focus(); input.select();
+      input.addEventListener('keydown',function(ev){if(ev.key==='Enter'){editCartQuantity(key,input.value);}});
+      input.addEventListener('blur',function(){editCartQuantity(key,input.value);});
+      return;
+    }
     if (e.target === document.getElementById("sheet-backdrop")) return closeSheet();
   });
 
   document.getElementById("sell-search").addEventListener("input", function (e) {
     sellSearchQuery = e.target.value;
+    document.getElementById('search-clear').classList.toggle('visible', !!sellSearchQuery);
     renderCatalogList();
+  });
+  document.getElementById('search-clear').addEventListener('click', function(){
+    var input=document.getElementById('sell-search'); input.value=''; sellSearchQuery='';
+    this.classList.remove('visible'); renderCatalogList(); input.focus();
   });
 
   migrateLegacyCart();
   bindPhotoInput();
+  applyTheme();
+  updateRepeatButton();
   renderManageList();
   renderCatalogList();
   renderCart();
+  renderRestorePanel();
   switchTab("sell");
 </script>
 </body>
