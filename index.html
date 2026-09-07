@@ -50,7 +50,7 @@
 
   .top-accent { height: 4px; flex-shrink: 0; background: linear-gradient(90deg, var(--gold-bright) 0 33%, var(--green) 33% 66%, var(--brick) 66% 100%); }
 
-  .screen { flex: 1; display: none; flex-direction: column; overflow: hidden; background-color: var(--paper); }
+  .screen { flex: 1; display: none; flex-direction: column; overflow: hidden; background-color: var(--paper); padding-top: env(safe-area-inset-top); }
   .screen.active { display: flex; }
 
   header { padding: 18px 20px 12px; flex-shrink: 0; }
@@ -149,7 +149,7 @@
   .cart-total-amount.pulse { animation: pulseAnim .28s ease; }
   @keyframes pulseAnim { 0% { transform: scale(1); } 50% { transform: scale(1.12); } 100% { transform: scale(1); } }
   .clear-btn {
-    background: transparent; border: 1px solid rgba(255,255,255,0.32); color: #fff;
+    background: rgba(255,255,255,0.10); border: 1px solid rgba(255,255,255,0.48); color: #fff;
     padding: 9px 18px; border-radius: 999px; font-size: 14px; font-weight: 550;
   }
   .clear-btn:active { background: rgba(255,255,255,0.12); }
@@ -162,20 +162,26 @@
   .theme-toggle { position:absolute; right:31px; top:50%; transform:translateY(-50%); width:28px; height:28px; padding:0; border:0; background:transparent; color:var(--ink-soft); display:flex; align-items:center; justify-content:center; font-size:18px; line-height:1; }
   .theme-toggle:active { color:var(--gold); transform:translateY(-50%) scale(.92); }
   .history-list { padding: 0 20px; }
-  .history-card { background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:11px 12px; margin-bottom:8px; }
+  .history-card { background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:8px 10px; margin-bottom:6px; cursor:pointer; }
+  .history-card:active { background:var(--gold-soft); }
   .history-top { display:flex; justify-content:space-between; align-items:center; gap:8px; }
-  .history-receipt { font-weight:700; color:var(--ink); font-size:13px; }
-  .history-total { font-weight:750; color:var(--gold); font-variant-numeric:tabular-nums; }
-  .history-meta { margin-top:3px; color:var(--ink-soft); font-size:11px; }
-  .history-items { margin:7px 0 0; padding-left:17px; color:var(--ink-soft); font-size:12px; line-height:1.45; }
-  .history-change { margin:14px 20px 0; padding:14px; border:1px solid var(--line); border-radius:16px; background:var(--surface); }
-  .history-change h2 { margin:0 0 9px; font-size:14px; }
-  .change-line { display:flex; justify-content:space-between; align-items:center; gap:10px; margin-top:8px; font-size:13px; }
-  .change-line input { width:130px; padding:9px 10px; border:1px solid var(--line); border-radius:10px; background:var(--paper); color:var(--ink); font-size:15px; text-align:right; outline:none; }
-  .change-result { font-size:18px; font-weight:750; color:var(--gold); }
+  .history-receipt { font-weight:700; color:var(--ink); font-size:12px; }
+  .history-total { font-weight:750; color:var(--gold); font-variant-numeric:tabular-nums; font-size:13px; }
+  .history-meta { margin-top:1px; color:var(--ink-soft); font-size:10px; }
+  .history-items { display:none; margin:6px 0 0; padding-left:16px; color:var(--ink-soft); font-size:11px; line-height:1.35; }
+  .history-card.expanded .history-items { display:block; }
+  .history-card::after { content:'Tap for details'; display:block; margin-top:2px; color:var(--ink-soft); font-size:9px; }
+  .history-card.expanded::after { content:'Tap to hide'; }
+  .history-change { margin:10px 20px 0; padding:12px; border:1px solid var(--line); border-radius:14px; background:var(--surface); }
+  .history-change h2 { margin:0 0 7px; font-size:13px; }
+  .change-line { display:flex; justify-content:space-between; align-items:center; gap:10px; margin-top:6px; font-size:12px; }
+  .change-line input { width:120px; padding:8px 9px; border:1px solid var(--line); border-radius:10px; background:var(--paper); color:var(--ink); font-size:15px; text-align:right; outline:none; }
+  .change-result { font-size:17px; font-weight:750; color:var(--gold); }
   .history-empty { text-align:center; padding:35px 20px; color:var(--ink-soft); font-size:13px; }
   .restore-panel { padding: 8px 20px 0; flex-shrink:0; }
-  .restore-row { display:flex; align-items:center; justify-content:space-between; gap:8px; padding:8px 10px; border:1px solid var(--line); border-radius:12px; background:var(--surface); font-size:12px; color:var(--ink-soft); }
+  .restore-panel-title { margin: 2px 0 5px; color:var(--ink-soft); font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; }
+  .restore-list { display:grid; gap:5px; }
+  .restore-row { display:flex; align-items:center; justify-content:space-between; gap:8px; padding:6px 9px; border:1px solid var(--line); border-radius:12px; background:var(--surface); font-size:11px; color:var(--ink-soft); }
   .restore-row button { border:0; background:none; color:var(--gold); font-weight:700; padding:4px; }
   .receipt-panel { position:fixed; inset:0; z-index:100; background:rgba(0,0,0,.45); display:flex; align-items:flex-end; justify-content:center; }
   .receipt-card { width:min(480px,100%); background:var(--surface); color:var(--ink); border-radius:24px 24px 0 0; padding:22px 20px calc(24px + env(safe-area-inset-bottom)); }
@@ -483,7 +489,6 @@
         </div>
       </div>
     </div>
-    <div class="restore-panel" id="restore-panel" hidden></div>
     <div class="cart-heading">Cart</div>
     <div class="scroll-area">
       <ul class="rows" id="cart-list"></ul>
@@ -515,9 +520,10 @@
     </header>
     <div class="scroll-area">
       <div class="history-list" id="history-list"></div>
+      <div class="restore-panel" id="restore-panel" hidden></div>
       <div class="history-change">
         <h2>Change calculator</h2>
-        <div class="change-line"><span>Receipt total</span><strong id="change-total">¢0.00</strong></div>
+        <div class="change-line"><span>Current total</span><strong id="change-total">¢0.00</strong></div>
         <div class="change-line"><span>Money received</span><input id="money-received" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00"></div>
         <div class="change-line"><span>Change to give</span><strong class="change-result" id="change-due">¢0.00</strong></div>
       </div>
@@ -912,6 +918,7 @@
       totalEl.classList.add("pulse");
     }
     lastTotal = total;
+    updateChangeCalculator();
   }
 
   function removeItem(id) {
@@ -944,10 +951,10 @@
     var panel=document.getElementById('restore-panel');
     if (!clearedCarts.length) { panel.hidden=true; panel.innerHTML=''; return; }
     panel.hidden=false;
-    panel.innerHTML = clearedCarts.slice(0,2).map(function(snap,idx){
+    panel.innerHTML = '<div class="restore-panel-title">Recently cleared</div><div class="restore-list">' + clearedCarts.slice(0,2).map(function(snap,idx){
       var total=receiptTotalFromSnapshot(snap);
-      return '<div class="restore-row"><span>Cleared '+(idx+1)+' · ¢'+formatCedis(total)+'</span><button data-restore-index="'+idx+'">↶ Restore</button></div>';
-    }).join('');
+      return '<div class="restore-row"><span>Sale · ¢'+formatCedis(total)+'</span><button data-restore-index="'+idx+'">↶ Restore</button></div>';
+    }).join('') + '</div>';
   }
   function restoreCleared(index) {
     var snap=clearedCarts[index]; if (!snap) return;
@@ -958,9 +965,6 @@
       clearedCarts.unshift(cartSnapshot()); clearedCarts=clearedCarts.slice(0,2); saveJson('price-list-cleared-carts-v1', clearedCarts);
     }
     cart = {}; saveCart(); renderCart(); renderRestorePanel();
-  }
-  function repeatSale(snapshot) {
-    if (!snapshot) return; cart=JSON.parse(JSON.stringify(snapshot)); saveCart(); renderCart(); switchTab('sell'); showToast('Last sale added');
   }
   function receiptTotalFromSnapshot(snapshot) {
     return cartEntriesForSnapshot(snapshot).reduce(function(sum,e){
@@ -1002,7 +1006,8 @@
     updateChangeCalculator();
   }
   function updateChangeCalculator(){
-    var total=receipts.length?Number(receipts[0].total)||0:0;
+    var liveTotal=receiptTotalFromSnapshot(cart);
+    var total=liveTotal > 0 ? liveTotal : (receipts.length ? Number(receipts[0].total)||0 : 0);
     document.getElementById('change-total').textContent='¢'+formatCedis(total);
     var received=Number(document.getElementById('money-received').value)||0;
     var change=Math.max(0,received-total);
@@ -1135,6 +1140,8 @@
     if (e.target.closest("#clear-btn")) return clearCart();
     if (e.target.closest("#complete-btn")) return completeSale();
     if (e.target.closest("#theme-toggle")) { darkMode=!darkMode; applyTheme(); return; }
+    var historyCard=e.target.closest('[data-history-index]');
+    if (historyCard) { historyCard.classList.toggle('expanded'); return; }
     var restoreBtn=e.target.closest("[data-restore-index]");
     if (restoreBtn) return restoreCleared(Number(restoreBtn.dataset.restoreIndex));
     if (e.target.closest("#receipt-close-btn")) { document.getElementById('receipt-panel').hidden=true; return; }
