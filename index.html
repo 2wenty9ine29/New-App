@@ -124,7 +124,7 @@
   .search-wrap { flex-shrink: 0; padding: 0 20px 12px; position: relative; }
   .search-wrap svg { position: absolute; left: 34px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: var(--ink-soft); pointer-events: none; }
   #sell-search {
-    width: 100%; padding: 11px 40px 11px 38px; border-radius: 999px; border: 1.5px solid var(--line);
+    width: 100%; padding: 11px 92px 11px 38px; border-radius: 999px; border: 1.5px solid var(--line);
     background-color: var(--surface); color: var(--ink); -webkit-text-fill-color: var(--ink);
     -webkit-appearance: none; appearance: none; font-size: 14.5px; outline: none;
   }
@@ -159,7 +159,21 @@
   .utility-bar { display:flex; gap:8px; padding: 8px 20px 0; flex-shrink:0; flex-wrap:wrap; }
   .utility-btn { border:1px solid var(--line); background:var(--surface); color:var(--ink); border-radius:999px; padding:7px 11px; font-size:12px; font-weight:600; }
   .utility-btn:active { background:var(--gold-soft); }
-  .theme-toggle { margin-left:auto; }
+  .theme-toggle { position:absolute; right:31px; top:50%; transform:translateY(-50%); width:28px; height:28px; padding:0; border:0; background:transparent; color:var(--ink-soft); display:flex; align-items:center; justify-content:center; font-size:18px; line-height:1; }
+  .theme-toggle:active { color:var(--gold); transform:translateY(-50%) scale(.92); }
+  .history-list { padding: 0 20px; }
+  .history-card { background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:11px 12px; margin-bottom:8px; }
+  .history-top { display:flex; justify-content:space-between; align-items:center; gap:8px; }
+  .history-receipt { font-weight:700; color:var(--ink); font-size:13px; }
+  .history-total { font-weight:750; color:var(--gold); font-variant-numeric:tabular-nums; }
+  .history-meta { margin-top:3px; color:var(--ink-soft); font-size:11px; }
+  .history-items { margin:7px 0 0; padding-left:17px; color:var(--ink-soft); font-size:12px; line-height:1.45; }
+  .history-change { margin:14px 20px 0; padding:14px; border:1px solid var(--line); border-radius:16px; background:var(--surface); }
+  .history-change h2 { margin:0 0 9px; font-size:14px; }
+  .change-line { display:flex; justify-content:space-between; align-items:center; gap:10px; margin-top:8px; font-size:13px; }
+  .change-line input { width:130px; padding:9px 10px; border:1px solid var(--line); border-radius:10px; background:var(--paper); color:var(--ink); font-size:15px; text-align:right; outline:none; }
+  .change-result { font-size:18px; font-weight:750; color:var(--gold); }
+  .history-empty { text-align:center; padding:35px 20px; color:var(--ink-soft); font-size:13px; }
   .restore-panel { padding: 8px 20px 0; flex-shrink:0; }
   .restore-row { display:flex; align-items:center; justify-content:space-between; gap:8px; padding:8px 10px; border:1px solid var(--line); border-radius:12px; background:var(--surface); font-size:12px; color:var(--ink-soft); }
   .restore-row button { border:0; background:none; color:var(--gold); font-weight:700; padding:4px; }
@@ -444,14 +458,12 @@
 
   <!-- SELL SCREEN -->
   <section id="screen-sell" class="screen">
-    <header>
-      <h1>New sale</h1>
-      <p>Tap an item below to add it to the cart</p>
-    </header>
+
     <div class="search-wrap">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
       <input id="sell-search" type="text" placeholder="Search items" autocomplete="off">
       <button class="search-clear" id="search-clear" aria-label="Clear search">×</button>
+      <button class="theme-toggle" id="theme-toggle" aria-label="Switch light or dark mode">☾</button>
     </div>
     <div class="catalog-wrap">
       <div class="sale-columns">
@@ -470,10 +482,6 @@
           <ul class="rows" id="single-catalog-list"></ul>
         </div>
       </div>
-    </div>
-    <div class="utility-bar">
-      <button class="utility-btn" id="repeat-last-btn" hidden>↻ Repeat last sale</button>
-      <button class="utility-btn theme-toggle" id="theme-toggle">☾ Dark mode</button>
     </div>
     <div class="restore-panel" id="restore-panel" hidden></div>
     <div class="cart-heading">Cart</div>
@@ -499,14 +507,30 @@
     </div>
   </section>
 
+  <!-- HISTORY SCREEN -->
+  <section id="screen-history" class="screen">
+    <header>
+      <h1>History</h1>
+      <p>Last 3 receipts</p>
+    </header>
+    <div class="scroll-area">
+      <div class="history-list" id="history-list"></div>
+      <div class="history-change">
+        <h2>Change calculator</h2>
+        <div class="change-line"><span>Receipt total</span><strong id="change-total">¢0.00</strong></div>
+        <div class="change-line"><span>Money received</span><input id="money-received" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00"></div>
+        <div class="change-line"><span>Change to give</span><strong class="change-result" id="change-due">¢0.00</strong></div>
+      </div>
+    </div>
+  </section>
+
   <div class="receipt-panel" id="receipt-panel" hidden>
     <div class="receipt-card">
       <h2>Sale completed ✓</h2>
       <div class="receipt-number" id="receipt-number">Receipt #0001</div>
       <div class="receipt-total" id="receipt-total">¢0.00</div>
       <div class="receipt-actions">
-        <button class="secondary" id="receipt-close-btn">Close</button>
-        <button class="primary" id="receipt-repeat-btn">Repeat sale</button>
+        <button class="primary" id="receipt-close-btn">Done</button>
       </div>
     </div>
   </div>
@@ -521,6 +545,10 @@
     <button class="tab-btn" data-tab="sell">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 2-1.58l1.65-7.42H5.12"/></svg>
       Sell
+    </button>
+    <button class="tab-btn" data-tab="history">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><polyline points="3 4 3 10 9 10"/><path d="M12 7v5l3 2"/></svg>
+      History
     </button>
   </nav>
 </div>
@@ -648,7 +676,7 @@
   var items = loadItems();
   var cart = loadCart();
   var clearedCarts = loadJson('price-list-cleared-carts-v1', []);
-  var lastSale = loadJson('price-list-last-sale-v1', null);
+  var receipts = loadJson('price-list-receipts-v1', []);
   var receiptCounter = Number(localStorage.getItem('price-list-receipt-counter-v1') || 0);
   var darkMode = localStorage.getItem('price-list-dark-mode-v1') === '1';
   var pendingPhoto = null;
@@ -916,7 +944,10 @@
     var panel=document.getElementById('restore-panel');
     if (!clearedCarts.length) { panel.hidden=true; panel.innerHTML=''; return; }
     panel.hidden=false;
-    panel.innerHTML = '<div class="restore-row"><span>Last cleared sale saved</span><button id="restore-last-clear">↶ Restore</button></div>';
+    panel.innerHTML = clearedCarts.slice(0,2).map(function(snap,idx){
+      var total=receiptTotalFromSnapshot(snap);
+      return '<div class="restore-row"><span>Cleared '+(idx+1)+' · ¢'+formatCedis(total)+'</span><button data-restore-index="'+idx+'">↶ Restore</button></div>';
+    }).join('');
   }
   function restoreCleared(index) {
     var snap=clearedCarts[index]; if (!snap) return;
@@ -931,35 +962,63 @@
   function repeatSale(snapshot) {
     if (!snapshot) return; cart=JSON.parse(JSON.stringify(snapshot)); saveCart(); renderCart(); switchTab('sell'); showToast('Last sale added');
   }
+  function receiptTotalFromSnapshot(snapshot) {
+    return cartEntriesForSnapshot(snapshot).reduce(function(sum,e){
+      var u=priceForMode(e.item,e.mode,e.fraction); return sum+(u===null?0:u*e.qty);
+    },0);
+  }
   function completeSale() {
     var entries=cartEntriesForSnapshot(cart); if (!entries.length) return;
-    var total=entries.reduce(function(sum,e){var u=priceForMode(e.item,e.mode,e.fraction); return sum+(u===null?0:u*e.qty);},0);
-    lastSale=cartSnapshot(); saveJson('price-list-last-sale-v1',lastSale);
+    var total=receiptTotalFromSnapshot(cart);
     receiptCounter += 1; localStorage.setItem('price-list-receipt-counter-v1', String(receiptCounter));
     var receiptNo='Receipt #' + String(receiptCounter).padStart(4,'0');
+    var receipt={number:receiptNo,total:total,createdAt:new Date().toISOString(),items:entries.map(function(e){
+      return {name:e.item.name,mode:e.mode,fraction:e.fraction,qty:e.qty,subtotal:(priceForMode(e.item,e.mode,e.fraction)||0)*e.qty};
+    })};
+    receipts.unshift(receipt); receipts=receipts.slice(0,3); saveJson('price-list-receipts-v1',receipts);
     document.getElementById('receipt-number').textContent=receiptNo;
     document.getElementById('receipt-total').textContent='¢'+formatCedis(total);
     document.getElementById('receipt-panel').hidden=false;
-    cart={}; saveCart(); renderCart(); updateRepeatButton(); renderRestorePanel();
+    cart={}; saveCart(); renderCart(); renderRestorePanel(); renderHistory();
   }
-  function updateRepeatButton() { document.getElementById('repeat-last-btn').hidden=!lastSale; }
   function applyTheme() {
     document.body.classList.toggle('dark', darkMode);
-    document.getElementById('theme-toggle').textContent=darkMode?'☀ Light mode':'☾ Dark mode';
+    var btn=document.getElementById('theme-toggle');
+    if(btn){ btn.textContent=darkMode?'☀':'☾'; btn.title=darkMode?'Switch to light mode':'Switch to dark mode'; }
     document.getElementById('theme-color-meta').setAttribute('content', darkMode?'#171715':'#F6F5F0');
     try { localStorage.setItem('price-list-dark-mode-v1', darkMode?'1':'0'); } catch(e){}
   }
-  function editCartQuantity(key, value) {
-    var n=parseInt(value,10); if (isNaN(n) || n<0) return renderCart();
-    if (n===0) delete cart[key]; else cart[key]=n; saveCart(); renderCart();
+  function renderHistory(){
+    var list=document.getElementById('history-list'); if(!list) return;
+    if(!receipts.length){ list.innerHTML='<div class="history-empty">No completed sales yet.</div>'; updateChangeCalculator(); return; }
+    list.innerHTML=receipts.slice(0,3).map(function(r,idx){
+      var d=new Date(r.createdAt); var when=isNaN(d.getTime())?'':d.toLocaleString([], {month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
+      var itemsHtml=(r.items||[]).map(function(i){
+        var mode=i.mode==='bulk'?(i.fraction===0.5?'½ BULK':i.fraction===0.25?'¼ BULK':'Full BULK'):'SINGLE';
+        return '<li>'+escapeHtml(i.name)+' — '+mode+' × '+i.qty+' — ¢'+formatCedis(i.subtotal)+'</li>';
+      }).join('');
+      return '<div class="history-card" data-history-index="'+idx+'"><div class="history-top"><span class="history-receipt">'+escapeHtml(r.number)+'</span><span class="history-total">¢'+formatCedis(r.total)+'</span></div><div class="history-meta">'+when+'</div><ul class="history-items">'+itemsHtml+'</ul></div>';
+    }).join('');
+    updateChangeCalculator();
   }
-
+  function updateChangeCalculator(){
+    var total=receipts.length?Number(receipts[0].total)||0:0;
+    document.getElementById('change-total').textContent='¢'+formatCedis(total);
+    var received=Number(document.getElementById('money-received').value)||0;
+    var change=Math.max(0,received-total);
+    document.getElementById('change-due').textContent='¢'+formatCedis(change);
+  }
   function switchTab(tab) {
     document.getElementById("screen-manage").classList.toggle("active", tab === "manage");
     document.getElementById("screen-sell").classList.toggle("active", tab === "sell");
-    document.querySelectorAll(".tab-btn").forEach(function (b) {
-      b.classList.toggle("active", b.dataset.tab === tab);
-    });
+    document.getElementById("screen-history").classList.toggle("active", tab === "history");
+    document.querySelectorAll(".tab-btn").forEach(function (b) { b.classList.toggle("active", b.dataset.tab === tab); });
+    if(tab==='history') renderHistory();
+  }
+
+  function editCartQuantity(key, value) {
+    var n=parseInt(value,10); if (isNaN(n) || n<0) return renderCart();
+    if (n===0) delete cart[key]; else cart[key]=n; saveCart(); renderCart();
   }
 
   function openAddSheet() {
@@ -1076,10 +1135,9 @@
     if (e.target.closest("#clear-btn")) return clearCart();
     if (e.target.closest("#complete-btn")) return completeSale();
     if (e.target.closest("#theme-toggle")) { darkMode=!darkMode; applyTheme(); return; }
-    if (e.target.closest("#repeat-last-btn")) return repeatSale(lastSale);
-    if (e.target.closest("#restore-last-clear")) return restoreCleared(0);
+    var restoreBtn=e.target.closest("[data-restore-index]");
+    if (restoreBtn) return restoreCleared(Number(restoreBtn.dataset.restoreIndex));
     if (e.target.closest("#receipt-close-btn")) { document.getElementById('receipt-panel').hidden=true; return; }
-    if (e.target.closest("#receipt-repeat-btn")) { document.getElementById('receipt-panel').hidden=true; return repeatSale(lastSale); }
     var qtyTap=e.target.closest('[data-qty]');
     if (qtyTap) {
       var key=qtyTap.dataset.qty; var input=document.createElement('input'); input.className='qty-edit'; input.type='number'; input.inputMode='numeric'; input.min='0'; input.value=cart[key]||1;
@@ -1104,11 +1162,12 @@
   migrateLegacyCart();
   bindPhotoInput();
   applyTheme();
-  updateRepeatButton();
   renderManageList();
   renderCatalogList();
   renderCart();
   renderRestorePanel();
+  renderHistory();
+  document.getElementById("money-received").addEventListener("input", updateChangeCalculator);
   switchTab("sell");
 </script>
 </body>
