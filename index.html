@@ -63,7 +63,7 @@
 
   .top-accent { height: 4px; flex-shrink: 0; background: linear-gradient(90deg, var(--gold-bright) 0 33%, var(--green) 33% 66%, var(--brick) 66% 100%); }
 
-  .screen { flex: 1; display: none; flex-direction: column; overflow: hidden; background-color: var(--paper); padding-top: env(safe-area-inset-top); }
+  .screen { flex: 1; display: none; flex-direction: column; overflow: hidden; background-color: var(--paper); padding-top: env(safe-area-inset-top); position:relative; }
   .screen.active { display: flex; }
 
   header { padding: 18px 20px 12px; flex-shrink: 0; }
@@ -155,7 +155,7 @@
   .cart-switch.small { padding:5px 10px; font-size:10px; }
   .cart-switch.active { background:var(--ink); color:#fff; border-color:var(--ink); }
   body.dark .cart-switch.active { background:var(--gold); border-color:var(--gold); }
-  .search-wrap { flex-shrink: 0; padding: 0 20px 10px; position: relative; }
+  .search-wrap { flex-shrink: 0; padding: 6px 20px 10px; position: relative; }
   .search-wrap svg { position: absolute; left: 34px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: var(--ink-soft); pointer-events: none; }
   #sell-search {
     width: 100%; padding: 11px 92px 11px 38px; border-radius: 999px; border: 1.5px solid var(--line);
@@ -171,7 +171,7 @@
     font-size: 16px; line-height: 1; padding: 0; z-index: 2;
   }
   .search-clear.visible { display: flex; }
-  .catalog-wrap { flex-shrink: 0; max-height: 31dvh; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 0 20px; border-bottom: 1px solid var(--line); }
+  .catalog-wrap { flex-shrink: 0; max-height: 35dvh; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 0 20px; border-bottom: 1px solid var(--line); }
   .cart-heading { padding: 10px 20px 4px; font-size: 12px; font-weight: 650; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.04em; flex-shrink: 0; }
 
   .cart-bar {
@@ -221,6 +221,8 @@
   .history-receipt-btn { border:1px solid var(--line); background:var(--surface); color:var(--ink); border-radius:999px; padding:7px 11px; font-size:11px; font-weight:700; display:inline-flex; align-items:center; gap:5px; }
   .history-receipt-btn:active { background:var(--gold-soft); transform:scale(.97); }
   .history-header { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+  .history-theme-toggle { position:absolute; right:18px; bottom:calc(16px + env(safe-area-inset-bottom)); z-index:5; width:42px; height:42px; border-radius:50%; background:var(--surface); border:1px solid var(--line); box-shadow:0 6px 18px rgba(28,27,24,.12); color:var(--ink); display:flex; align-items:center; justify-content:center; font-size:19px; }
+  .history-theme-toggle:active { transform:scale(.94); }
   .receipt-history-panel { position:fixed; inset:0; z-index:110; background:rgba(0,0,0,.45); display:flex; align-items:flex-end; justify-content:center; }
   .receipt-history-card { width:min(480px,100%); max-height:86dvh; overflow-y:auto; background:var(--surface); color:var(--ink); border-radius:24px 24px 0 0; padding:18px 18px calc(22px + env(safe-area-inset-bottom)); }
   .receipt-history-head { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:12px; }
@@ -293,14 +295,14 @@
 
 
   /* Lively Sell catalog */
-  .search-wrap { padding-top: 10px; }
+  .search-wrap { padding-top: 6px; }
   #sell-search {
     box-shadow: 0 4px 14px rgba(28,27,24,0.05);
     transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease;
   }
   #sell-search:focus { transform: translateY(-1px); }
   .catalog-wrap {
-    max-height: 31dvh;
+    max-height: 35dvh;
     padding: 0 8px 8px;
     border-bottom: 1px solid var(--line);
   }
@@ -349,6 +351,7 @@
     border-bottom: 1px solid rgba(230,226,216,.65);
     min-height: 58px;
     cursor: pointer;
+    -webkit-user-select: none; user-select: none;
   }
   .sale-column .row:last-child { border-bottom: none; }
   .sale-column .row:hover { background: var(--gold-soft); transform: translateY(-1px); }
@@ -551,10 +554,6 @@
   <!-- SELL SCREEN -->
   <section id="screen-sell" class="screen">
 
-    <div class="sell-titlebar compact">
-      <span></span>
-      <button class="theme-toggle" id="theme-toggle" aria-label="Switch light or dark mode">☾</button>
-    </div>
     <div class="search-wrap">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
       <input id="sell-search" type="text" placeholder="Search items" autocomplete="off">
@@ -612,6 +611,7 @@
         <button class="history-receipt-btn" id="receipt-history-btn" aria-label="View last 10 receipts">▤ Receipts 10</button>
       </div>
     </header>
+    <button class="theme-toggle history-theme-toggle" id="theme-toggle" aria-label="Switch light or dark mode">☾</button>
     <div class="scroll-area">
       <button class="cart-history-btn" id="cart-history-btn" aria-label="View and manage carts">
         <span class="big-cart-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="20" r="1"/><circle cx="19" cy="20" r="1"/><path d="M2 3h2l2.6 11.4a2 2 0 0 0 2 1.6h8.8a2 2 0 0 0 2-1.6L21 7H5"/></svg></span>
@@ -643,7 +643,7 @@
       <div class="cart-overview-tabs"><button class="cart-overview-tab active" data-overview-cart="0">Cart 1</button><button class="cart-overview-tab" data-overview-cart="1">Cart 2</button></div>
       <div class="cart-overview-list" id="cart-overview-list"></div>
       <div class="cart-overview-footer"><span>Total</span><strong id="cart-overview-total">¢0.00</strong></div>
-      <div class="longpress-hint">Tip: hold a product in Sell for 3 seconds to choose a quantity.</div>
+      <div class="longpress-hint">Hold a product in Sell to choose a quantity.</div>
     </div>
   </div>
 
@@ -651,7 +651,7 @@
   <div id="quantity-sheet" hidden>
     <div class="fraction-handle"></div>
     <h2 id="quantity-title">Choose quantity</h2>
-    <p>Hold an item for 3 seconds to open this selector.</p>
+    <p>Hold an item to open this selector.</p>
     <div class="quantity-control"><button id="quantity-minus" type="button">−</button><input id="quantity-value" type="number" min="1" step="1" value="1" inputmode="numeric"><button id="quantity-plus" type="button">+</button></div>
     <div class="quantity-actions"><button id="quantity-cancel" type="button">Cancel</button><button id="quantity-add" type="button">Add quantity</button></div>
   </div>
@@ -892,7 +892,6 @@
     normalizeCartOrder();
     renderCart();
     updateCartSwitcher();
-    showToast('Cart ' + (index + 1) + ' selected');
   }
   function updateCartSwitcher() {
     document.querySelectorAll('.cart-switch').forEach(function(btn){
@@ -938,7 +937,7 @@
   function showUndo(message, undoFn) {
     var t=document.getElementById('toast');
     clearTimeout(showUndo.timer);
-    t.innerHTML='<span>'+escapeHtml(message)+'</span><button id="undo-btn" type="button">Undo</button>';
+    t.innerHTML=(message ? '<span>'+escapeHtml(message)+'</span>' : '')+'<button id="undo-btn" type="button">undo</button>';
     t.classList.add('show');
     undoState={fn:undoFn, revision:cartRevision};
     var btn=document.getElementById('undo-btn');
@@ -946,7 +945,7 @@
       if(undoState && undoState.revision===cartRevision) undoState.fn();
       undoState=null; t.classList.remove('show');
     }, {once:true});
-    showUndo.timer=setTimeout(function(){ undoState=null; t.classList.remove('show'); }, 2600);
+    showUndo.timer=setTimeout(function(){ undoState=null; t.classList.remove('show'); }, 2000);
   }
   function escapeHtml(str) {
     return String(str).replace(/[&<>"']/g, function (m) {
@@ -1190,7 +1189,7 @@
     var snapshot=cartSnapshot();
     var previousOrder=cartOrder.slice();
     cart = {}; cartOrder=[]; bumpCartRevision(); saveJson('price-list-cart-order-v1-' + activeCartIndex, cartOrder); saveCart(); renderCart();
-    showUndo('Sale cleared', function(){
+    showUndo('', function(){
       cart=JSON.parse(JSON.stringify(snapshot)); cartOrder=previousOrder.filter(function(k){ return Object.prototype.hasOwnProperty.call(cart,k); });
       normalizeCartOrder(); bumpCartRevision(); saveCart(); renderCart();
     });
@@ -1227,7 +1226,7 @@
   function confirmQuantity(){
     var n=Math.max(1,parseInt(document.getElementById('quantity-value').value,10)||1);
     if(quantityItemId===null) return;
-    var key=cartKey(quantityItemId,quantityMode,quantityFraction); cart[key]=(Number(cart[key])||0)+n; moveCartKeyToTop(key); bumpCartRevision(); saveCart(); renderCart(); closeQuantitySheet(); showToast(n+' added');
+    var key=cartKey(quantityItemId,quantityMode,quantityFraction); cart[key]=(Number(cart[key])||0)+n; moveCartKeyToTop(key); bumpCartRevision(); saveCart(); renderCart(); closeQuantitySheet();
   }
   function renderCartOverview(){
     var list=document.getElementById('cart-overview-list'); if(!list) return;
@@ -1422,13 +1421,14 @@
       var id=Number(row.dataset.add), mode=row.dataset.mode||'bulk', item=items.find(function(i){return i.id===id;});
       if(!item) return;
       if(mode==='bulk' && isFractionalBulkProduct(item)){ closeFractionSheet(); openQuantitySheet(id,mode,1); } else openQuantitySheet(id,mode,1);
-    },3000);
+    },650);
   },{passive:true});
   document.addEventListener('touchmove', function(e){
     if(!longPressTimer) return; var t=e.touches[0]; if(!window.__lpStart){window.__lpStart={x:t.clientX,y:t.clientY}; return;}
-    if(Math.abs(t.clientX-window.__lpStart.x)>12 || Math.abs(t.clientY-window.__lpStart.y)>12){ clearTimeout(longPressTimer); longPressTimer=null; window.__lpStart=null; }
+    if(Math.abs(t.clientX-window.__lpStart.x)>20 || Math.abs(t.clientY-window.__lpStart.y)>20){ clearTimeout(longPressTimer); longPressTimer=null; window.__lpStart=null; }
   },{passive:true});
   document.addEventListener('touchend', function(){ clearTimeout(longPressTimer); longPressTimer=null; window.__lpStart=null; },{passive:true});
+  document.addEventListener('touchcancel', function(){ clearTimeout(longPressTimer); longPressTimer=null; window.__lpStart=null; },{passive:true});
 
   document.addEventListener("click", function (e) {
     var removeBtn = e.target.closest("[data-remove]");
