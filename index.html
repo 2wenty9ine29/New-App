@@ -1255,7 +1255,13 @@
 
   function restoreReceiptToCart(receiptIndex) {
     var r=receipts[receiptIndex]; if(!r || !Array.isArray(r.items) || !r.items.length) return;
-    var targetIndex=(r.cartIndex===0 || r.cartIndex===1) ? r.cartIndex : 0;
+    // Restore into any empty cart so the user's current cart is never overwritten.
+    saveCart();
+    var targetIndex=-1;
+    for(var ci=0; ci<2; ci++){
+      if(!Object.keys(carts[ci]||{}).length){ targetIndex=ci; break; }
+    }
+    if(targetIndex===-1){ showToast('No empty cart'); return; }
     var restored={}; var restoredOrder=[];
     (r.items||[]).forEach(function(i){
       var id=Number(i.id);
@@ -1292,7 +1298,7 @@
         var mode=i.mode==='bulk'?(i.fraction===0.5?'½ BULK':i.fraction===0.25?'¼ BULK':'Full BULK'):'SINGLE';
         return '<li>'+escapeHtml(i.name)+' — '+mode+' × '+i.qty+' — ¢'+formatCedis(i.subtotal)+'</li>';
       }).join('');
-      return '<div class="history-card" data-history-index="'+idx+'"><div class="history-top"><span class="history-receipt">'+escapeHtml(r.number)+'</span><span class="history-total">¢'+formatCedis(r.total)+'</span></div><div class="history-meta">'+when+'</div><ul class="history-items">'+itemsHtml+'</ul></div>';
+      return '<div class="history-card" data-history-index="'+idx+'" data-receipt-index="'+idx+'"><div class="history-top"><span class="history-receipt">'+escapeHtml(r.number)+'</span><span class="history-total">¢'+formatCedis(r.total)+'</span></div><div class="history-meta">'+when+'</div><ul class="history-items">'+itemsHtml+'</ul></div>';
     }).join('');
     renderReceiptHistory();
     updateChangeCalculator();
