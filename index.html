@@ -134,6 +134,25 @@
   .no-match { text-align: center; padding: 18px 0; font-size: 13px; color: var(--ink-soft); }
 
   /* Sell screen search */
+  .sell-titlebar {
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+    padding:12px 20px 4px; flex-shrink:0;
+  }
+  .sell-titlebar h1 { margin:0; font-size:20px; font-weight:650; color:var(--ink); }
+  .sell-titlebar p { margin:2px 0 0; font-size:11px; color:var(--ink-soft); }
+  .sell-titlebar .theme-toggle { position:static; transform:none; width:34px; height:34px; border-radius:50%; background:var(--surface); border:1px solid var(--line); }
+  .sell-titlebar .theme-toggle:active { transform:scale(.92); }
+  .cart-switcher {
+    display:flex; align-items:center; gap:6px; padding:7px 20px 5px; flex-shrink:0;
+    background:var(--paper);
+  }
+  .cart-switch {
+    border:1px solid var(--line); background:var(--surface); color:var(--ink-soft);
+    border-radius:999px; padding:7px 13px; font-size:12px; font-weight:700;
+  }
+  .cart-switch.small { padding:5px 10px; font-size:10px; }
+  .cart-switch.active { background:var(--ink); color:#fff; border-color:var(--ink); }
+  body.dark .cart-switch.active { background:var(--gold); border-color:var(--gold); }
   .search-wrap { flex-shrink: 0; padding: 0 20px 12px; position: relative; }
   .search-wrap svg { position: absolute; left: 34px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: var(--ink-soft); pointer-events: none; }
   #sell-search {
@@ -172,8 +191,7 @@
   .utility-bar { display:flex; gap:8px; padding: 8px 20px 0; flex-shrink:0; flex-wrap:wrap; }
   .utility-btn { border:1px solid var(--line); background:var(--surface); color:var(--ink); border-radius:999px; padding:7px 11px; font-size:12px; font-weight:600; }
   .utility-btn:active { background:var(--gold-soft); }
-  .theme-toggle { position:absolute; right:31px; top:50%; transform:translateY(-50%); width:28px; height:28px; padding:0; border:0; background:transparent; color:var(--ink-soft); display:flex; align-items:center; justify-content:center; font-size:18px; line-height:1; }
-  .theme-toggle:active { color:var(--gold); transform:translateY(-50%) scale(.92); }
+
   .history-list { padding: 0 20px; }
   .history-card { background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:8px 10px; margin-bottom:6px; cursor:pointer; }
   .history-card:active { background:var(--gold-soft); }
@@ -198,6 +216,21 @@
   .restore-row button { border:0; background:none; color:var(--gold); font-weight:700; padding:4px; }
   .receipt-panel { position:fixed; inset:0; z-index:100; background:rgba(0,0,0,.45); display:flex; align-items:flex-end; justify-content:center; }
   .receipt-card { width:min(480px,100%); background:var(--surface); color:var(--ink); border-radius:24px 24px 0 0; padding:22px 20px calc(24px + env(safe-area-inset-bottom)); }
+  .history-receipt-btn { border:1px solid var(--line); background:var(--surface); color:var(--ink); border-radius:999px; padding:7px 11px; font-size:11px; font-weight:700; display:inline-flex; align-items:center; gap:5px; }
+  .history-receipt-btn:active { background:var(--gold-soft); transform:scale(.97); }
+  .history-header { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+  .receipt-history-panel { position:fixed; inset:0; z-index:110; background:rgba(0,0,0,.45); display:flex; align-items:flex-end; justify-content:center; }
+  .receipt-history-card { width:min(480px,100%); max-height:86dvh; overflow-y:auto; background:var(--surface); color:var(--ink); border-radius:24px 24px 0 0; padding:18px 18px calc(22px + env(safe-area-inset-bottom)); }
+  .receipt-history-head { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:12px; }
+  .receipt-history-head h2 { margin:0; font-size:18px; }
+  .receipt-history-close { width:32px; height:32px; border:0; border-radius:50%; background:var(--paper); color:var(--ink); font-size:20px; line-height:1; }
+  .receipt-history-list { display:grid; gap:8px; }
+  .receipt-history-item { border:1px solid var(--line); border-radius:14px; padding:10px 11px; background:var(--paper); }
+  .receipt-history-item .rh-top { display:flex; justify-content:space-between; gap:8px; align-items:center; }
+  .receipt-history-item .rh-no { font-size:12px; font-weight:750; }
+  .receipt-history-item .rh-total { font-size:13px; font-weight:750; color:var(--gold); }
+  .receipt-history-item .rh-meta { color:var(--ink-soft); font-size:10px; margin-top:2px; }
+  .receipt-history-item .rh-items { margin:7px 0 0; padding-left:16px; color:var(--ink-soft); font-size:10.5px; line-height:1.35; }
   .receipt-card h2 { margin:0 0 5px; font-size:20px; }
   .receipt-number { color:var(--gold); font-weight:750; font-size:14px; }
   .receipt-total { font-size:28px; font-weight:750; margin:12px 0 18px; }
@@ -478,11 +511,14 @@
   <!-- SELL SCREEN -->
   <section id="screen-sell" class="screen">
 
+    <div class="sell-titlebar">
+      <div><h1>Sell</h1><p>Build a sale quickly</p></div>
+      <button class="theme-toggle" id="theme-toggle" aria-label="Switch light or dark mode">☾</button>
+    </div>
     <div class="search-wrap">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
       <input id="sell-search" type="text" placeholder="Search items" autocomplete="off">
       <button class="search-clear" id="search-clear" aria-label="Clear search">×</button>
-      <button class="theme-toggle" id="theme-toggle" aria-label="Switch light or dark mode">☾</button>
     </div>
     <div class="catalog-wrap">
       <div class="sale-columns">
@@ -501,6 +537,10 @@
           <ul class="rows" id="single-catalog-list"></ul>
         </div>
       </div>
+    </div>
+    <div class="cart-switcher" aria-label="Choose cart">
+      <button class="cart-switch active" id="cart-1-btn" data-cart-switch="0">Cart 1</button>
+      <button class="cart-switch small" id="cart-2-btn" data-cart-switch="1">Cart 2</button>
     </div>
     <div class="scroll-area">
       <ul class="rows" id="cart-list"></ul>
@@ -527,8 +567,10 @@
   <!-- HISTORY SCREEN -->
   <section id="screen-history" class="screen">
     <header>
-      <h1>History</h1>
-      <p>Last 3 receipts</p>
+      <div class="history-header">
+        <div><h1>History</h1><p>Last 3 receipts</p></div>
+        <button class="history-receipt-btn" id="receipt-history-btn" aria-label="View last 10 receipts">▤ Receipts 10</button>
+      </div>
     </header>
     <div class="scroll-area">
       <div class="history-list" id="history-list"></div>
@@ -541,6 +583,16 @@
       </div>
     </div>
   </section>
+
+  <div class="receipt-history-panel" id="receipt-history-panel" hidden>
+    <div class="receipt-history-card">
+      <div class="receipt-history-head">
+        <div><h2>Recent receipts</h2><div style="font-size:10px;color:var(--ink-soft);margin-top:2px">Last 10 completed sales</div></div>
+        <button class="receipt-history-close" id="receipt-history-close" aria-label="Close receipts">×</button>
+      </div>
+      <div class="receipt-history-list" id="receipt-history-list"></div>
+    </div>
+  </div>
 
   <div class="receipt-panel" id="receipt-panel" hidden>
     <div class="receipt-card">
@@ -624,7 +676,7 @@
   }
   var AVATAR_PALETTE = ["#C6921C", "#1E5C46", "#AD4433", "#2B6E6B", "#8C6A3F"];
   var STORAGE_KEY = "priceListItems_v3";
-  var CART_STORAGE_KEY = "priceListCart_v1";
+  var CART_STORAGE_KEY = "priceListCarts_v2";
 
   var defaultItems = [
     {id:1,name:"Angel Cola",bulk:41.00,single:4.00},
@@ -671,7 +723,7 @@
     {id:42,name:"Perla",bulk:35.00,single:null},
     {id:43,name:"PET Malt",bulk:120.00,single:null},
     {id:44,name:"Planet",bulk:42.00,single:4.00},
-    {id:45,name:"Puma",bulk:42.00,single:null},
+    {id:45,name:"Puma Cola",bulk:42.00,single:null},
     {id:46,name:"Rendez Vous",bulk:35.00,single:null},
     {id:47,name:"Royal Apple and Drinks",bulk:45.00,single:null},
     {id:48,name:"Run",bulk:72.00,single:null},
@@ -685,14 +737,19 @@
     {id:56,name:"Vitamilk (Singles-14)",bulk:80.00,single:14.00},
     {id:57,name:"Vitamilk Kallypo Champion (25 per 6)",bulk:null,single:25.00},
     {id:58,name:"Voltic (Medium)",bulk:35.00,single:null},
-    {id:59,name:"Voltic (Big)",bulk:35.00,single:null},
+    {id:59,name:"Voltic (Big)",bulk:35.00,single:8.00},
     {id:60,name:"Wheat Drink (Medium)",bulk:160.00,single:null},
-    {id:61,name:"5 Star",bulk:47.00,single:5.00}
+    {id:61,name:"5 Star",bulk:47.00,single:5.00},
+    {id:62,name:"Blue Jeans",bulk:null,single:null},
+    {id:63,name:"Lucozade Bottle and Can (6 pieces)",bulk:null,single:null}
   ];
   defaultItems.forEach(function(i){ i.photo = null; });
 
   var items = loadItems();
-  var cart = loadCart();
+  ensureLatestItems();
+  var carts = loadCarts();
+  var activeCartIndex = 0;
+  var cart = carts[0];
   var clearedCarts = loadJson('price-list-cleared-carts-v1', []);
   var receipts = loadJson('price-list-receipts-v1', []);
   var receiptCounter = Number(localStorage.getItem('price-list-receipt-counter-v1') || 0);
@@ -701,7 +758,7 @@
   var editingId = null;
   var sellSearchQuery = "";
   var lastTotal = -1;
-  var cartOrder = loadJson('price-list-cart-order-v1', []);
+  var cartOrder = loadJson('price-list-cart-order-v1-' + activeCartIndex, []);
   var cartRevision = 0;
   var undoState = null;
 
@@ -715,18 +772,64 @@
   function saveItems() {
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(items)); } catch (e) {}
   }
-  function loadCart() {
+  function ensureLatestItems() {
+    var changed = false;
+    var updates = [
+      {id:45,name:"Puma Cola",bulk:42.00,single:null},
+      {id:59,name:"Voltic (Big)",bulk:35.00,single:8.00},
+      {id:62,name:"Blue Jeans",bulk:null,single:null},
+      {id:63,name:"Lucozade Bottle and Can (6 pieces)",bulk:null,single:null}
+    ];
+    updates.forEach(function(u){
+      var existing = items.find(function(i){ return i.id === u.id; });
+      if (existing) {
+        if (existing.name !== u.name) { existing.name = u.name; changed = true; }
+        if (u.id === 59 && Number(existing.single) !== 8) { existing.single = 8; changed = true; }
+      } else {
+        items.push({id:u.id,name:u.name,bulk:u.bulk,single:u.single,photo:null});
+        changed = true;
+      }
+    });
+    if (changed) saveItems();
+  }
+
+  function loadCarts() {
     try {
       var raw = localStorage.getItem(CART_STORAGE_KEY);
       if (raw) {
         var parsed = JSON.parse(raw);
-        if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) return parsed;
+        if (Array.isArray(parsed) && parsed.length >= 2 && parsed[0] && parsed[1]) return [parsed[0], parsed[1]];
       }
+      var legacy = localStorage.getItem("priceListCart_v1");
+      var first = legacy ? JSON.parse(legacy) : {};
+      if (!first || Array.isArray(first) || typeof first !== "object") first = {};
+      return [first, {}];
     } catch (e) {}
-    return {};
+    return [{}, {}];
   }
   function saveCart() {
-    try { localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart)); } catch (e) {}
+    try {
+      carts[activeCartIndex] = cart;
+      localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(carts));
+    } catch (e) {}
+  }
+  function switchCart(index) {
+    index = Number(index);
+    if (index !== 0 && index !== 1) return;
+    saveCart();
+    activeCartIndex = index;
+    cart = carts[activeCartIndex] || {};
+    cartOrder = loadJson('price-list-cart-order-v1-' + activeCartIndex, []);
+    migrateLegacyCart();
+    normalizeCartOrder();
+    renderCart();
+    updateCartSwitcher();
+    showToast('Cart ' + (index + 1) + ' selected');
+  }
+  function updateCartSwitcher() {
+    document.querySelectorAll('.cart-switch').forEach(function(btn){
+      btn.classList.toggle('active', Number(btn.dataset.cartSwitch) === activeCartIndex);
+    });
   }
   function loadJson(key, fallback) {
     try { var raw = localStorage.getItem(key); return raw ? JSON.parse(raw) : fallback; } catch (e) { return fallback; }
@@ -741,7 +844,7 @@
     });
     keys.forEach(function(k){ if (!seen[k]) { cartOrder.push(k); seen[k]=true; } });
     cartOrder = cartOrder.filter(function(k){ return Object.prototype.hasOwnProperty.call(cart,k) && Number(cart[k]) > 0; });
-    saveJson('price-list-cart-order-v1', cartOrder);
+    saveJson('price-list-cart-order-v1-' + activeCartIndex, cartOrder);
   }
   function moveCartKeyToTop(key) {
     cartOrder = (Array.isArray(cartOrder) ? cartOrder : []).filter(function(k){ return k !== key; });
@@ -750,7 +853,7 @@
   }
   function removeCartKeyFromOrder(key) {
     cartOrder = (Array.isArray(cartOrder) ? cartOrder : []).filter(function(k){ return k !== key; });
-    saveJson('price-list-cart-order-v1', cartOrder);
+    saveJson('price-list-cart-order-v1-' + activeCartIndex, cartOrder);
   }
   function bumpCartRevision() { cartRevision += 1; }
   function cartSnapshot() { return JSON.parse(JSON.stringify(cart)); }
@@ -1025,14 +1128,14 @@
   }
   function restoreCleared(index) {
     var snap=clearedCarts[index]; if (!snap) return;
-    cart=JSON.parse(JSON.stringify(snap)); cartOrder=Object.keys(cart); saveJson('price-list-cart-order-v1', cartOrder); bumpCartRevision(); saveCart(); renderCart(); renderRestorePanel(); showToast('Sale restored');
+    cart=JSON.parse(JSON.stringify(snap)); cartOrder=Object.keys(cart); saveJson('price-list-cart-order-v1-' + activeCartIndex, cartOrder); bumpCartRevision(); saveCart(); renderCart(); renderRestorePanel(); showToast('Sale restored');
   }
   function clearCart() {
     if (!Object.keys(cart).length) return;
     var snapshot=cartSnapshot();
     clearedCarts.unshift(snapshot); clearedCarts=clearedCarts.slice(0,2); saveJson('price-list-cleared-carts-v1', clearedCarts);
     var previousOrder=cartOrder.slice();
-    cart = {}; cartOrder=[]; bumpCartRevision(); saveJson('price-list-cart-order-v1', cartOrder); saveCart(); renderCart(); renderRestorePanel();
+    cart = {}; cartOrder=[]; bumpCartRevision(); saveJson('price-list-cart-order-v1-' + activeCartIndex, cartOrder); saveCart(); renderCart(); renderRestorePanel();
     showUndo('Sale cleared', function(){
       cart=JSON.parse(JSON.stringify(snapshot)); cartOrder=previousOrder.filter(function(k){ return Object.prototype.hasOwnProperty.call(cart,k); });
       normalizeCartOrder(); bumpCartRevision(); saveCart(); renderCart(); renderRestorePanel();
@@ -1051,7 +1154,7 @@
     var receipt={number:receiptNo,total:total,createdAt:new Date().toISOString(),items:entries.map(function(e){
       return {name:e.item.name,mode:e.mode,fraction:e.fraction,qty:e.qty,subtotal:(priceForMode(e.item,e.mode,e.fraction)||0)*e.qty};
     })};
-    receipts.unshift(receipt); receipts=receipts.slice(0,3); saveJson('price-list-receipts-v1',receipts);
+    receipts.unshift(receipt); receipts=receipts.slice(0,10); saveJson('price-list-receipts-v1',receipts);
     document.getElementById('receipt-number').textContent=receiptNo;
     document.getElementById('receipt-total').textContent='¢'+formatCedis(total);
     document.getElementById('receipt-panel').hidden=false;
@@ -1066,7 +1169,7 @@
   }
   function renderHistory(){
     var list=document.getElementById('history-list'); if(!list) return;
-    if(!receipts.length){ list.innerHTML='<div class="history-empty">No completed sales yet.</div>'; updateChangeCalculator(); return; }
+    if(!receipts.length){ list.innerHTML='<div class="history-empty">No completed sales yet.</div>'; renderReceiptHistory(); updateChangeCalculator(); return; }
     list.innerHTML=receipts.slice(0,3).map(function(r,idx){
       var d=new Date(r.createdAt); var when=isNaN(d.getTime())?'':d.toLocaleString([], {month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
       var itemsHtml=(r.items||[]).map(function(i){
@@ -1075,7 +1178,20 @@
       }).join('');
       return '<div class="history-card" data-history-index="'+idx+'"><div class="history-top"><span class="history-receipt">'+escapeHtml(r.number)+'</span><span class="history-total">¢'+formatCedis(r.total)+'</span></div><div class="history-meta">'+when+'</div><ul class="history-items">'+itemsHtml+'</ul></div>';
     }).join('');
+    renderReceiptHistory();
     updateChangeCalculator();
+  }
+  function renderReceiptHistory(){
+    var list=document.getElementById('receipt-history-list'); if(!list) return;
+    if(!receipts.length){ list.innerHTML='<div class="history-empty">No completed sales yet.</div>'; return; }
+    list.innerHTML=receipts.slice(0,10).map(function(r){
+      var d=new Date(r.createdAt); var when=isNaN(d.getTime())?'':d.toLocaleString([], {month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'});
+      var itemsHtml=(r.items||[]).map(function(i){
+        var mode=i.mode==='bulk'?(i.fraction===0.5?'½ BULK':i.fraction===0.25?'¼ BULK':'Full BULK'):'SINGLE';
+        return '<li>'+escapeHtml(i.name)+' — '+mode+' × '+i.qty+' — ¢'+formatCedis(i.subtotal)+'</li>';
+      }).join('');
+      return '<div class="receipt-history-item"><div class="rh-top"><span class="rh-no">'+escapeHtml(r.number)+'</span><span class="rh-total">¢'+formatCedis(r.total)+'</span></div><div class="rh-meta">'+when+'</div><ul class="rh-items">'+itemsHtml+'</ul></div>';
+    }).join('');
   }
   function updateChangeCalculator(){
     var liveTotal=receiptTotalFromSnapshot(cart);
@@ -1234,6 +1350,9 @@
     var editRow = e.target.closest("[data-edit]");
     if (editRow) return openEditSheet(Number(editRow.dataset.edit));
 
+    var cartSwitch = e.target.closest("[data-cart-switch]");
+    if (cartSwitch) return switchCart(Number(cartSwitch.dataset.cartSwitch));
+
     var tabBtn = e.target.closest(".tab-btn");
     if (tabBtn) return switchTab(tabBtn.dataset.tab);
 
@@ -1243,6 +1362,8 @@
     if (e.target.closest("#sheet-delete-btn")) return handleSheetDelete();
     if (e.target.closest("#clear-btn")) return clearCart();
     if (e.target.closest("#complete-btn")) return completeSale();
+    if (e.target.closest("#receipt-history-btn")) { renderReceiptHistory(); document.getElementById('receipt-history-panel').hidden=false; return; }
+    if (e.target.closest("#receipt-history-close") || e.target === document.getElementById('receipt-history-panel')) { document.getElementById('receipt-history-panel').hidden=true; return; }
     if (e.target.closest("#theme-toggle")) { darkMode=!darkMode; applyTheme(); return; }
     var historyCard=e.target.closest('[data-history-index]');
     if (historyCard) { historyCard.classList.toggle('expanded'); return; }
@@ -1280,6 +1401,7 @@
   renderRestorePanel();
   renderHistory();
   document.getElementById("money-received").addEventListener("input", updateChangeCalculator);
+  updateCartSwitcher();
   switchTab("sell");
 </script>
 </body>
