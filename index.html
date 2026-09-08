@@ -761,6 +761,7 @@
     {id:18,name:"Ceres (Medium)",bulk:16.00,single:null},
     {id:19,name:"Ceres (Large)",bulk:35.00,single:null},
     {id:20,name:"ChocoMalt",bulk:75.00,single:null},
+    {id:64,name:"ChocoMalt (Small)",bulk:52.00,single:null},
     {id:21,name:"Coke Bottle (Large)",bulk:25.00,single:null},
     {id:22,name:"Coke Bottle (Medium, 450ml)",bulk:90.00,single:null},
     {id:23,name:"Coke Bottle (Small)",bulk:65.00,single:null},
@@ -776,11 +777,11 @@
     {id:33,name:"Kalyppo",bulk:97.00,single:5.00},
     {id:34,name:"Kangen (Small)",bulk:30.00,single:null},
     {id:35,name:"Kangen (Big)",bulk:30.00,single:null},
-    {id:36,name:"Lucozade (6 pieces)",bulk:80.00,single:null},
+    {id:36,name:"Lucozade (Per 6)",bulk:80.00,single:null},
     {id:37,name:"Malt Guinness Bottle",bulk:120.00,single:null},
     {id:38,name:"Multi Fruit (Big Red)",bulk:75.00,single:null},
     {id:39,name:"Multi Fruit (Small)",bulk:null,single:null},
-    {id:40,name:"Multi Fruit Kiki (6)",bulk:20.00,single:null},
+    {id:40,name:"Multi Fruit Kiki (Per 6)",bulk:20.00,single:null},
     {id:41,name:"Niche",bulk:null,single:6.00},
     {id:42,name:"Perla",bulk:35.00,single:null},
     {id:43,name:"PET Malt",bulk:120.00,single:null},
@@ -797,13 +798,13 @@
     {id:54,name:"U-Fresh Grapes (Medium)",bulk:38.00,single:null},
     {id:55,name:"Verna 36 (Small)",bulk:60.00,single:null},
     {id:56,name:"Vitamilk (Singles-14)",bulk:80.00,single:14.00},
-    {id:57,name:"Vitamilk Kallypo Champion (25 per 6)",bulk:null,single:25.00},
+    {id:57,name:"Vitamilk Kallypo Champion (Per 6)",bulk:25.00,single:null},
     {id:58,name:"Voltic (Medium)",bulk:35.00,single:null},
     {id:59,name:"Voltic (Big)",bulk:35.00,single:8.00},
     {id:60,name:"Wheat Drink (Medium)",bulk:160.00,single:null},
     {id:61,name:"5 Star",bulk:47.00,single:5.00},
     {id:62,name:"Blue Jeans",bulk:null,single:null},
-    {id:63,name:"Lucozade Bottle and Can (6 pieces)",bulk:null,single:null}
+    {id:63,name:"Lucozade Bottle and Can (Per 6)",bulk:null,single:null}
   ];
   defaultItems.forEach(function(i){ i.photo = null; });
 
@@ -846,13 +847,18 @@
       {id:45,name:"Puma Cola",bulk:42.00,single:null},
       {id:59,name:"Voltic (Big)",bulk:35.00,single:8.00},
       {id:62,name:"Blue Jeans",bulk:null,single:null},
-      {id:63,name:"Lucozade Bottle and Can (6 pieces)",bulk:null,single:null}
+      {id:63,name:"Lucozade Bottle and Can (Per 6)",bulk:null,single:null},
+      {id:36,name:"Lucozade (Per 6)",bulk:80.00,single:null},
+      {id:40,name:"Multi Fruit Kiki (Per 6)",bulk:20.00,single:null},
+      {id:57,name:"Vitamilk Kallypo Champion (Per 6)",bulk:25.00,single:null},
+      {id:64,name:"ChocoMalt (Small)",bulk:52.00,single:null}
     ];
     updates.forEach(function(u){
       var existing = items.find(function(i){ return i.id === u.id; });
       if (existing) {
         if (existing.name !== u.name) { existing.name = u.name; changed = true; }
-        if (u.id === 59 && Number(existing.single) !== 8) { existing.single = 8; changed = true; }
+        if (u.bulk !== undefined && Number(existing.bulk) !== Number(u.bulk)) { existing.bulk = u.bulk; changed = true; }
+        if (u.single !== undefined && (existing.single === undefined ? null : existing.single) !== u.single) { existing.single = u.single; changed = true; }
       } else {
         items.push({id:u.id,name:u.name,bulk:u.bulk,single:u.single,photo:null});
         changed = true;
@@ -1204,8 +1210,8 @@
     var total=receiptTotalFromSnapshot(cart);
     receiptCounter += 1; localStorage.setItem('price-list-receipt-counter-v1', String(receiptCounter));
     var receiptNo='Receipt #' + String(receiptCounter).padStart(4,'0');
-    var receipt={number:receiptNo,total:total,createdAt:new Date().toISOString(),items:entries.map(function(e){
-      return {name:e.item.name,mode:e.mode,fraction:e.fraction,qty:e.qty,subtotal:(priceForMode(e.item,e.mode,e.fraction)||0)*e.qty};
+    var receipt={number:receiptNo,total:total,createdAt:new Date().toISOString(),cartIndex:activeCartIndex,items:entries.map(function(e){
+      return {id:e.item.id,key:e.key,name:e.item.name,mode:e.mode,fraction:e.fraction,qty:e.qty,subtotal:(priceForMode(e.item,e.mode,e.fraction)||0)*e.qty};
     })};
     receipts.unshift(receipt); receipts=receipts.slice(0,10); saveJson('price-list-receipts-v1',receipts);
     document.getElementById('receipt-number').textContent=receiptNo;
@@ -1245,6 +1251,29 @@
     carts[overviewCartIndex]=target; saveJson(CART_STORAGE_KEY,carts);
     if(overviewCartIndex===activeCartIndex){ cart=target; cartOrder=Object.keys(cart); saveJson('price-list-cart-order-v1-'+activeCartIndex,cartOrder); renderCart(); }
     renderCartOverview();
+  }
+
+  function restoreReceiptToCart(receiptIndex) {
+    var r=receipts[receiptIndex]; if(!r || !Array.isArray(r.items) || !r.items.length) return;
+    var targetIndex=(r.cartIndex===0 || r.cartIndex===1) ? r.cartIndex : 0;
+    var restored={}; var restoredOrder=[];
+    (r.items||[]).forEach(function(i){
+      var id=Number(i.id);
+      if(!id && i.name){ var found=items.find(function(x){return x.name===i.name;}); if(found) id=found.id; }
+      if(!id) return;
+      var mode=i.mode || 'bulk', fraction=(i.fraction==null?1:Number(i.fraction));
+      var key=i.key || cartKey(id,mode,fraction);
+      restored[key]=(Number(restored[key])||0)+(Number(i.qty)||0);
+      if(restoredOrder.indexOf(key)<0) restoredOrder.push(key);
+    });
+    if(!Object.keys(restored).length) return;
+    saveCart();
+    carts[targetIndex]=restored;
+    saveJson(CART_STORAGE_KEY,carts);
+    saveJson('price-list-cart-order-v1-'+targetIndex,restoredOrder);
+    activeCartIndex=targetIndex; cart=restored; cartOrder=restoredOrder;
+    normalizeCartOrder(); updateCartSwitcher(); renderCart();
+    switchTab('sell');
   }
 
   function applyTheme() {
@@ -1430,6 +1459,15 @@
   document.addEventListener('touchend', function(){ clearTimeout(longPressTimer); longPressTimer=null; window.__lpStart=null; },{passive:true});
   document.addEventListener('touchcancel', function(){ clearTimeout(longPressTimer); longPressTimer=null; window.__lpStart=null; },{passive:true});
 
+  var receiptHoldTimer=null, receiptHoldTriggered=false;
+  document.addEventListener('touchstart', function(e){
+    var row=e.target.closest && e.target.closest('[data-receipt-index]'); if(!row) return;
+    receiptHoldTriggered=false; clearTimeout(receiptHoldTimer);
+    receiptHoldTimer=setTimeout(function(){ receiptHoldTriggered=true; restoreReceiptToCart(Number(row.dataset.receiptIndex)); },650);
+  },{passive:true});
+  document.addEventListener('touchend', function(){ clearTimeout(receiptHoldTimer); receiptHoldTimer=null; },{passive:true});
+  document.addEventListener('touchcancel', function(){ clearTimeout(receiptHoldTimer); receiptHoldTimer=null; },{passive:true});
+
   document.addEventListener("click", function (e) {
     var removeBtn = e.target.closest("[data-remove]");
     if (removeBtn) return removeItem(Number(removeBtn.dataset.remove));
@@ -1482,7 +1520,9 @@
     if(e.target.closest('#quantity-add')){ confirmQuantity(); return; }
     if (e.target.closest("#theme-toggle")) { darkMode=!darkMode; applyTheme(); return; }
     var historyCard=e.target.closest('[data-history-index]');
-    if (historyCard) { historyCard.classList.toggle('expanded'); return; }
+    if (historyCard) { if(receiptHoldTriggered){ receiptHoldTriggered=false; return; } historyCard.classList.toggle('expanded'); return; }
+    var receiptHistoryItem=e.target.closest('[data-receipt-index]');
+    if (receiptHistoryItem && receiptHoldTriggered) { receiptHoldTriggered=false; return; }
     if (e.target.closest("#receipt-close-btn")) { document.getElementById('receipt-panel').hidden=true; return; }
     var qtyTap=e.target.closest('[data-qty]');
     if (qtyTap) {
