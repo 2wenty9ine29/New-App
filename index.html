@@ -241,7 +241,12 @@
   .receipt-history-item .rh-items { margin:7px 0 0; padding-left:16px; color:var(--ink-soft); font-size:10.5px; line-height:1.35; }
   .receipt-card h2 { margin:0 0 5px; font-size:20px; }
   .receipt-number { color:var(--gold); font-weight:750; font-size:14px; }
-  .receipt-total { font-size:28px; font-weight:750; margin:12px 0 18px; }
+  .receipt-summary { margin:14px 0 20px; display:grid; gap:7px; }
+  .receipt-summary-line { display:flex; justify-content:space-between; gap:18px; font-size:15px; }
+  .receipt-summary-line strong { font-size:17px; }
+  .receipt-discount-row { color:var(--ink-soft); }
+  .receipt-new-total { padding-top:8px; border-top:1px solid var(--line); font-size:18px; }
+  .receipt-new-total strong { font-size:28px; color:var(--gold); }
   .receipt-actions { display:flex; gap:10px; }
   .receipt-actions button { flex:1; border:0; border-radius:12px; padding:12px; font-size:14px; font-weight:650; }
   .receipt-actions .primary { background:var(--gold); color:#fff; }
@@ -668,7 +673,11 @@
     <div class="receipt-card">
       <h2>Sale completed ✓</h2>
       <div class="receipt-number" id="receipt-number">Receipt #0001</div>
-      <div class="receipt-total" id="receipt-total">¢0.00</div>
+      <div class="receipt-summary" id="receipt-summary">
+        <div class="receipt-summary-line"><span>TOTAL</span><strong id="receipt-gross">¢0.00</strong></div>
+        <div class="receipt-summary-line receipt-discount-row" id="receipt-discount-row" hidden><span>DISCOUNT</span><strong id="receipt-discount">-¢0.00</strong></div>
+        <div class="receipt-summary-line receipt-new-total" id="receipt-new-total-row" hidden><span>NEW TOTAL</span><strong id="receipt-total">¢0.00</strong></div>
+      </div>
       <div class="receipt-actions">
         <button class="primary" id="receipt-close-btn">Done</button>
         <button class="secondary receipt-share-btn" id="receipt-share-btn">Share</button>
@@ -769,8 +778,10 @@
     {id:17,name:"Can Malt Nigeria",bulk:190.00,single:10.00},
     {id:18,name:"Ceres (Medium)",bulk:16.00,single:null},
     {id:19,name:"Ceres (Large)",bulk:35.00,single:null},
+    {id:65,name:"Frutelli Large",bulk:30.00,single:null},
     {id:20,name:"ChocoMalt",bulk:75.00,single:null},
     {id:64,name:"ChocoMalt (Small)",bulk:52.00,single:null},
+      {id:65,name:"Frutelli Large",bulk:30.00,single:null},
     {id:21,name:"Coke Bottle (Large)",bulk:25.00,single:null},
     {id:22,name:"Coke Bottle (Medium, 450ml)",bulk:90.00,single:null},
     {id:23,name:"Coke Bottle (Small)",bulk:65.00,single:null},
@@ -812,8 +823,8 @@
     {id:59,name:"Voltic (Big)",bulk:35.00,single:8.00},
     {id:60,name:"Wheat Drink (Medium)",bulk:160.00,single:null},
     {id:61,name:"5 Star",bulk:47.00,single:5.00},
-    {id:62,name:"Blue Jeans",bulk:null,single:null},
-    {id:63,name:"Lucozade Bottle and Can (Per 6)",bulk:null,single:null}
+    {id:62,name:"Blue Jeans (Per 6)",bulk:115.00,single:null},
+    {id:63,name:"Lucozade Bottle and Can (Per 6)",bulk:115.00,single:null}
   ];
   defaultItems.forEach(function(i){ i.photo = null; });
 
@@ -858,12 +869,13 @@
     var updates = [
       {id:45,name:"Puma Cola",bulk:42.00,single:null},
       {id:59,name:"Voltic (Big)",bulk:35.00,single:8.00},
-      {id:62,name:"Blue Jeans",bulk:null,single:null},
-      {id:63,name:"Lucozade Bottle and Can (Per 6)",bulk:null,single:null},
+      {id:62,name:"Blue Jeans (Per 6)",bulk:115.00,single:null},
+      {id:63,name:"Lucozade Bottle and Can (Per 6)",bulk:115.00,single:null},
       {id:36,name:"Lucozade (Per 6)",bulk:80.00,single:null},
       {id:40,name:"Multi Fruit Kiki (Per 6)",bulk:20.00,single:null},
       {id:57,name:"Vitamilk Kallypo Champion (Per 6)",bulk:25.00,single:null},
-      {id:64,name:"ChocoMalt (Small)",bulk:52.00,single:null}
+      {id:64,name:"ChocoMalt (Small)",bulk:52.00,single:null},
+      {id:65,name:"Frutelli Large",bulk:30.00,single:null}
     ];
     updates.forEach(function(u){
       var existing = items.find(function(i){ return i.id === u.id; });
@@ -1252,7 +1264,13 @@
     })};
     receipts.unshift(receipt); receipts=receipts.slice(0,10); saveJson('price-list-receipts-v1',receipts);
     document.getElementById('receipt-number').textContent=receiptNo;
+    document.getElementById('receipt-gross').textContent='¢'+formatCedis(grossTotal);
     document.getElementById('receipt-total').textContent='¢'+formatCedis(total);
+    var receiptDiscountRow=document.getElementById('receipt-discount-row');
+    var receiptNewTotalRow=document.getElementById('receipt-new-total-row');
+    if(receiptDiscountRow) receiptDiscountRow.hidden=discount<=0;
+    if(receiptNewTotalRow) receiptNewTotalRow.hidden=discount<=0;
+    if(discount>0) document.getElementById('receipt-discount').textContent='-¢'+formatCedis(discount);
     document.getElementById('receipt-panel').hidden=false;
     cart={}; discounts[activeCartIndex]=0; saveCart(); renderCart(); renderHistory();
   }
@@ -1334,24 +1352,35 @@
   async function shareReceipt(receiptIndex) {
     var r=receipts[receiptIndex]; if(!r) return;
     var canvas=document.createElement('canvas'), ctx=canvas.getContext('2d');
-    var W=900, pad=70, line=42, rows=(r.items||[]).length;
-    var H=260+rows*line+(Number(r.discount)||0)>0?0:0;
-    H=300+rows*line+(Number(r.discount)||0>0?45:0);
+    var W=900, pad=70, amountX=700, line=42, rows=(r.items||[]).length;
+    var hasDiscount=(Number(r.discount)||0)>0;
+    var H=300+rows*line+(hasDiscount?130:0);
     canvas.width=W; canvas.height=H;
     ctx.fillStyle='#ffffff'; ctx.fillRect(0,0,W,H); ctx.fillStyle='#202020';
     ctx.font='700 42px system-ui'; ctx.fillText('RECEIPT',pad,70);
     ctx.font='600 28px system-ui'; ctx.fillText(r.number,pad,115);
     ctx.font='22px system-ui'; ctx.fillText(new Date(r.createdAt).toLocaleString(),pad,150);
     var y=205; ctx.font='22px system-ui';
-    (r.items||[]).forEach(function(i){ ctx.fillText((i.name||'')+'  × '+i.qty, pad,y); ctx.textAlign='right'; ctx.fillText('¢'+formatCedis(i.subtotal||0),W-pad,y); ctx.textAlign='left'; y+=line; });
-    y+=15; ctx.strokeStyle='#dddddd'; ctx.beginPath(); ctx.moveTo(pad,y); ctx.lineTo(W-pad,y); ctx.stroke(); y+=45;
-    if(Number(r.discount)||0){ ctx.fillText('Discount',pad,y); ctx.textAlign='right'; ctx.fillText('-¢'+formatCedis(r.discount),W-pad,y); ctx.textAlign='left'; y+=40; }
-    ctx.font='700 34px system-ui'; ctx.fillText('TOTAL',pad,y); ctx.textAlign='right'; ctx.fillText('¢'+formatCedis(r.total),W-pad,y); ctx.textAlign='left';
+    (r.items||[]).forEach(function(i){
+      var label=(i.name||'')+'  × '+i.qty;
+      var maxText=amountX-pad-35;
+      while(label.length>4 && ctx.measureText(label).width>maxText) label=label.slice(0,-2)+'…';
+      ctx.fillText(label,pad,y);
+      ctx.textAlign='right'; ctx.fillText('¢'+formatCedis(i.subtotal||0),amountX,y); ctx.textAlign='left'; y+=line;
+    });
+    y+=15; ctx.strokeStyle='#dddddd'; ctx.beginPath(); ctx.moveTo(pad,y); ctx.lineTo(amountX+120,y); ctx.stroke(); y+=45;
+    if(hasDiscount){
+      ctx.font='600 22px system-ui'; ctx.fillText('TOTAL',pad,y); ctx.textAlign='right'; ctx.fillText('¢'+formatCedis(r.grossTotal!=null?r.grossTotal:r.total),amountX,y); ctx.textAlign='left'; y+=40;
+      ctx.fillText('DISCOUNT',pad,y); ctx.textAlign='right'; ctx.fillText('-¢'+formatCedis(r.discount),amountX,y); ctx.textAlign='left'; y+=45;
+      ctx.font='700 34px system-ui'; ctx.fillText('NEW TOTAL',pad,y); ctx.textAlign='right'; ctx.fillText('¢'+formatCedis(r.total),amountX,y); ctx.textAlign='left';
+    } else {
+      ctx.font='700 34px system-ui'; ctx.fillText('TOTAL',pad,y); ctx.textAlign='right'; ctx.fillText('¢'+formatCedis(r.total),amountX,y); ctx.textAlign='left';
+    }
     canvas.toBlob(async function(blob){
       if(!blob) return;
       var file=new File([blob], (r.number||'receipt')+'.png', {type:'image/png'});
       try {
-        if(navigator.share && (!navigator.canShare || navigator.canShare({files:[file]}))) await navigator.share({title:r.number,text:'Receipt '+r.number,files:[file]});
+        if(navigator.share && (!navigator.canShare || navigator.canShare({files:[file]}))) await navigator.share({title:r.number,text:r.number,files:[file]});
         else { var url=URL.createObjectURL(blob); var a=document.createElement('a'); a.href=url; a.download=file.name; a.click(); setTimeout(function(){URL.revokeObjectURL(url);},1000); showToast('Receipt image ready'); }
       } catch(e) {}
     },'image/png');
