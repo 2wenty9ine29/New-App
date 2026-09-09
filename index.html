@@ -1094,11 +1094,22 @@
   }
   // Receipt lists show fractional bulk quantities explicitly. A single half/quarter
   // is displayed as × 1/2 or × 1/4 instead of the misleading × 1.
+  // Recover the fraction from the saved cart key as a fallback so older/imported
+  // receipt records cannot silently lose the half/quarter marker.
+  function receiptFraction(item) {
+    var fraction = Number(item && item.fraction);
+    if (fraction === 0.5 || fraction === 0.25 || fraction === 1) return fraction;
+    var key = String(item && item.key || '');
+    var parts = key.split('|');
+    var keyFraction = Number(parts.length > 2 ? parts[2] : NaN);
+    return (keyFraction === 0.5 || keyFraction === 0.25 || keyFraction === 1) ? keyFraction : 1;
+  }
   function receiptQuantityText(item) {
     var qty = Number(item && item.qty) || 0;
-    var fraction = Number(item && item.fraction);
-    if (item && item.mode === 'bulk' && fraction === 0.5) return qty === 1 ? '1/2' : String(qty) + ' × 1/2';
-    if (item && item.mode === 'bulk' && fraction === 0.25) return qty === 1 ? '1/4' : String(qty) + ' × 1/4';
+    var fraction = receiptFraction(item);
+    var mode = item && item.mode ? item.mode : (String(item && item.key || '').split('|')[1] || 'bulk');
+    if (mode === 'bulk' && fraction === 0.5) return qty === 1 ? '1/2' : String(qty) + ' × 1/2';
+    if (mode === 'bulk' && fraction === 0.25) return qty === 1 ? '1/4' : String(qty) + ' × 1/4';
     return String(qty);
   }
   function cartKey(id, mode, fraction) {
