@@ -83,7 +83,7 @@
 
   .manage-search-wrap { padding: 0 20px 12px; flex-shrink: 0; }
   .manage-search-wrap .search-wrap { margin: 0; }
-  #manage-search { width: 100%; border: 0; outline: none; background: transparent; color: var(--ink); font-size: 14px; min-width: 0; }
+  #manage-search { width: 100%; padding-right: 42px; box-sizing: border-box; border: 0; outline: none; background: transparent; color: var(--ink); font-size: 14px; min-width: 0; }
   #manage-search::placeholder { color: var(--ink-soft); }
   .manage-copy-wrap { padding: 12px 0 20px; }
   .manage-copy-btn { width: 100%; border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 14px; padding: 12px 14px; font-size: 14px; font-weight: 650; }
@@ -173,7 +173,7 @@
   #sell-search:focus { border-color: var(--gold); box-shadow: 0 0 0 3px var(--gold-soft); }
 
   .search-clear {
-    position: absolute; right: 31px; top: 50%; transform: translateY(-50%);
+    position: absolute; right: 41px; top: 50%; transform: translateY(-50%);
     width: 24px; height: 24px; border: 0; border-radius: 50%; background: var(--line);
     color: var(--ink-soft); display: none; align-items: center; justify-content: center;
     font-size: 16px; line-height: 1; padding: 0; z-index: 2;
@@ -813,7 +813,7 @@
     {id:3,name:"Awake (Tiny Bottles)",bulk:25.00,single:null},
     {id:4,name:"Awake (Small)",bulk:35.00,single:3.00},
     {id:5,name:"Awake (Medium)",bulk:45.00,single:4.00},
-    {id:6,name:"Bel Active",bulk:50.00,single:null},
+    {id:6,name:"Bel Active",bulk:50.00,single:6.00},
     {id:7,name:"Bel Aqua (Small)",bulk:35.00,single:null},
     {id:8,name:"Bel Aqua (Medium)",bulk:45.00,single:null},
     {id:9,name:"Bel Aqua (1 Litre)",bulk:45.00,single:null},
@@ -888,18 +888,20 @@
   try { localStorage.removeItem('price-list-cleared-carts-v1'); } catch(e) {}
   var receipts = loadJson('price-list-receipts-v1', []);
   var receiptCounter = Number(localStorage.getItem('price-list-receipt-counter-v1') || 0);
+
+  // Keep the visible receipt numbers orderly by date while the counter itself
+  // always moves forward. This means the newest saved receipt has the largest
+  // visible number, while deleting/restoring a receipt never reuses a number.
   function normalizeReceiptNumbers() {
     if (!Array.isArray(receipts) || !receipts.length) return;
-    var maxNo = Number(receiptCounter) || 0;
-    receipts.forEach(function(r){ var m=String(r.number||'').match(/(\d+)$/); if(m) maxNo=Math.max(maxNo,Number(m[1])); });
-    if(maxNo < receipts.length) maxNo=receipts.length;
-    var ordered=receipts.slice().sort(function(a,b){ return new Date(a.createdAt).getTime()-new Date(b.createdAt).getTime(); });
-    var first=maxNo-ordered.length+1;
-    ordered.forEach(function(r,i){ r.number='Receipt #'+String(first+i).padStart(4,'0'); });
-    receipts=ordered.reverse();
-    receiptCounter=maxNo;
-    saveJson('price-list-receipts-v1',receipts);
-    localStorage.setItem('price-list-receipt-counter-v1',String(receiptCounter));
+    receipts.sort(function(a,b){ return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(); });
+    var start = Math.max(1, Number(receiptCounter)||0 - receipts.length + 1);
+    receipts.forEach(function(r, i){ r.number='Receipt #' + String(start+i).padStart(4,'0'); });
+    receipts.sort(function(a,b){ return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(); });
+    var highest = start + receipts.length - 1;
+    receiptCounter = Math.max(Number(receiptCounter)||0, highest);
+    localStorage.setItem('price-list-receipt-counter-v1', String(receiptCounter));
+    saveJson('price-list-receipts-v1', receipts);
   }
   normalizeReceiptNumbers();
   var darkMode = localStorage.getItem('price-list-dark-mode-v1') === '1';
@@ -1453,7 +1455,7 @@
     var receipt={number:receiptNo,total:total,grossTotal:grossTotal,discount:discount,createdAt:new Date().toISOString(),cartIndex:activeCartIndex,items:entries.map(function(e){
       return {id:e.item.id,key:e.key,name:e.item.name,mode:e.mode,fraction:e.fraction,qty:e.qty,subtotal:(priceForMode(e.item,e.mode,e.fraction)||0)*e.qty};
     })};
-    receipts.unshift(receipt); receipts=receipts.slice(0,20); normalizeReceiptNumbers();
+    receipts.unshift(receipt); receipts=receipts.slice(0,20); saveJson('price-list-receipts-v1',receipts);
     document.getElementById('receipt-number').textContent=receiptNo;
     document.getElementById('receipt-gross').textContent='¢'+formatCedis(grossTotal);
     document.getElementById('receipt-total').textContent='¢'+formatCedis(total);
@@ -1502,8 +1504,6 @@
 
   function restoreReceiptToCart(receiptIndex) {
     var r=receipts[receiptIndex]; if(!r || !Array.isArray(r.items) || !r.items.length) return;
-    var when=new Date(r.createdAt); var dateText=isNaN(when.getTime())?'':when.toLocaleString();
-    if(!window.confirm('Send '+r.number+' from '+dateText+' back to a cart?')) return;
     // Restore into any empty cart so the user's current cart is never overwritten.
     saveCart();
     var targetIndex=-1;
@@ -1526,6 +1526,7 @@
     carts[targetIndex]=restored;
     discounts[targetIndex]=Math.min(grossTotalFromSnapshot(restored), Number(r.discount)||0);
     receipts.splice(receiptIndex,1);
+    normalizeReceiptNumbers();
     saveJson(CART_STORAGE_KEY,carts);
     saveJson(DISCOUNT_STORAGE_KEY,discounts);
     saveJson('price-list-receipts-v1',receipts);
@@ -1609,45 +1610,108 @@
     });
     merged.sort(function(a,b){ return new Date(b.createdAt).getTime()-new Date(a.createdAt).getTime(); });
     receipts=merged.slice(0,20);
+    var maxNo=receiptCounter;
+    receipts.forEach(function(r){ var m=String(r.number||'').match(/(\d+)$/); if(m) maxNo=Math.max(maxNo,Number(m[1])); });
+    receiptCounter=maxNo; localStorage.setItem('price-list-receipt-counter-v1',String(receiptCounter));
     normalizeReceiptNumbers();
-    renderHistory(); closeReceiptImport(); showToast(incoming.length+' receipt'+(incoming.length===1?'':'s')+' imported');
+    saveJson('price-list-receipts-v1',receipts); renderHistory(); closeReceiptImport(); showToast(incoming.length+' receipt'+(incoming.length===1?'':'s')+' imported');
   }
 
   async function shareReceipt(receiptIndex) {
     var r=receipts[receiptIndex]; if(!r) return;
-    var canvas=document.createElement('canvas'), ctx=canvas.getContext('2d');
-    var W=900, pad=55, amountX=735, line=58, rows=(r.items||[]).length;
-    var hasDiscount=(Number(r.discount)||0)>0;
-    var H=330+rows*line+(hasDiscount?155:0);
-    canvas.width=W; canvas.height=H;
-    ctx.fillStyle='#ffffff'; ctx.fillRect(0,0,W,H); ctx.fillStyle='#202020';
-    ctx.font='700 42px system-ui'; ctx.fillText('RECEIPT',pad,70);
-    ctx.font='700 34px system-ui'; ctx.fillText(r.number,pad,116);
-    ctx.font='700 30px system-ui'; ctx.fillText(new Date(r.createdAt).toLocaleString(),pad,158);
-    var y=222; ctx.font='700 42px system-ui';
-    (r.items||[]).forEach(function(i){
-      var label=(i.name||'')+'  × '+i.qty;
-      var maxText=amountX-pad-30;
-      while(label.length>4 && ctx.measureText(label).width>maxText) label=label.slice(0,-2)+'…';
-      ctx.fillText(label,pad,y);
-      ctx.textAlign='right'; ctx.fillText('¢'+formatCedis(i.subtotal||0),amountX,y); ctx.textAlign='left'; y+=line;
-    });
-    y+=8; ctx.strokeStyle='#dddddd'; ctx.beginPath(); ctx.moveTo(pad,y); ctx.lineTo(amountX+120,y); ctx.stroke(); y+=45;
-    if(hasDiscount){
-      ctx.font='700 42px system-ui'; ctx.fillText('TOTAL',pad,y); ctx.textAlign='right'; ctx.fillText('¢'+formatCedis(r.grossTotal!=null?r.grossTotal:r.total),amountX,y); ctx.textAlign='left'; y+=40;
-      ctx.fillText('DISCOUNT',pad,y); ctx.textAlign='right'; ctx.font='700 42px system-ui'; ctx.fillText('-¢'+formatCedis(r.discount),amountX,y); ctx.textAlign='left'; y+=45;
-      ctx.font='700 42px system-ui'; ctx.fillText('NEW TOTAL',pad,y); ctx.textAlign='right'; ctx.fillText('¢'+formatCedis(r.total),amountX,y); ctx.textAlign='left';
-    } else {
-      ctx.font='700 42px system-ui'; ctx.fillText('TOTAL',pad,y); ctx.textAlign='right'; ctx.fillText('¢'+formatCedis(r.total),amountX,y); ctx.textAlign='left';
+    // Receipts with more than 18 items are shared as two balanced images.
+    // Keep the large-print item font on both pages.
+    var many=(r.items||[]).length>18;
+    var font=40;
+    var smallFont=24;
+    var lineGap=54;
+    var W=1000, pad=58, amountX=W-pad, nameRight=amountX-245;
+
+    function wrapText(text, maxWidth, ctx){
+      var words=String(text||'').split(/\s+/), lines=[], line='';
+      words.forEach(function(word){
+        var test=line ? line+' '+word : word;
+        if(ctx.measureText(test).width<=maxWidth || !line){ line=test; }
+        else { lines.push(line); line=word; }
+      });
+      if(line) lines.push(line);
+      return lines.length ? lines : [''];
     }
-    canvas.toBlob(async function(blob){
-      if(!blob) return;
-      var file=new File([blob], (r.number||'receipt')+'.png', {type:'image/png'});
-      try {
-        if(navigator.share && (!navigator.canShare || navigator.canShare({files:[file]}))) await navigator.share({title:r.number,text:r.number,files:[file]});
-        else { var url=URL.createObjectURL(blob); var a=document.createElement('a'); a.href=url; a.download=file.name; a.click(); setTimeout(function(){URL.revokeObjectURL(url);},1000); showToast('Receipt image ready'); }
-      } catch(e) {}
-    },'image/png');
+
+    function makePage(pageItems, pageNo, pageCount){
+      var measure=document.createElement('canvas'), mctx=measure.getContext('2d');
+      mctx.font='400 '+font+'px system-ui';
+      var prepared=pageItems.map(function(i){
+        var label=(i.name||'')+'  × '+i.qty;
+        return {item:i,lines:wrapText(label,nameRight-pad,mctx)};
+      });
+      var itemHeight=prepared.reduce(function(total,p){ return total + Math.max(1,p.lines.length)*lineGap; },0);
+      var footerHeight=(Number(r.discount)||0)>0 ? 220 : 165;
+      var H=Math.max(520, 245 + itemHeight + footerHeight);
+      var canvas=document.createElement('canvas'), ctx=canvas.getContext('2d');
+      canvas.width=W; canvas.height=H;
+      ctx.fillStyle='#ffffff'; ctx.fillRect(0,0,W,H); ctx.fillStyle='#202020';
+      ctx.textAlign='left';
+
+      // Professional receipt header
+      ctx.font='800 44px system-ui'; ctx.fillText('RECEIPT',pad,62);
+      ctx.font='700 27px system-ui'; ctx.fillText(r.number,pad,103);
+      ctx.font='22px system-ui'; ctx.fillText(new Date(r.createdAt).toLocaleString(),pad,137);
+      ctx.font='600 18px system-ui'; ctx.fillStyle='#666666';
+      ctx.fillText(pageCount>1 ? 'CUSTOMER COPY  •  PAGE '+pageNo+' OF '+pageCount : 'CUSTOMER COPY',pad,169);
+
+      ctx.strokeStyle='#BDBDBD'; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(pad,190); ctx.lineTo(W-pad,190); ctx.stroke();
+      ctx.fillStyle='#202020'; ctx.font='700 18px system-ui';
+      ctx.fillText('ITEM',pad,220); ctx.textAlign='right'; ctx.fillText('AMOUNT',amountX,220); ctx.textAlign='left';
+      ctx.strokeStyle='#E0E0E0'; ctx.beginPath(); ctx.moveTo(pad,232); ctx.lineTo(W-pad,232); ctx.stroke();
+
+      var y=232+lineGap-8;
+      prepared.forEach(function(p){
+        ctx.font='400 '+font+'px system-ui'; ctx.fillStyle='#202020';
+        p.lines.forEach(function(lineText, li){
+          ctx.textAlign='left'; ctx.fillText(lineText,pad,y); y+=lineGap;
+        });
+        // Amount sits on the first line, aligned to the same right edge.
+        ctx.font='400 '+font+'px system-ui'; ctx.textAlign='right';
+        ctx.fillText('¢'+formatCedis(p.item.subtotal||0),amountX,y-lineGap);
+        ctx.textAlign='left';
+      });
+
+      y+=8; ctx.strokeStyle='#D8D8D8'; ctx.beginPath(); ctx.moveTo(pad,y); ctx.lineTo(W-pad,y); ctx.stroke(); y+=40;
+      var hasDiscount=(Number(r.discount)||0)>0;
+      if(hasDiscount){
+        ctx.font='600 '+smallFont+'px system-ui'; ctx.fillStyle='#202020'; ctx.textAlign='left'; ctx.fillText('SUBTOTAL',pad,y);
+        ctx.textAlign='right'; ctx.fillText('¢'+formatCedis(r.grossTotal!=null?r.grossTotal:r.total),amountX,y); y+=38;
+        ctx.textAlign='left'; ctx.fillText('DISCOUNT',pad,y); ctx.textAlign='right'; ctx.fillText('-¢'+formatCedis(r.discount),amountX,y); y+=48;
+      }
+      ctx.font='800 38px system-ui'; ctx.fillStyle='#202020'; ctx.textAlign='left'; ctx.fillText('TOTAL',pad,y);
+      ctx.textAlign='right'; ctx.fillText('¢'+formatCedis(r.total),amountX,y); ctx.textAlign='left'; y+=58;
+      ctx.font='600 18px system-ui'; ctx.fillStyle='#666666'; ctx.fillText('Items: '+(r.items||[]).length, pad, y);
+      ctx.textAlign='center'; ctx.font='600 19px system-ui'; ctx.fillText('Thank you for your purchase',W/2,H-34); ctx.textAlign='left';
+      return canvas;
+    }
+
+    // 18 items or fewer stay on one large-print page. Above 18, split by item
+    // count as evenly as possible into exactly two images, preserving the font size.
+    var pages=[];
+    if(!many) pages=[r.items||[]];
+    else { var split=Math.ceil((r.items||[]).length/2); pages=[(r.items||[]).slice(0,split),(r.items||[]).slice(split)]; }
+    var canvases=pages.map(function(list,idx){ return makePage(list,idx+1,pages.length); });
+    var blobs=[];
+    for(var bi=0; bi<canvases.length; bi++){
+      var blob=await new Promise(function(resolve){ canvases[bi].toBlob(resolve,'image/png'); });
+      if(blob) blobs.push(blob);
+    }
+    if(!blobs.length) return;
+    var files=blobs.map(function(blob,idx){ return new File([blob], (r.number||'receipt')+'-page-'+(idx+1)+'.png',{type:'image/png'}); });
+    try {
+      if(navigator.share && (!navigator.canShare || navigator.canShare({files:files}))) {
+        await navigator.share({title:r.number,text:files.length>1?r.number+' — receipt pages':r.number,files:files});
+      } else {
+        files.forEach(function(file,idx){ var url=URL.createObjectURL(blobs[idx]); var a=document.createElement('a'); a.href=url; a.download=file.name; a.click(); setTimeout(function(){URL.revokeObjectURL(url);},1000); });
+        showToast(files.length>1?'Receipt pages ready':'Receipt image ready');
+      }
+    } catch(e) {}
   }
 
 function renderHistory(){
@@ -1830,7 +1894,11 @@ function renderHistory(){
   document.addEventListener('touchstart', function(e){
     var row=e.target.closest && e.target.closest('[data-receipt-index]'); if(!row) return;
     receiptHoldTriggered=false; clearTimeout(receiptHoldTimer);
-    receiptHoldTimer=setTimeout(function(){ receiptHoldTriggered=true; restoreReceiptToCart(Number(row.dataset.receiptIndex)); },650);
+    receiptHoldTimer=setTimeout(function(){
+      receiptHoldTriggered=true;
+      var idx=Number(row.dataset.receiptIndex), r=receipts[idx];
+      if(r && window.confirm('Send '+(r.number||'this receipt')+' back to a cart?')) restoreReceiptToCart(idx);
+    },650);
   },{passive:true});
   document.addEventListener('touchend', function(){ clearTimeout(receiptHoldTimer); receiptHoldTimer=null; },{passive:true});
   document.addEventListener('touchcancel', function(){ clearTimeout(receiptHoldTimer); receiptHoldTimer=null; },{passive:true});
