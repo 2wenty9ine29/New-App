@@ -83,22 +83,23 @@
 
   .manage-search-wrap { padding: 0 20px 12px; flex-shrink: 0; }
   .manage-search-wrap .search-wrap {
-    margin: 0; padding: 7px 10px; display: flex; align-items: center; gap: 9px;
+    position: relative; margin: 0; padding: 7px 42px 7px 38px;
+    display: flex; align-items: center; min-height: 40px;
     border: 1.5px solid var(--line); border-radius: 999px; background: var(--surface);
   }
   .manage-search-wrap .search-wrap svg {
-    position: static; flex: 0 0 17px; width: 17px; height: 17px; transform: none;
-    color: var(--ink-soft); pointer-events: none;
+    position: absolute; left: 13px; top: 50%; width: 17px; height: 17px;
+    transform: translateY(-50%); color: var(--ink-soft); pointer-events: none;
   }
   #manage-search {
-    flex: 1 1 auto; width: auto; min-width: 0; padding: 4px 0;
+    flex: 1 1 auto; width: 100%; min-width: 0; padding: 4px 0;
     border: 0; outline: none; background: transparent; color: var(--ink);
     -webkit-text-fill-color: var(--ink); font-size: 14px; box-sizing: border-box;
   }
   #manage-search::placeholder { color: var(--ink-soft); opacity: 1; }
   .manage-search-wrap .search-clear {
-    position: static; flex: 0 0 24px; width: 24px; height: 24px; transform: none;
-    margin: 0; padding: 0;
+    position: absolute; right: 9px; top: 50%; width: 24px; height: 24px;
+    transform: translateY(-50%); margin: 0; padding: 0;
   }
   .manage-copy-wrap { padding: 12px 0 20px; }
   .manage-copy-btn { width: 100%; border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 14px; padding: 12px 14px; font-size: 14px; font-weight: 650; }
