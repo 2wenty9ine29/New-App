@@ -82,8 +82,9 @@
   .add-btn svg { width: 18px; height: 18px; }
 
   .manage-search-wrap { padding: 0 20px 12px; flex-shrink: 0; }
-  .manage-search-wrap .search-wrap { margin: 0; }
-  #manage-search { width: 100%; padding-right: 42px; box-sizing: border-box; border: 0; outline: none; background: transparent; color: var(--ink); font-size: 14px; min-width: 0; }
+  .manage-search-wrap .search-wrap { margin: 0; padding-left: 0; padding-right: 0; }
+  .manage-search-wrap .search-wrap svg { left: 2px; }
+  #manage-search { width: 100%; padding-left: 30px; padding-right: 42px; box-sizing: border-box; border: 0; outline: none; background: transparent; color: var(--ink); font-size: 14px; min-width: 0; }
   #manage-search::placeholder { color: var(--ink-soft); }
   .manage-copy-wrap { padding: 12px 0 20px; }
   .manage-copy-btn { width: 100%; border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 14px; padding: 12px 14px; font-size: 14px; font-weight: 650; }
@@ -1691,11 +1692,18 @@
       return canvas;
     }
 
-    // 18 items or fewer stay on one large-print page. Above 18, split by item
-    // count as evenly as possible into exactly two images, preserving the font size.
+    // Keep a strict maximum of 18 items per receipt image. As soon as page 1
+    // reaches 18 items, the remaining items continue on page 2. If there are
+    // more than 36 items, page 3 (and further pages if ever needed) continues
+    // in the same 18-item chunks. The large-print font is kept on every page.
+    var allItems=r.items||[];
     var pages=[];
-    if(!many) pages=[r.items||[]];
-    else { var split=Math.ceil((r.items||[]).length/2); pages=[(r.items||[]).slice(0,split),(r.items||[]).slice(split)]; }
+    if(!allItems.length) pages=[[]];
+    else {
+      for(var start=0; start<allItems.length; start+=18){
+        pages.push(allItems.slice(start,start+18));
+      }
+    }
     var canvases=pages.map(function(list,idx){ return makePage(list,idx+1,pages.length); });
     var blobs=[];
     for(var bi=0; bi<canvases.length; bi++){
