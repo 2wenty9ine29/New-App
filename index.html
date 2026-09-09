@@ -82,10 +82,24 @@
   .add-btn svg { width: 18px; height: 18px; }
 
   .manage-search-wrap { padding: 0 20px 12px; flex-shrink: 0; }
-  .manage-search-wrap .search-wrap { margin: 0; padding-left: 0; padding-right: 0; }
-  .manage-search-wrap .search-wrap svg { left: 12px; }
-  #manage-search { width: 100%; padding-left: 40px; padding-right: 42px; box-sizing: border-box; border: 0; outline: none; background: transparent; color: var(--ink); font-size: 14px; min-width: 0; }
-  #manage-search::placeholder { color: var(--ink-soft); }
+  .manage-search-wrap .search-wrap {
+    margin: 0; padding: 7px 10px; display: flex; align-items: center; gap: 9px;
+    border: 1.5px solid var(--line); border-radius: 999px; background: var(--surface);
+  }
+  .manage-search-wrap .search-wrap svg {
+    position: static; flex: 0 0 17px; width: 17px; height: 17px; transform: none;
+    color: var(--ink-soft); pointer-events: none;
+  }
+  #manage-search {
+    flex: 1 1 auto; width: auto; min-width: 0; padding: 4px 0;
+    border: 0; outline: none; background: transparent; color: var(--ink);
+    -webkit-text-fill-color: var(--ink); font-size: 14px; box-sizing: border-box;
+  }
+  #manage-search::placeholder { color: var(--ink-soft); opacity: 1; }
+  .manage-search-wrap .search-clear {
+    position: static; flex: 0 0 24px; width: 24px; height: 24px; transform: none;
+    margin: 0; padding: 0;
+  }
   .manage-copy-wrap { padding: 12px 0 20px; }
   .manage-copy-btn { width: 100%; border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 14px; padding: 12px 14px; font-size: 14px; font-weight: 650; }
   .manage-copy-btn:active { opacity: .8; transform: scale(.99); }
@@ -567,7 +581,7 @@
     <div class="manage-search-wrap">
       <div class="search-wrap">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <input id="manage-search" type="text" placeholder="Search price list" autocomplete="off">
+        <input id="manage-search" type="text" placeholder="Search" autocomplete="off">
         <button class="search-clear" id="manage-search-clear" aria-label="Clear price list search">×</button>
       </div>
     </div>
