@@ -81,6 +81,14 @@
   .add-btn:active { opacity: 0.85; }
   .add-btn svg { width: 18px; height: 18px; }
 
+  .manage-search-wrap { padding: 0 20px 12px; flex-shrink: 0; }
+  .manage-search-wrap .search-wrap { margin: 0; }
+  #manage-search { width: 100%; border: 0; outline: none; background: transparent; color: var(--ink); font-size: 14px; min-width: 0; }
+  #manage-search::placeholder { color: var(--ink-soft); }
+  .manage-copy-wrap { padding: 12px 0 20px; }
+  .manage-copy-btn { width: 100%; border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 14px; padding: 12px 14px; font-size: 14px; font-weight: 650; }
+  .manage-copy-btn:active { opacity: .8; transform: scale(.99); }
+
   ul.rows { list-style: none; margin: 0; padding: 0; }
   .row {
     display: flex; align-items: center; gap: 10px; padding: 10px 6px; margin: 0 -6px; border-radius: 10px;
@@ -544,6 +552,13 @@
       <h1>Price list</h1>
       <p id="manage-count">0 items</p>
     </header>
+    <div class="manage-search-wrap">
+      <div class="search-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input id="manage-search" type="text" placeholder="Search price list" autocomplete="off">
+        <button class="search-clear" id="manage-search-clear" aria-label="Clear price list search">×</button>
+      </div>
+    </div>
     <div class="add-btn-wrap">
       <button class="add-btn" id="add-item-btn">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -558,6 +573,9 @@
         </div>
         <p class="title">No items yet</p>
         <p class="body">Add your first item to start building your price list.</p>
+      </div>
+      <div class="manage-copy-wrap">
+        <button class="manage-copy-btn" id="manage-copy-btn">Copy price list</button>
       </div>
     </div>
   </section>
@@ -843,6 +861,7 @@
   var pendingPhoto = null;
   var editingId = null;
   var sellSearchQuery = "";
+  var manageSearchQuery = "";
   var lastTotal = -1;
   var cartOrder = loadJson('price-list-cart-order-v1-' + activeCartIndex, []);
   var cartRevision = 0;
@@ -1073,8 +1092,14 @@
     var empty = document.getElementById("manage-empty");
     document.getElementById("manage-count").textContent = items.length + (items.length === 1 ? " item" : " items");
     if (items.length === 0) { ul.innerHTML = ""; empty.hidden = false; return; }
+    var filtered = searchItems(manageSearchQuery);
+    if (filtered.length === 0) {
+      ul.innerHTML = '<li class="no-match">No items found</li>';
+      empty.hidden = true;
+      return;
+    }
     empty.hidden = true;
-    ul.innerHTML = items.map(function (item) {
+    ul.innerHTML = filtered.map(function (item) {
       var bulkVal = priceForMode(item, "bulk") !== null ? "¢" + formatCedis(priceForMode(item, "bulk")) : "—";
       var singleVal = priceForMode(item, "single") !== null ? "¢" + formatCedis(priceForMode(item, "single")) : "—";
       return '<li class="row" data-edit="' + item.id + '">' +
@@ -1088,6 +1113,41 @@
         '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +
         '</button></li>';
     }).join("");
+  }
+
+  function priceListText() {
+    // Deliberately structured so it can be pasted back into ChatGPT and restored reliably.
+    var backup = {
+      format: 'PRICE_LIST_BACKUP_V1',
+      app: 'Price List Sales Calculator',
+      items: items.map(function(item){
+        var bulk = priceForMode(item, 'bulk');
+        var single = priceForMode(item, 'single');
+        return { id: Number(item.id), name: String(item.name || ''), bulk: bulk === null ? null : Number(bulk), single: single === null ? null : Number(single) };
+      })
+    };
+    return JSON.stringify(backup, null, 2) + '\n';
+  }
+  async function copyPriceList() {
+    var text = priceListText();
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(text);
+        showToast('Price list copied');
+        return;
+      }
+    } catch(e) {}
+    try {
+      var ta=document.createElement('textarea'); ta.value=text; ta.style.position='fixed'; ta.style.opacity='0';
+      document.body.appendChild(ta); ta.focus(); ta.select(); document.execCommand('copy'); ta.remove();
+      showToast('Price list copied');
+      return;
+    } catch(e) {}
+    var blob=new Blob([text],{type:'text/plain;charset=utf-8'});
+    var url=URL.createObjectURL(blob), a=document.createElement('a');
+    a.href=url; a.download='price-list.txt'; a.click();
+    setTimeout(function(){URL.revokeObjectURL(url);},1000);
+    showToast('Price list TXT ready');
   }
 
   function catalogRow(item, mode) {
@@ -1111,11 +1171,78 @@
     return String(text || '').toLowerCase().replace(/[^a-z0-9]/g, '');
   }
 
+  // Forgiving search: exact matches win, but small typos still find the intended item.
+  function editDistance(a, b) {
+    a = String(a || ''); b = String(b || '');
+    if (!a) return b.length;
+    if (!b) return a.length;
+    var prev = new Array(b.length + 1);
+    for (var j = 0; j <= b.length; j++) prev[j] = j;
+    for (var i = 1; i <= a.length; i++) {
+      var cur = [i];
+      for (var k = 1; k <= b.length; k++) {
+        var cost = a.charAt(i - 1) === b.charAt(k - 1) ? 0 : 1;
+        cur[k] = Math.min(cur[k - 1] + 1, prev[k] + 1, prev[k - 1] + cost);
+      }
+      prev = cur;
+    }
+    return prev[b.length];
+  }
+
+  function isSubsequence(query, text) {
+    if (!query) return true;
+    var qi = 0;
+    for (var i = 0; i < text.length && qi < query.length; i++) {
+      if (text.charAt(i) === query.charAt(qi)) qi++;
+    }
+    return qi === query.length;
+  }
+
+  function fuzzySearchScore(item, rawQuery) {
+    var query = normalizeSearchText(rawQuery);
+    if (!query) return 0;
+    var name = normalizeSearchText(item.name);
+    var score = -1;
+    if (name === query) score = 10000;
+    else if (name.indexOf(query) !== -1) score = 9000 - (name.indexOf(query) * 5);
+    else if (query.length >= 3 && isSubsequence(query, name)) score = 7000 - (name.length - query.length);
+
+    // Also allow a price search, e.g. 115 finds both products priced at ¢115.
+    var priceMatch = false;
+    if (/^\d+(?:\d{1,2})?$/.test(query)) {
+      var numericQuery = Number(query);
+      var prices = [priceForMode(item, 'bulk'), priceForMode(item, 'single')];
+      priceMatch = prices.some(function(v){ return v !== null && Number(v) === numericQuery; });
+      if (priceMatch) score = Math.max(score, 8500);
+    }
+
+    // For 3+ characters, tolerate common typing mistakes. Keep short queries exact
+    // so typing just "v" or "a" doesn't flood the list with unrelated results.
+    if (query.length >= 3) {
+      var best = editDistance(query, name);
+      var words = String(item.name || '').split(/[^a-z0-9]+/i).filter(Boolean);
+      words.forEach(function(word){
+        var nw = normalizeSearchText(word);
+        if (nw) best = Math.min(best, editDistance(query, nw));
+      });
+      var allowed = query.length <= 4 ? 3 : (query.length <= 7 ? 3 : 4);
+      if (best <= allowed) score = Math.max(score, 6000 - best * 250 - Math.max(0, name.length - query.length));
+    }
+    return score;
+  }
+
+  function searchItems(rawQuery) {
+    var query = normalizeSearchText(rawQuery);
+    if (!query) return items.slice();
+    return items.map(function(item){
+      return {item:item, score:fuzzySearchScore(item, rawQuery)};
+    }).filter(function(x){ return x.score >= 0; })
+      .sort(function(a,b){ return b.score - a.score || String(a.item.name).localeCompare(String(b.item.name)); })
+      .map(function(x){ return x.item; });
+  }
+
   function renderCatalogList() {
-    var query = normalizeSearchText(sellSearchQuery);
-    var filtered = items.filter(function (item) {
-      return normalizeSearchText(item.name).indexOf(query) !== -1;
-    });
+    var filtered = searchItems(sellSearchQuery);
     var bulkUl = document.getElementById("bulk-catalog-list");
     var singleUl = document.getElementById("single-catalog-list");
     if (filtered.length === 0) {
@@ -1641,6 +1768,17 @@ function renderHistory(){
     }
     if (e.target === document.getElementById("sheet-backdrop")) return closeSheet();
   });
+
+  document.getElementById('manage-search').addEventListener('input', function(e){
+    manageSearchQuery=e.target.value;
+    document.getElementById('manage-search-clear').classList.toggle('visible', !!manageSearchQuery);
+    renderManageList();
+  });
+  document.getElementById('manage-search-clear').addEventListener('click', function(){
+    var input=document.getElementById('manage-search'); input.value=''; manageSearchQuery='';
+    this.classList.remove('visible'); renderManageList(); input.focus();
+  });
+  document.getElementById('manage-copy-btn').addEventListener('click', copyPriceList);
 
   document.getElementById("sell-search").addEventListener("input", function (e) {
     sellSearchQuery = e.target.value;
