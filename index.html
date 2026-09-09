@@ -1678,8 +1678,14 @@
       var measure=document.createElement('canvas'), mctx=measure.getContext('2d');
       mctx.font='400 '+font+'px system-ui';
       var prepared=pageItems.map(function(i){
-        var saleMode=i.mode==='bulk'?(i.fraction===0.5?'½ BULK':i.fraction===0.25?'¼ BULK':'FULL BULK'):'SINGLE';
-         var label=(i.name||'')+'  '+saleMode+'  × '+receiptQuantityText(i);
+        // Customer-facing copy: no internal "BULK"/"SINGLE" jargon and no duplicated
+        // fraction text. Half/quarter sales (Kalyppo, U-Fresh, can drinks) are shown
+        // the same way other size variants already are on the receipt, e.g.
+        // "Bel Aqua (Small)" — so here it's "Kalyppo (Half)" / "Kalyppo (Quarter)".
+        var fraction=receiptFraction(i);
+        var isBulk=(i.mode || String(i.key||'').split('|')[1] || 'bulk')==='bulk';
+        var sizeTag=(isBulk && fraction===0.5)?' (Half)':(isBulk && fraction===0.25)?' (Quarter)':'';
+        var label=(i.name||'')+sizeTag+'  × '+(Number(i.qty)||0);
         return {item:i,lines:wrapText(label,nameRight-pad,mctx)};
       });
       var itemHeight=prepared.reduce(function(total,p){ return total + Math.max(1,p.lines.length)*lineGap; },0);
