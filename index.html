@@ -888,6 +888,20 @@
   try { localStorage.removeItem('price-list-cleared-carts-v1'); } catch(e) {}
   var receipts = loadJson('price-list-receipts-v1', []);
   var receiptCounter = Number(localStorage.getItem('price-list-receipt-counter-v1') || 0);
+  function normalizeReceiptNumbers() {
+    if (!Array.isArray(receipts) || !receipts.length) return;
+    var maxNo = Number(receiptCounter) || 0;
+    receipts.forEach(function(r){ var m=String(r.number||'').match(/(\d+)$/); if(m) maxNo=Math.max(maxNo,Number(m[1])); });
+    if(maxNo < receipts.length) maxNo=receipts.length;
+    var ordered=receipts.slice().sort(function(a,b){ return new Date(a.createdAt).getTime()-new Date(b.createdAt).getTime(); });
+    var first=maxNo-ordered.length+1;
+    ordered.forEach(function(r,i){ r.number='Receipt #'+String(first+i).padStart(4,'0'); });
+    receipts=ordered.reverse();
+    receiptCounter=maxNo;
+    saveJson('price-list-receipts-v1',receipts);
+    localStorage.setItem('price-list-receipt-counter-v1',String(receiptCounter));
+  }
+  normalizeReceiptNumbers();
   var darkMode = localStorage.getItem('price-list-dark-mode-v1') === '1';
   var pendingPhoto = null;
   var editingId = null;
@@ -1439,7 +1453,7 @@
     var receipt={number:receiptNo,total:total,grossTotal:grossTotal,discount:discount,createdAt:new Date().toISOString(),cartIndex:activeCartIndex,items:entries.map(function(e){
       return {id:e.item.id,key:e.key,name:e.item.name,mode:e.mode,fraction:e.fraction,qty:e.qty,subtotal:(priceForMode(e.item,e.mode,e.fraction)||0)*e.qty};
     })};
-    receipts.unshift(receipt); receipts=receipts.slice(0,20); saveJson('price-list-receipts-v1',receipts);
+    receipts.unshift(receipt); receipts=receipts.slice(0,20); normalizeReceiptNumbers();
     document.getElementById('receipt-number').textContent=receiptNo;
     document.getElementById('receipt-gross').textContent='¢'+formatCedis(grossTotal);
     document.getElementById('receipt-total').textContent='¢'+formatCedis(total);
@@ -1488,6 +1502,8 @@
 
   function restoreReceiptToCart(receiptIndex) {
     var r=receipts[receiptIndex]; if(!r || !Array.isArray(r.items) || !r.items.length) return;
+    var when=new Date(r.createdAt); var dateText=isNaN(when.getTime())?'':when.toLocaleString();
+    if(!window.confirm('Send '+r.number+' from '+dateText+' back to a cart?')) return;
     // Restore into any empty cart so the user's current cart is never overwritten.
     saveCart();
     var targetIndex=-1;
@@ -1593,38 +1609,36 @@
     });
     merged.sort(function(a,b){ return new Date(b.createdAt).getTime()-new Date(a.createdAt).getTime(); });
     receipts=merged.slice(0,20);
-    var maxNo=receiptCounter;
-    receipts.forEach(function(r){ var m=String(r.number||'').match(/(\d+)$/); if(m) maxNo=Math.max(maxNo,Number(m[1])); });
-    receiptCounter=maxNo; localStorage.setItem('price-list-receipt-counter-v1',String(receiptCounter));
-    saveJson('price-list-receipts-v1',receipts); renderHistory(); closeReceiptImport(); showToast(incoming.length+' receipt'+(incoming.length===1?'':'s')+' imported');
+    normalizeReceiptNumbers();
+    renderHistory(); closeReceiptImport(); showToast(incoming.length+' receipt'+(incoming.length===1?'':'s')+' imported');
   }
 
   async function shareReceipt(receiptIndex) {
     var r=receipts[receiptIndex]; if(!r) return;
     var canvas=document.createElement('canvas'), ctx=canvas.getContext('2d');
-    var W=900, pad=70, amountX=700, line=42, rows=(r.items||[]).length;
+    var W=900, pad=55, amountX=735, line=58, rows=(r.items||[]).length;
     var hasDiscount=(Number(r.discount)||0)>0;
-    var H=300+rows*line+(hasDiscount?130:0);
+    var H=330+rows*line+(hasDiscount?155:0);
     canvas.width=W; canvas.height=H;
     ctx.fillStyle='#ffffff'; ctx.fillRect(0,0,W,H); ctx.fillStyle='#202020';
     ctx.font='700 42px system-ui'; ctx.fillText('RECEIPT',pad,70);
-    ctx.font='600 28px system-ui'; ctx.fillText(r.number,pad,115);
-    ctx.font='22px system-ui'; ctx.fillText(new Date(r.createdAt).toLocaleString(),pad,150);
-    var y=205; ctx.font='22px system-ui';
+    ctx.font='700 34px system-ui'; ctx.fillText(r.number,pad,116);
+    ctx.font='700 30px system-ui'; ctx.fillText(new Date(r.createdAt).toLocaleString(),pad,158);
+    var y=222; ctx.font='700 42px system-ui';
     (r.items||[]).forEach(function(i){
       var label=(i.name||'')+'  × '+i.qty;
-      var maxText=amountX-pad-35;
+      var maxText=amountX-pad-30;
       while(label.length>4 && ctx.measureText(label).width>maxText) label=label.slice(0,-2)+'…';
       ctx.fillText(label,pad,y);
       ctx.textAlign='right'; ctx.fillText('¢'+formatCedis(i.subtotal||0),amountX,y); ctx.textAlign='left'; y+=line;
     });
-    y+=15; ctx.strokeStyle='#dddddd'; ctx.beginPath(); ctx.moveTo(pad,y); ctx.lineTo(amountX+120,y); ctx.stroke(); y+=45;
+    y+=8; ctx.strokeStyle='#dddddd'; ctx.beginPath(); ctx.moveTo(pad,y); ctx.lineTo(amountX+120,y); ctx.stroke(); y+=45;
     if(hasDiscount){
-      ctx.font='600 22px system-ui'; ctx.fillText('TOTAL',pad,y); ctx.textAlign='right'; ctx.fillText('¢'+formatCedis(r.grossTotal!=null?r.grossTotal:r.total),amountX,y); ctx.textAlign='left'; y+=40;
-      ctx.fillText('DISCOUNT',pad,y); ctx.textAlign='right'; ctx.fillText('-¢'+formatCedis(r.discount),amountX,y); ctx.textAlign='left'; y+=45;
-      ctx.font='700 34px system-ui'; ctx.fillText('NEW TOTAL',pad,y); ctx.textAlign='right'; ctx.fillText('¢'+formatCedis(r.total),amountX,y); ctx.textAlign='left';
+      ctx.font='700 42px system-ui'; ctx.fillText('TOTAL',pad,y); ctx.textAlign='right'; ctx.fillText('¢'+formatCedis(r.grossTotal!=null?r.grossTotal:r.total),amountX,y); ctx.textAlign='left'; y+=40;
+      ctx.fillText('DISCOUNT',pad,y); ctx.textAlign='right'; ctx.font='700 42px system-ui'; ctx.fillText('-¢'+formatCedis(r.discount),amountX,y); ctx.textAlign='left'; y+=45;
+      ctx.font='700 42px system-ui'; ctx.fillText('NEW TOTAL',pad,y); ctx.textAlign='right'; ctx.fillText('¢'+formatCedis(r.total),amountX,y); ctx.textAlign='left';
     } else {
-      ctx.font='700 34px system-ui'; ctx.fillText('TOTAL',pad,y); ctx.textAlign='right'; ctx.fillText('¢'+formatCedis(r.total),amountX,y); ctx.textAlign='left';
+      ctx.font='700 42px system-ui'; ctx.fillText('TOTAL',pad,y); ctx.textAlign='right'; ctx.fillText('¢'+formatCedis(r.total),amountX,y); ctx.textAlign='left';
     }
     canvas.toBlob(async function(blob){
       if(!blob) return;
