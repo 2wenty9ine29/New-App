@@ -1203,9 +1203,26 @@
     if (!query) return 0;
     var name = normalizeSearchText(item.name);
     var score = -1;
+    var words = String(item.name || '').split(/[^a-z0-9]+/i).filter(Boolean);
+    var normalizedWords = words.map(function(word){ return normalizeSearchText(word); }).filter(Boolean);
+    var firstWord = normalizedWords[0] || '';
+    var firstLetterMatch = !!query.charAt(0) && !!firstWord && query.charAt(0) === firstWord.charAt(0);
+
     if (name === query) score = 10000;
     else if (name.indexOf(query) !== -1) score = 9000 - (name.indexOf(query) * 5);
     else if (query.length >= 3 && isSubsequence(query, name)) score = 7000 - (name.length - query.length);
+
+    // Strongly prefer products whose first letter matches what was typed.
+    // This makes a typo like "vilt" push "Voltic" ahead of unrelated near-matches.
+    if (firstLetterMatch) score = Math.max(score, 6600);
+
+    // Prefer a close match to the beginning of the product name/first word.
+    if (firstWord) {
+      var prefixDistance = editDistance(query, firstWord.slice(0, Math.min(firstWord.length, query.length + 2)));
+      if (prefixDistance <= (query.length <= 4 ? 2 : 3)) {
+        score = Math.max(score, 6800 - prefixDistance * 220 - Math.max(0, firstWord.length - query.length));
+      }
+    }
 
     // Also allow a price search, e.g. 115 finds both products priced at ¢115.
     var priceMatch = false;
@@ -1220,13 +1237,15 @@
     // so typing just "v" or "a" doesn't flood the list with unrelated results.
     if (query.length >= 3) {
       var best = editDistance(query, name);
-      var words = String(item.name || '').split(/[^a-z0-9]+/i).filter(Boolean);
-      words.forEach(function(word){
-        var nw = normalizeSearchText(word);
+      normalizedWords.forEach(function(nw){
         if (nw) best = Math.min(best, editDistance(query, nw));
       });
       var allowed = query.length <= 4 ? 3 : (query.length <= 7 ? 3 : 4);
-      if (best <= allowed) score = Math.max(score, 6000 - best * 250 - Math.max(0, name.length - query.length));
+      if (best <= allowed) {
+        var typoScore = 6000 - best * 250 - Math.max(0, name.length - query.length);
+        if (firstLetterMatch) typoScore += 850;
+        score = Math.max(score, typoScore);
+      }
     }
     return score;
   }
