@@ -261,6 +261,17 @@
   .receipt-actions .secondary { background:var(--paper); color:var(--ink); }
   .receipt-share-btn { background:var(--gold-soft); color:var(--ink); }
   .receipt-history-share { margin-top:7px; border:0; background:var(--gold-soft); color:var(--ink); border-radius:9px; padding:6px 10px; font-size:10px; font-weight:700; }
+  .receipt-copy-btn { margin-top:7px; margin-left:5px; border:0; background:var(--paper); color:var(--ink); border-radius:9px; padding:6px 10px; font-size:10px; font-weight:700; }
+  .receipt-tools { display:flex; gap:7px; flex-wrap:wrap; margin-top:4px; }
+  .receipt-tool-btn { border:1px solid var(--line); background:var(--paper); color:var(--ink); border-radius:10px; padding:8px 11px; font-size:11px; font-weight:700; }
+  .receipt-import-panel { position:fixed; inset:0; z-index:120; background:rgba(0,0,0,.45); display:flex; align-items:flex-end; justify-content:center; }
+  .receipt-import-card { width:min(520px,100%); background:var(--surface); color:var(--ink); border-radius:24px 24px 0 0; padding:18px 18px calc(22px + env(safe-area-inset-bottom)); }
+  .receipt-import-card h2 { margin:0; font-size:19px; }
+  .receipt-import-card p { margin:5px 0 10px; color:var(--ink-soft); font-size:11px; line-height:1.4; }
+  #receipt-import-text { width:100%; min-height:220px; box-sizing:border-box; resize:vertical; border:1px solid var(--line); border-radius:12px; padding:10px; background:var(--paper); color:var(--ink); font:11px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace; }
+  .receipt-import-actions { display:flex; gap:8px; margin-top:10px; }
+  .receipt-import-actions button { flex:1; border:0; border-radius:11px; padding:11px; font-size:12px; font-weight:700; }
+
   .toast { position:fixed; left:50%; bottom:calc(90px + env(safe-area-inset-bottom)); transform:translateX(-50%) translateY(10px); background:var(--ink); color:var(--paper); padding:9px 13px; border-radius:999px; font-size:12px; opacity:0; pointer-events:none; transition:.2s ease; z-index:120; }
   .toast.show { opacity:1; transform:translateX(-50%) translateY(0); pointer-events:auto; }
   .qty-edit { width:48px; padding:3px 5px; border:1px solid var(--gold); border-radius:7px; background:var(--surface); color:var(--ink); font:inherit; text-align:center; }
@@ -639,7 +650,7 @@
     <header>
       <div class="history-header">
         <div><h1>History</h1><p>Last 3 receipts</p></div>
-        <button class="history-receipt-btn" id="receipt-history-btn" aria-label="View last 10 receipts">▤ Receipts 10</button>
+        <button class="history-receipt-btn" id="receipt-history-btn" aria-label="View last 20 receipts">▤ Receipts 20</button>
       </div>
     </header>
     <button class="theme-toggle history-theme-toggle" id="theme-toggle" aria-label="Switch light or dark mode">☾</button>
@@ -661,8 +672,12 @@
   <div class="receipt-history-panel" id="receipt-history-panel" hidden>
     <div class="receipt-history-card">
       <div class="receipt-history-head">
-        <div><h2>Recent receipts</h2><div style="font-size:10px;color:var(--ink-soft);margin-top:2px">Last 10 completed sales</div></div>
+        <div><h2>Recent receipts</h2><div style="font-size:10px;color:var(--ink-soft);margin-top:2px">Last 20 completed sales</div></div>
         <button class="receipt-history-close" id="receipt-history-close" aria-label="Close receipts">×</button>
+      </div>
+      <div class="receipt-tools">
+        <button class="receipt-tool-btn" id="copy-all-receipts-btn">Copy receipts</button>
+        <button class="receipt-tool-btn" id="paste-receipts-btn">Paste receipts</button>
       </div>
       <div class="receipt-history-list" id="receipt-history-list"></div>
     </div>
@@ -699,6 +714,22 @@
       <div class="receipt-actions">
         <button class="primary" id="receipt-close-btn">Done</button>
         <button class="secondary receipt-share-btn" id="receipt-share-btn">Share</button>
+        <button class="secondary" id="receipt-copy-btn">Copy</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="receipt-import-panel" id="receipt-import-panel" hidden>
+    <div class="receipt-import-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+        <h2>Paste receipts</h2>
+        <button class="receipt-history-close" id="receipt-import-close" aria-label="Close paste receipts">×</button>
+      </div>
+      <p>Paste a receipt backup copied from this app. Receipts are merged and placed in time order, newest first. Up to 20 are kept.</p>
+      <textarea id="receipt-import-text" placeholder="Paste the copied receipt text here..."></textarea>
+      <div class="receipt-import-actions">
+        <button id="receipt-clipboard-paste">Paste from clipboard</button>
+        <button id="receipt-import-confirm" style="background:var(--gold);color:#fff">Import receipts</button>
       </div>
     </div>
   </div>
@@ -1408,7 +1439,7 @@
     var receipt={number:receiptNo,total:total,grossTotal:grossTotal,discount:discount,createdAt:new Date().toISOString(),cartIndex:activeCartIndex,items:entries.map(function(e){
       return {id:e.item.id,key:e.key,name:e.item.name,mode:e.mode,fraction:e.fraction,qty:e.qty,subtotal:(priceForMode(e.item,e.mode,e.fraction)||0)*e.qty};
     })};
-    receipts.unshift(receipt); receipts=receipts.slice(0,10); saveJson('price-list-receipts-v1',receipts);
+    receipts.unshift(receipt); receipts=receipts.slice(0,20); saveJson('price-list-receipts-v1',receipts);
     document.getElementById('receipt-number').textContent=receiptNo;
     document.getElementById('receipt-gross').textContent='¢'+formatCedis(grossTotal);
     document.getElementById('receipt-total').textContent='¢'+formatCedis(total);
@@ -1495,6 +1526,79 @@
     document.getElementById('theme-color-meta').setAttribute('content', darkMode?'#0B1020':'#F6F5F0');
     try { localStorage.setItem('price-list-dark-mode-v1', darkMode?'1':'0'); } catch(e){}
   }
+  function receiptBackupText(receiptList) {
+    var list=Array.isArray(receiptList)?receiptList:[];
+    return JSON.stringify({format:'RECEIPTS_BACKUP_V1',app:'Price List Sales Calculator',receipts:list}, null, 2) + '\n';
+  }
+  async function copyTextWithFallback(text, successMessage, filename) {
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(text); showToast(successMessage); return true;
+      }
+    } catch(e) {}
+    try {
+      var ta=document.createElement('textarea'); ta.value=text; ta.style.position='fixed'; ta.style.opacity='0';
+      document.body.appendChild(ta); ta.focus(); ta.select(); document.execCommand('copy'); ta.remove(); showToast(successMessage); return true;
+    } catch(e) {}
+    var blob=new Blob([text],{type:'text/plain;charset=utf-8'}), url=URL.createObjectURL(blob), a=document.createElement('a');
+    a.href=url; a.download=filename||'receipts-backup.txt'; a.click(); setTimeout(function(){URL.revokeObjectURL(url);},1000); showToast('Receipt TXT ready'); return false;
+  }
+  function copyReceipt(receiptIndex) {
+    var r=receipts[receiptIndex]; if(!r) return;
+    copyTextWithFallback(receiptBackupText([r]), 'Receipt copied', (r.number||'receipt')+'.txt');
+  }
+  function copyAllReceipts() {
+    if(!receipts.length){ showToast('No receipts to copy'); return; }
+    copyTextWithFallback(receiptBackupText(receipts.slice(0,20)), 'Receipts copied', 'receipts-backup.txt');
+  }
+  function openReceiptImport() {
+    var panel=document.getElementById('receipt-import-panel'); if(!panel) return;
+    document.getElementById('receipt-import-text').value=''; panel.hidden=false;
+  }
+  function closeReceiptImport() { var p=document.getElementById('receipt-import-panel'); if(p) p.hidden=true; }
+  async function pasteReceiptsFromClipboard() {
+    try {
+      if(navigator.clipboard && navigator.clipboard.readText){
+        var text=await navigator.clipboard.readText();
+        document.getElementById('receipt-import-text').value=text||'';
+        showToast(text?'Pasted from clipboard':'Clipboard is empty');
+        return;
+      }
+    } catch(e) { showToast('Tap the box and paste manually'); return; }
+    showToast('Tap the box and paste manually');
+  }
+  function normalizeImportedReceipts(payload) {
+    var list=[];
+    if(payload && payload.format==='RECEIPTS_BACKUP_V1' && Array.isArray(payload.receipts)) list=payload.receipts;
+    else if(Array.isArray(payload)) list=payload;
+    else if(payload && payload.number && payload.items) list=[payload];
+    return list.filter(function(r){ return r && r.number && r.createdAt && Array.isArray(r.items); }).map(function(r){
+      return {
+        number:String(r.number), total:Number(r.total)||0, grossTotal:r.grossTotal==null?Number(r.total)||0:Number(r.grossTotal)||0,
+        discount:Number(r.discount)||0, createdAt:String(r.createdAt), cartIndex:Number(r.cartIndex)||0,
+        items:r.items.map(function(i){ return {id:i.id==null?null:Number(i.id),key:i.key||'',name:String(i.name||''),mode:i.mode||'bulk',fraction:i.fraction==null?1:Number(i.fraction),qty:Number(i.qty)||0,subtotal:Number(i.subtotal)||0}; })
+      };
+    });
+  }
+  function importReceiptsFromText() {
+    var text=(document.getElementById('receipt-import-text').value||'').trim();
+    if(!text){ showToast('Paste a receipt backup first'); return; }
+    var payload;
+    try { payload=JSON.parse(text); } catch(e) { showToast('That receipt backup is not valid'); return; }
+    var incoming=normalizeImportedReceipts(payload);
+    if(!incoming.length){ showToast('No valid receipts found'); return; }
+    var merged=receipts.concat(incoming), seen={};
+    merged=merged.filter(function(r){
+      var key=String(r.number)+'|'+String(r.createdAt); if(seen[key]) return false; seen[key]=true; return true;
+    });
+    merged.sort(function(a,b){ return new Date(b.createdAt).getTime()-new Date(a.createdAt).getTime(); });
+    receipts=merged.slice(0,20);
+    var maxNo=receiptCounter;
+    receipts.forEach(function(r){ var m=String(r.number||'').match(/(\d+)$/); if(m) maxNo=Math.max(maxNo,Number(m[1])); });
+    receiptCounter=maxNo; localStorage.setItem('price-list-receipt-counter-v1',String(receiptCounter));
+    saveJson('price-list-receipts-v1',receipts); renderHistory(); closeReceiptImport(); showToast(incoming.length+' receipt'+(incoming.length===1?'':'s')+' imported');
+  }
+
   async function shareReceipt(receiptIndex) {
     var r=receipts[receiptIndex]; if(!r) return;
     var canvas=document.createElement('canvas'), ctx=canvas.getContext('2d');
@@ -1541,7 +1645,7 @@ function renderHistory(){
         var mode=i.mode==='bulk'?(i.fraction===0.5?'½ BULK':i.fraction===0.25?'¼ BULK':'Full BULK'):'SINGLE';
         return '<li>'+escapeHtml(i.name)+' — '+mode+' × '+i.qty+' — ¢'+formatCedis(i.subtotal)+'</li>';
       }).join('');
-      return '<div class="history-card" data-history-index="'+idx+'" data-receipt-index="'+idx+'"><div class="history-top"><span class="history-receipt">'+escapeHtml(r.number)+'</span><span class="history-total">¢'+formatCedis(r.total)+'</span></div><div class="history-meta">'+when+'</div><ul class="history-items">'+itemsHtml+'</ul><button class="receipt-history-share" data-share-receipt="'+idx+'">Share receipt</button></div>';
+      return '<div class="history-card" data-history-index="'+idx+'" data-receipt-index="'+idx+'"><div class="history-top"><span class="history-receipt">'+escapeHtml(r.number)+'</span><span class="history-total">¢'+formatCedis(r.total)+'</span></div><div class="history-meta">'+when+'</div><ul class="history-items">'+itemsHtml+'</ul><button class="receipt-history-share" data-share-receipt="'+idx+'">Share receipt</button><button class="receipt-copy-btn" data-copy-receipt="'+idx+'">Copy</button></div>';
     }).join('');
     renderReceiptHistory();
     updateChangeCalculator();
@@ -1549,13 +1653,13 @@ function renderHistory(){
   function renderReceiptHistory(){
     var list=document.getElementById('receipt-history-list'); if(!list) return;
     if(!receipts.length){ list.innerHTML='<div class="history-empty">No completed sales yet.</div>'; return; }
-    list.innerHTML=receipts.slice(0,10).map(function(r){
+    list.innerHTML=receipts.slice(0,20).map(function(r){
       var d=new Date(r.createdAt); var when=isNaN(d.getTime())?'':d.toLocaleString([], {month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'});
       var itemsHtml=(r.items||[]).map(function(i){
         var mode=i.mode==='bulk'?(i.fraction===0.5?'½ BULK':i.fraction===0.25?'¼ BULK':'Full BULK'):'SINGLE';
         return '<li>'+escapeHtml(i.name)+' — '+mode+' × '+i.qty+' — ¢'+formatCedis(i.subtotal)+'</li>';
       }).join('');
-      return '<div class="receipt-history-item" data-receipt-index="'+receipts.indexOf(r)+'"><div class="rh-top"><span class="rh-no">'+escapeHtml(r.number)+'</span><span class="rh-total">¢'+formatCedis(r.total)+'</span></div><div class="rh-meta">'+when+'</div><ul class="rh-items">'+itemsHtml+'</ul><button class="receipt-history-share" data-share-receipt="'+receipts.indexOf(r)+'">Share as image</button></div>';
+      return '<div class="receipt-history-item" data-receipt-index="'+receipts.indexOf(r)+'"><div class="rh-top"><span class="rh-no">'+escapeHtml(r.number)+'</span><span class="rh-total">¢'+formatCedis(r.total)+'</span></div><div class="rh-meta">'+when+'</div><ul class="rh-items">'+itemsHtml+'</ul><button class="receipt-history-share" data-share-receipt="'+receipts.indexOf(r)+'">Share as image</button><button class="receipt-copy-btn" data-copy-receipt="'+receipts.indexOf(r)+'">Copy</button></div>';
     }).join('');
   }
   function updateChangeCalculator(){
@@ -1754,11 +1858,18 @@ function renderHistory(){
     if (e.target.closest("#sheet-save-btn")) return handleSheetSave();
     if (e.target.closest("#sheet-delete-btn")) return handleSheetDelete();
     if (e.target.closest("#discount-btn")) return setDiscount();
+    var copyReceiptBtn=e.target.closest('[data-copy-receipt]');
+    if(copyReceiptBtn){ e.stopPropagation(); return copyReceipt(Number(copyReceiptBtn.dataset.copyReceipt)); }
     var shareBtn=e.target.closest('[data-share-receipt]');
     if(shareBtn){ e.stopPropagation(); return shareReceipt(Number(shareBtn.dataset.shareReceipt)); }
     if (e.target.closest("#clear-btn")) return clearCart();
     if (e.target.closest("#complete-btn")) return completeSale();
     if (e.target.closest("#receipt-history-btn")) { renderReceiptHistory(); document.getElementById('receipt-history-panel').hidden=false; return; }
+    if (e.target.closest("#copy-all-receipts-btn")) return copyAllReceipts();
+    if (e.target.closest("#paste-receipts-btn")) return openReceiptImport();
+    if (e.target.closest("#receipt-import-close") || e.target === document.getElementById('receipt-import-panel')) return closeReceiptImport();
+    if (e.target.closest("#receipt-clipboard-paste")) return pasteReceiptsFromClipboard();
+    if (e.target.closest("#receipt-import-confirm")) return importReceiptsFromText();
     if (e.target.closest("#receipt-history-close") || e.target === document.getElementById('receipt-history-panel')) { document.getElementById('receipt-history-panel').hidden=true; return; }
     if (e.target.closest('#cart-history-btn')) { openCartOverview(); return; }
     if (e.target.closest('#cart-overview-close') || e.target === document.getElementById('cart-overview-panel')) { document.getElementById('cart-overview-panel').hidden=true; return; }
@@ -1776,6 +1887,7 @@ function renderHistory(){
     var receiptHistoryItem=e.target.closest('[data-receipt-index]');
     if (receiptHistoryItem && receiptHoldTriggered) { receiptHoldTriggered=false; return; }
     if (e.target.closest("#receipt-share-btn")) { var latest=receipts[0]; if(latest) shareReceipt(0); return; }
+    if (e.target.closest("#receipt-copy-btn")) { if(receipts[0]) copyReceipt(0); return; }
     if (e.target.closest("#receipt-close-btn")) { document.getElementById('receipt-panel').hidden=true; return; }
     var qtyTap=e.target.closest('[data-qty]');
     if (qtyTap) {
