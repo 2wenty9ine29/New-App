@@ -102,8 +102,11 @@
     transform: translateY(-50%); margin: 0; padding: 0;
   }
   .manage-copy-wrap { padding: 12px 0 20px; }
+  .manage-copy-row { display: flex; gap: 8px; }
   .manage-copy-btn { width: 100%; border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 14px; padding: 12px 14px; font-size: 14px; font-weight: 650; }
+  .manage-copy-row .manage-copy-btn { width: auto; flex: 1; }
   .manage-copy-btn:active { opacity: .8; transform: scale(.99); }
+  #price-import-text { width:100%; min-height:220px; box-sizing:border-box; resize:vertical; border:1px solid var(--line); border-radius:12px; padding:10px; background:var(--paper); color:var(--ink); font:11px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace; }
 
   ul.rows { list-style: none; margin: 0; padding: 0; }
   .row {
@@ -602,7 +605,10 @@
         <p class="body">Add your first item to start building your price list.</p>
       </div>
       <div class="manage-copy-wrap">
-        <button class="manage-copy-btn" id="manage-copy-btn">Copy price list</button>
+        <div class="manage-copy-row">
+          <button class="manage-copy-btn" id="manage-copy-btn">Copy price list</button>
+          <button class="manage-copy-btn" id="manage-paste-btn">Paste price list</button>
+        </div>
       </div>
     </div>
   </section>
@@ -688,7 +694,7 @@
   <div class="receipt-history-panel" id="receipt-history-panel" hidden>
     <div class="receipt-history-card">
       <div class="receipt-history-head">
-        <div><h2>Recent receipts</h2><div style="font-size:10px;color:var(--ink-soft);margin-top:2px">Last 20 completed sales</div></div>
+        <div><h2>Recent receipts</h2><div style="font-size:10px;color:var(--ink-soft);margin-top:2px">Last 500 completed sales</div></div>
         <button class="receipt-history-close" id="receipt-history-close" aria-label="Close receipts">×</button>
       </div>
       <div class="receipt-tools">
@@ -741,11 +747,25 @@
         <h2>Paste receipts</h2>
         <button class="receipt-history-close" id="receipt-import-close" aria-label="Close paste receipts">×</button>
       </div>
-      <p>Paste a receipt backup copied from this app. Receipts are merged and placed in time order, newest first. Up to 20 are kept.</p>
+      <p>Paste a receipt backup copied from this app. Receipts are merged and placed in time order, newest first. Up to 500 are kept.</p>
       <textarea id="receipt-import-text" placeholder="Paste the copied receipt text here..."></textarea>
       <div class="receipt-import-actions">
         <button id="receipt-clipboard-paste">Paste from clipboard</button>
         <button id="receipt-import-confirm" style="background:var(--gold);color:#fff">Import receipts</button>
+      </div>
+    </div>
+  </div>
+  <div class="receipt-import-panel" id="price-import-panel" hidden>
+    <div class="receipt-import-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+        <h2>Paste price list</h2>
+        <button class="receipt-history-close" id="price-import-close" aria-label="Close paste price list">×</button>
+      </div>
+      <p>Paste a price list backup copied from this app (yours or another device's). Only items you don't already have get added — anything already in your list, and its prices, are left exactly as they are.</p>
+      <textarea id="price-import-text" placeholder="Paste the copied price list text here..."></textarea>
+      <div class="receipt-import-actions">
+        <button id="price-clipboard-paste">Paste from clipboard</button>
+        <button id="price-import-confirm" style="background:var(--gold);color:#fff">Import price list</button>
       </div>
     </div>
   </div>
@@ -911,7 +931,7 @@
   function normalizeReceiptNumbers() {
     if (!Array.isArray(receipts) || !receipts.length) return;
     receipts.sort(function(a,b){ return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(); });
-    var start = Math.max(1, Number(receiptCounter)||0 - receipts.length + 1);
+    var start = Math.max(1, (Number(receiptCounter)||0) - receipts.length + 1);
     receipts.forEach(function(r, i){ r.number='Receipt #' + String(start+i).padStart(4,'0'); });
     receipts.sort(function(a,b){ return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(); });
     var highest = start + receipts.length - 1;
@@ -1233,6 +1253,68 @@
     showToast('Price list TXT ready');
   }
 
+  function openPriceImport() {
+    var panel = document.getElementById('price-import-panel'); if (!panel) return;
+    document.getElementById('price-import-text').value = '';
+    panel.hidden = false;
+  }
+  function closePriceImport() {
+    var p = document.getElementById('price-import-panel'); if (p) p.hidden = true;
+  }
+  async function pastePriceListFromClipboard() {
+    try {
+      if (navigator.clipboard && navigator.clipboard.readText) {
+        var text = await navigator.clipboard.readText();
+        document.getElementById('price-import-text').value = text || '';
+        showToast(text ? 'Pasted from clipboard' : 'Clipboard is empty');
+        return;
+      }
+    } catch (e) { showToast('Tap the box and paste manually'); return; }
+    showToast('Tap the box and paste manually');
+  }
+  function normalizeImportedPriceItems(payload) {
+    var list = [];
+    if (payload && payload.format === 'PRICE_LIST_BACKUP_V1' && Array.isArray(payload.items)) list = payload.items;
+    else if (Array.isArray(payload)) list = payload;
+    return list.filter(function (i) { return i && i.name; }).map(function (i) {
+      var bulk = (i.bulk === null || i.bulk === undefined || i.bulk === '') ? null : Number(i.bulk);
+      var single = (i.single === null || i.single === undefined || i.single === '') ? null : Number(i.single);
+      return {
+        name: String(i.name).trim(),
+        bulk: (bulk === null || isNaN(bulk)) ? null : bulk,
+        single: (single === null || isNaN(single)) ? null : single
+      };
+    }).filter(function (i) { return !!i.name; });
+  }
+  // Import is additive-only by design: items already in the catalog (matched by
+  // name) are left completely untouched, including their prices. Only names
+  // that don't already exist get inserted as new items.
+  function importPriceListFromText() {
+    var text = (document.getElementById('price-import-text').value || '').trim();
+    if (!text) { showToast('Paste a price list backup first'); return; }
+    var payload;
+    try { payload = JSON.parse(text); } catch (e) { showToast('That price list backup is not valid'); return; }
+    var incoming = normalizeImportedPriceItems(payload);
+    if (!incoming.length) { showToast('No valid items found'); return; }
+    var existingNames = {};
+    items.forEach(function (i) { existingNames[normalizeSearchText(i.name)] = true; });
+    var added = 0, ts = Date.now();
+    incoming.forEach(function (i) {
+      var key = normalizeSearchText(i.name);
+      if (!key || existingNames[key]) return;
+      existingNames[key] = true;
+      items.push({ id: ts + added, name: i.name, bulk: i.bulk, single: i.single, photo: null });
+      added += 1;
+    });
+    if (!added) { showToast('Nothing new — you already have all of those'); closePriceImport(); return; }
+    saveItems();
+    renderManageList();
+    renderCatalogList();
+    renderCart();
+    closePriceImport();
+    showToast(added + ' item' + (added === 1 ? '' : 's') + ' added');
+  }
+
   function catalogRow(item, mode) {
     var value = priceForMode(item, mode);
     var unavailable = value === null;
@@ -1491,7 +1573,7 @@
     var receipt={number:receiptNo,total:total,grossTotal:grossTotal,discount:discount,createdAt:new Date().toISOString(),cartIndex:activeCartIndex,items:entries.map(function(e){
       return {id:e.item.id,key:e.key,name:e.item.name,mode:e.mode,fraction:e.fraction,qty:e.qty,subtotal:(priceForMode(e.item,e.mode,e.fraction)||0)*e.qty};
     })};
-    receipts.unshift(receipt); receipts=receipts.slice(0,20); saveJson('price-list-receipts-v1',receipts);
+    receipts.unshift(receipt); receipts=receipts.slice(0,500); saveJson('price-list-receipts-v1',receipts);
     document.getElementById('receipt-number').textContent=receiptNo;
     document.getElementById('receipt-gross').textContent='¢'+formatCedis(grossTotal);
     document.getElementById('receipt-total').textContent='¢'+formatCedis(total);
@@ -1602,7 +1684,7 @@
   }
   function copyAllReceipts() {
     if(!receipts.length){ showToast('No receipts to copy'); return; }
-    copyTextWithFallback(receiptBackupText(receipts.slice(0,20)), 'Receipts copied', 'receipts-backup.txt');
+    copyTextWithFallback(receiptBackupText(receipts), 'Receipts copied', 'receipts-backup.txt');
   }
   function openReceiptImport() {
     var panel=document.getElementById('receipt-import-panel'); if(!panel) return;
@@ -1645,7 +1727,7 @@
       var key=String(r.number)+'|'+String(r.createdAt); if(seen[key]) return false; seen[key]=true; return true;
     });
     merged.sort(function(a,b){ return new Date(b.createdAt).getTime()-new Date(a.createdAt).getTime(); });
-    receipts=merged.slice(0,20);
+    receipts=merged.slice(0,500);
     var maxNo=receiptCounter;
     receipts.forEach(function(r){ var m=String(r.number||'').match(/(\d+)$/); if(m) maxNo=Math.max(maxNo,Number(m[1])); });
     receiptCounter=maxNo; localStorage.setItem('price-list-receipt-counter-v1',String(receiptCounter));
@@ -1781,7 +1863,7 @@ function renderHistory(){
   function renderReceiptHistory(){
     var list=document.getElementById('receipt-history-list'); if(!list) return;
     if(!receipts.length){ list.innerHTML='<div class="history-empty">No completed sales yet.</div>'; return; }
-    list.innerHTML=receipts.slice(0,20).map(function(r){
+    list.innerHTML=receipts.map(function(r){
       var d=new Date(r.createdAt); var when=isNaN(d.getTime())?'':d.toLocaleString([], {month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'});
       var itemsHtml=(r.items||[]).map(function(i){
         var mode=i.mode==='bulk'?(i.fraction===0.5?'½ BULK':i.fraction===0.25?'¼ BULK':'Full BULK'):'SINGLE';
@@ -2002,6 +2084,9 @@ function renderHistory(){
     if (e.target.closest("#receipt-import-close") || e.target === document.getElementById('receipt-import-panel')) return closeReceiptImport();
     if (e.target.closest("#receipt-clipboard-paste")) return pasteReceiptsFromClipboard();
     if (e.target.closest("#receipt-import-confirm")) return importReceiptsFromText();
+    if (e.target.closest("#price-import-close") || e.target === document.getElementById('price-import-panel')) return closePriceImport();
+    if (e.target.closest("#price-clipboard-paste")) return pastePriceListFromClipboard();
+    if (e.target.closest("#price-import-confirm")) return importPriceListFromText();
     if (e.target.closest("#receipt-history-close") || e.target === document.getElementById('receipt-history-panel')) { document.getElementById('receipt-history-panel').hidden=true; return; }
     if (e.target.closest('#cart-history-btn')) { openCartOverview(); return; }
     if (e.target.closest('#cart-overview-close') || e.target === document.getElementById('cart-overview-panel')) { document.getElementById('cart-overview-panel').hidden=true; return; }
@@ -2042,6 +2127,7 @@ function renderHistory(){
     this.classList.remove('visible'); renderManageList(); input.focus();
   });
   document.getElementById('manage-copy-btn').addEventListener('click', copyPriceList);
+  document.getElementById('manage-paste-btn').addEventListener('click', openPriceImport);
 
   document.getElementById("sell-search").addEventListener("input", function (e) {
     sellSearchQuery = e.target.value;
