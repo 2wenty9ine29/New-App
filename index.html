@@ -1771,7 +1771,7 @@ function renderHistory(){
       var d=new Date(r.createdAt); var when=isNaN(d.getTime())?'':d.toLocaleString([], {month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
       var itemsHtml=(r.items||[]).map(function(i){
         var mode=i.mode==='bulk'?(i.fraction===0.5?'½ BULK':i.fraction===0.25?'¼ BULK':'Full BULK'):'SINGLE';
-        return '<li>'+escapeHtml(i.name)+' — '+mode+' × '+receiptQuantityText(i)+' — ¢'+formatCedis(i.subtotal)+'</li>';
+        return '<li>'+escapeHtml(i.name)+' — '+mode+' × '+(Number(i.qty)||0)+' — ¢'+formatCedis(i.subtotal)+'</li>';
       }).join('');
       return '<div class="history-card" data-history-index="'+idx+'" data-receipt-index="'+idx+'"><div class="history-top"><span class="history-receipt">'+escapeHtml(r.number)+'</span><span class="history-total">¢'+formatCedis(r.total)+'</span></div><div class="history-meta">'+when+'</div><ul class="history-items">'+itemsHtml+'</ul><button class="receipt-history-share" data-share-receipt="'+idx+'">Share receipt</button><button class="receipt-copy-btn" data-copy-receipt="'+idx+'">Copy</button></div>';
     }).join('');
@@ -1785,7 +1785,7 @@ function renderHistory(){
       var d=new Date(r.createdAt); var when=isNaN(d.getTime())?'':d.toLocaleString([], {month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'});
       var itemsHtml=(r.items||[]).map(function(i){
         var mode=i.mode==='bulk'?(i.fraction===0.5?'½ BULK':i.fraction===0.25?'¼ BULK':'Full BULK'):'SINGLE';
-        return '<li>'+escapeHtml(i.name)+' — '+mode+' × '+receiptQuantityText(i)+' — ¢'+formatCedis(i.subtotal)+'</li>';
+        return '<li>'+escapeHtml(i.name)+' — '+mode+' × '+(Number(i.qty)||0)+' — ¢'+formatCedis(i.subtotal)+'</li>';
       }).join('');
       return '<div class="receipt-history-item" data-receipt-index="'+receipts.indexOf(r)+'"><div class="rh-top"><span class="rh-no">'+escapeHtml(r.number)+'</span><span class="rh-total">¢'+formatCedis(r.total)+'</span></div><div class="rh-meta">'+when+'</div><ul class="rh-items">'+itemsHtml+'</ul><button class="receipt-history-share" data-share-receipt="'+receipts.indexOf(r)+'">Share as image</button><button class="receipt-copy-btn" data-copy-receipt="'+receipts.indexOf(r)+'">Copy</button></div>';
     }).join('');
