@@ -270,10 +270,8 @@
   .receipt-action-close:active { transform:scale(.94); }
   .receipt-action-list { display:grid; gap:10px; }
   .receipt-action-btn { width:100%; min-height:58px; border:1px solid var(--line); border-radius:15px; padding:12px 15px; background:var(--paper); color:var(--ink); display:flex; align-items:center; gap:12px; text-align:left; font-size:17px; font-weight:750; letter-spacing:-.01em; }
-  .receipt-action-btn .action-icon { width:34px; height:34px; flex:0 0 34px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:800; background:var(--surface); color:var(--ink); }
-  .receipt-action-btn.debt .action-icon { color:var(--gold); }
-  .receipt-action-btn.change .action-icon { color:#0ea5e9; }
-  .receipt-action-btn.restore .action-icon { color:#8b5cf6; }
+  .receipt-action-btn .action-icon { width:34px; height:34px; flex:0 0 34px; border-radius:10px; display:flex; align-items:center; justify-content:center; background:var(--surface); color:var(--ink); }
+  .receipt-action-btn .action-icon svg { width:19px; height:19px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
   .receipt-action-btn:active { transform:scale(.985); }
 
   .receipt-history-list { display:grid; gap:8px; }
@@ -298,6 +296,19 @@
   .receipt-share-btn { background:var(--gold-soft); color:var(--ink); }
   .receipt-history-share { margin-top:7px; border:0; background:var(--gold-soft); color:var(--ink); border-radius:9px; padding:6px 10px; font-size:10px; font-weight:700; }
   .receipt-copy-btn { margin-top:7px; margin-left:5px; border:0; background:var(--paper); color:var(--ink); border-radius:9px; padding:6px 10px; font-size:10px; font-weight:700; }
+  .receipt-statuses { display:flex; gap:6px; flex-wrap:wrap; margin-top:6px; }
+  .receipt-status-chip { border:0; background:transparent; color:var(--ink); padding:2px 4px; font-size:10px; font-weight:800; text-decoration:underline; text-underline-offset:2px; }
+  .receipt-status-chip:active { opacity:.65; transform:scale(.97); }
+  .receipt-status-chip.debt { color:var(--ink); }
+  .receipt-status-chip.change { color:var(--ink); }
+  .settlement-detail-panel { position:fixed; inset:0; z-index:145; background:rgba(0,0,0,.42); display:flex; align-items:center; justify-content:center; padding:20px; }
+  .settlement-detail-card { width:min(300px,100%); box-sizing:border-box; background:var(--surface); color:var(--ink); border:1px solid var(--line); border-radius:16px; padding:15px; box-shadow:0 18px 50px rgba(0,0,0,.22); }
+  .settlement-detail-head { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:12px; }
+  .settlement-detail-title { margin:0; font-size:15px; }
+  .settlement-detail-close { width:28px; height:28px; border:0; border-radius:50%; background:var(--paper); color:var(--ink); font-size:19px; line-height:1; }
+  .settlement-detail-amount { font-size:22px; font-weight:800; margin:2px 0 12px; }
+  .settlement-detail-meta { color:var(--ink-soft); font-size:10px; margin-bottom:11px; }
+  .settlement-detail-settle { width:100%; border:0; border-radius:10px; padding:9px 11px; background:var(--gold); color:#fff; font-size:11px; font-weight:800; }
   .receipt-tools { display:flex; gap:7px; flex-wrap:wrap; margin-top:4px; }
   .receipt-tool-btn { border:1px solid var(--line); background:var(--paper); color:var(--ink); border-radius:10px; padding:8px 11px; font-size:11px; font-weight:700; }
   .receipt-import-panel { position:fixed; inset:0; z-index:120; background:rgba(0,0,0,.45); display:flex; align-items:flex-end; justify-content:center; }
@@ -734,9 +745,9 @@
         <button class="receipt-action-close" id="receipt-action-cancel" aria-label="Close">×</button>
       </div>
       <div class="receipt-action-list">
-        <button class="receipt-action-btn debt" id="receipt-add-debt-btn"><span class="action-icon">₵</span><span>Add Debt</span></button>
-        <button class="receipt-action-btn change" id="receipt-add-change-btn"><span class="action-icon">↩</span><span>Add Change</span></button>
-        <button class="receipt-action-btn restore" id="receipt-restore-btn"><span class="action-icon">↻</span><span>Restore to Cart</span></button>
+        <button class="receipt-action-btn debt" id="receipt-add-debt-btn"><span class="action-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3.5h9l3 3V20.5H6z"/><path d="M15 3.5v4h4"/><path d="M9 13h6M12 10v6"/></svg></span><span>Add Debt</span></button>
+        <button class="receipt-action-btn change" id="receipt-add-change-btn"><span class="action-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7h10a4 4 0 0 1 0 8H8"/><path d="M8 12l-4 3 4 3"/><path d="M17 7l-2-2m2 2-2 2"/></svg></span><span>Add Change</span></button>
+        <button class="receipt-action-btn restore" id="receipt-restore-btn"><span class="action-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8a8 8 0 1 1-1 7"/><path d="M5 4v4h4"/><path d="M12 8v5l3 2"/></svg></span><span>Restore to Cart</span></button>
       </div>
     </div>
   </div>
@@ -746,6 +757,15 @@
       <div class="settlement-head"><h2 id="settlement-title">Unsettled Debts</h2><button class="receipt-history-close" id="settlement-close" aria-label="Close">×</button></div>
       <div class="settlement-tabs"><button class="settlement-tab active" id="settlement-debt-tab">Unsettled Debts</button><button class="settlement-tab" id="settlement-change-tab">Change Owed</button></div>
       <div class="settlement-list" id="settlement-list"></div>
+    </div>
+  </div>
+
+  <div class="settlement-detail-panel" id="settlement-detail-panel" hidden>
+    <div class="settlement-detail-card">
+      <div class="settlement-detail-head"><h2 class="settlement-detail-title" id="settlement-detail-title">Change</h2><button class="settlement-detail-close" id="settlement-detail-close" aria-label="Close">×</button></div>
+      <div class="settlement-detail-amount" id="settlement-detail-amount">¢0.00</div>
+      <div class="settlement-detail-meta" id="settlement-detail-meta">Receipt</div>
+      <button class="settlement-detail-settle" id="settlement-detail-settle">Settled</button>
     </div>
   </div>
 
@@ -1005,6 +1025,7 @@
   var changeOwed = loadJson('price-list-change-owed-v1', []);
   var settlementView = 'debt';
   var receiptActionIndex = null;
+  var settlementDetailType = null, settlementDetailReceiptNumber = null, settlementDetailReceiptCreatedAt = null;
 
   // Keep the visible receipt numbers orderly by date while the counter itself
   // always moves forward. This means the newest saved receipt has the largest
@@ -1705,6 +1726,52 @@
     saveJson('price-list-unsettled-debts-v1', unsettledDebts);
     saveJson('price-list-change-owed-v1', changeOwed);
   }
+  function settlementRecordsForReceipt(type, r) {
+    var data=type==='debt'?unsettledDebts:changeOwed;
+    var number=String(r && r.number || '');
+    var createdAt=String(r && r.createdAt || '');
+    return data.filter(function(x){ return String(x.receiptNumber||'')===number && (!createdAt || String(x.receiptCreatedAt||'')===createdAt); });
+  }
+  function receiptStatusHtml(r) {
+    var html='';
+    ['change','debt'].forEach(function(type){
+      var records=settlementRecordsForReceipt(type,r);
+      if(!records.length) return;
+      var amount=records.reduce(function(sum,x){ return sum+(Number(x.amount)||0); },0);
+      var label=type==='change'?'Change':'Debt';
+      html+='<button class="receipt-status-chip '+type+'" data-settlement-detail="'+type+'" data-settlement-receipt="'+escapeHtml(r.number||'')+'" data-settlement-created="'+escapeHtml(r.createdAt||'')+'">'+label+'</button>';
+    });
+    return html ? '<div class="receipt-statuses">'+html+'</div>' : '';
+  }
+  function openSettlementDetail(type, receiptNumber, receiptCreatedAt) {
+    var data=type==='debt'?unsettledDebts:changeOwed;
+    var records=data.filter(function(x){ return String(x.receiptNumber||'')===String(receiptNumber||'') && String(x.receiptCreatedAt||'')===String(receiptCreatedAt||''); });
+    if(!records.length) return;
+    settlementDetailType=type; settlementDetailReceiptNumber=receiptNumber; settlementDetailReceiptCreatedAt=receiptCreatedAt;
+    var amount=records.reduce(function(sum,x){ return sum+(Number(x.amount)||0); },0);
+    document.getElementById('settlement-detail-title').textContent=type==='debt'?'Debt':'Change';
+    document.getElementById('settlement-detail-amount').textContent='¢'+formatCedis(amount);
+    document.getElementById('settlement-detail-meta').textContent=receiptNumber||'Receipt';
+    document.getElementById('settlement-detail-panel').hidden=false;
+  }
+  function closeSettlementDetail() {
+    settlementDetailType=null; settlementDetailReceiptNumber=null; settlementDetailReceiptCreatedAt=null;
+    document.getElementById('settlement-detail-panel').hidden=true;
+  }
+  function settleReceiptDetail() {
+    if(!settlementDetailType) return;
+    var data=settlementDetailType==='debt'?unsettledDebts:changeOwed;
+    var number=settlementDetailReceiptNumber, createdAt=settlementDetailReceiptCreatedAt;
+    for(var i=data.length-1;i>=0;i--){
+      if(String(data[i].receiptNumber||'')===String(number||'') && String(data[i].receiptCreatedAt||'')===String(createdAt||'')) data.splice(i,1);
+    }
+    var settledLabel=settlementDetailType==='debt'?'Debt settled':'Change settled';
+    saveSettlements();
+    closeSettlementDetail();
+    renderHistory();
+    showToast(settledLabel);
+    if(!document.getElementById('settlement-panel').hidden) renderSettlementList();
+  }
   function openReceiptActionMenu(receiptIndex) {
     var r=receipts[receiptIndex]; if(!r) return;
     receiptActionIndex=receiptIndex;
@@ -1722,6 +1789,7 @@
     if(type==='debt') unsettledDebts.unshift(record); else changeOwed.unshift(record);
     saveSettlements();
     closeReceiptActionMenu();
+    renderHistory();
     showToast(type==='debt'?'Debt added':'Change added');
     renderSettlementList();
   }
@@ -1744,7 +1812,7 @@
   }
   function completeSettlement(index) {
     var data=settlementView==='debt'?unsettledDebts:changeOwed; if(!data[index]) return;
-    data.splice(index,1); saveSettlements(); renderSettlementList(); showToast(settlementView==='debt'?'Debt marked as paid':'Change marked as collected');
+    data.splice(index,1); saveSettlements(); renderSettlementList(); renderHistory(); showToast(settlementView==='debt'?'Debt marked as paid':'Change marked as collected');
   }
 
   function restoreReceiptToCart(receiptIndex) {
@@ -1982,7 +2050,7 @@ function renderHistory(){
         var mode=i.mode==='bulk'?(i.fraction===0.5?'½ BULK':i.fraction===0.25?'¼ BULK':'Full BULK'):'SINGLE';
         return '<li>'+escapeHtml(i.name)+' — '+mode+' × '+(Number(i.qty)||0)+' — ¢'+formatCedis(i.subtotal)+'</li>';
       }).join('');
-      return '<div class="history-card" data-history-index="'+idx+'" data-receipt-index="'+idx+'"><div class="history-top"><span class="history-receipt">'+escapeHtml(r.number)+'</span><span class="history-total">¢'+formatCedis(r.total)+'</span></div><div class="history-meta">'+when+'</div><ul class="history-items">'+itemsHtml+'</ul><button class="receipt-history-share" data-share-receipt="'+idx+'">Share receipt</button><button class="receipt-copy-btn" data-copy-receipt="'+idx+'">Copy</button></div>';
+      return '<div class="history-card" data-history-index="'+idx+'" data-receipt-index="'+idx+'"><div class="history-top"><span class="history-receipt">'+escapeHtml(r.number)+'</span><span class="history-total">¢'+formatCedis(r.total)+'</span></div><div class="history-meta">'+when+'</div>'+receiptStatusHtml(r)+'<ul class="history-items">'+itemsHtml+'</ul><button class="receipt-history-share" data-share-receipt="'+idx+'">Share receipt</button><button class="receipt-copy-btn" data-copy-receipt="'+idx+'">Copy</button></div>';
     }).join('');
     updateReceiptCount();
     renderReceiptHistory();
@@ -2004,7 +2072,7 @@ function renderHistory(){
         var mode=i.mode==='bulk'?(i.fraction===0.5?'½ BULK':i.fraction===0.25?'¼ BULK':'Full BULK'):'SINGLE';
         return '<li>'+escapeHtml(i.name)+' — '+mode+' × '+(Number(i.qty)||0)+' — ¢'+formatCedis(i.subtotal)+'</li>';
       }).join('');
-      return '<div class="receipt-history-item" data-receipt-index="'+receipts.indexOf(r)+'"><div class="rh-top"><span class="rh-no">'+escapeHtml(r.number)+'</span><span class="rh-total">¢'+formatCedis(r.total)+'</span></div><div class="rh-meta">'+when+'</div><ul class="rh-items">'+itemsHtml+'</ul><button class="receipt-history-share" data-share-receipt="'+receipts.indexOf(r)+'">Share as image</button><button class="receipt-copy-btn" data-copy-receipt="'+receipts.indexOf(r)+'">Copy</button></div>';
+      return '<div class="receipt-history-item" data-receipt-index="'+receipts.indexOf(r)+'"><div class="rh-top"><span class="rh-no">'+escapeHtml(r.number)+'</span><span class="rh-total">¢'+formatCedis(r.total)+'</span></div><div class="rh-meta">'+when+'</div>'+receiptStatusHtml(r)+'<ul class="rh-items">'+itemsHtml+'</ul><button class="receipt-history-share" data-share-receipt="'+receipts.indexOf(r)+'">Share as image</button><button class="receipt-copy-btn" data-copy-receipt="'+receipts.indexOf(r)+'">Copy</button></div>';
     }).join('');
   }
   function updateChangeCalculator(){
@@ -2214,6 +2282,10 @@ function renderHistory(){
     if (e.target.closest("#clear-btn")) return clearCart();
     if (e.target.closest("#complete-btn")) return completeSale();
     if (e.target.closest("#receipt-history-btn")) { renderReceiptHistory(); document.getElementById('receipt-history-panel').hidden=false; return; }
+    var settlementDetail=e.target.closest('[data-settlement-detail]');
+    if(settlementDetail){ e.stopPropagation(); return openSettlementDetail(settlementDetail.dataset.settlementDetail, settlementDetail.dataset.settlementReceipt, settlementDetail.dataset.settlementCreated); }
+    if (e.target.closest('#settlement-detail-close') || e.target === document.getElementById('settlement-detail-panel')) { closeSettlementDetail(); return; }
+    if (e.target.closest('#settlement-detail-settle')) { settleReceiptDetail(); return; }
     if (e.target.closest("#unsettled-debts-btn")) { openSettlements('debt'); return; }
     if (e.target.closest("#change-owed-btn")) { openSettlements('change'); return; }
     if (e.target.closest("#settlement-close") || e.target === document.getElementById('settlement-panel')) { document.getElementById('settlement-panel').hidden=true; return; }
