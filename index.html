@@ -197,6 +197,12 @@
   .cart-switch.small { padding:4px 9px; font-size:10px; }
   .cart-switch.active { background:var(--ink); color:#fff; border-color:var(--ink); }
   body.dark .cart-switch.active { background:var(--gold); border-color:var(--gold); }
+  .search-broom {
+    margin-left:auto; width:34px; height:34px; padding:0; border:1px solid var(--line);
+    border-radius:50%; background:var(--surface); color:var(--ink); display:flex;
+    align-items:center; justify-content:center; font-size:18px; line-height:1;
+  }
+  .search-broom:active { transform:scale(.92); }
   .search-wrap { flex-shrink: 0; padding: 5px 20px 7px; position: relative; }
   .search-wrap svg { position: absolute; left: 34px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: var(--ink-soft); pointer-events: none; }
   #sell-search {
@@ -825,6 +831,7 @@
         <button class="cart-switch active" id="cart-1-btn" data-cart-switch="0">Cart 1</button>
         <button class="cart-switch small" id="cart-2-btn" data-cart-switch="1">Cart 2</button>
         <button class="discount-btn" id="discount-btn">DISCOUNT</button>
+        <button class="search-broom" id="search-broom" aria-label="Clear item search" title="Clear search">🧹</button>
       </div>
       <div class="scroll-area">
         <ul class="rows" id="cart-list"></ul>
@@ -904,10 +911,9 @@
       </div>
       <div class="reports-tabs">
         <button class="reports-tab" data-report-period="today">Today</button>
-        <button class="reports-tab" data-report-period="yesterday">Yesterday</button>
-        <button class="reports-tab" data-report-period="dayBeforeYesterday" id="report-day-before-yesterday">Thursday</button>
+        <button class="reports-tab" data-report-period="week">This Week</button>
         <button class="reports-tab" data-report-period="month">This Month</button>
-        <button class="reports-tab" data-report-period="year">This Year</button>
+        <button class="reports-tab" data-report-period="all">All Time</button>
       </div>
       <div id="reports-body"></div>
     </div>
@@ -1538,7 +1544,7 @@
     showToast('Price list TXT ready');
   }
 
-  var APP_VERSION = 'v8.9';
+  var APP_VERSION = 'v8.5';
   var LAST_BACKUP_KEY = 'price-list-last-backup-v1';
   function isAppStorageKey(k) {
     return !!k && (k.indexOf('priceList') === 0 || k.indexOf('price-list-') === 0);
@@ -2333,37 +2339,23 @@ function renderHistory(){
   var reportPeriod = 'today';
   function reportPeriodStart(period) {
     var now = new Date();
-    var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    if (period === 'today') return { start: today, end: new Date(today.getTime() + 86400000) };
-    if (period === 'yesterday') {
-      var yesterday = new Date(today);
-      yesterday.setDate(yesterday.getDate() - 1);
-      return { start: yesterday, end: today };
+    if (period === 'today') return new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    if (period === 'week') {
+      var d = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      var day = d.getDay();
+      var diff = (day === 0 ? 6 : day - 1); // week starts Monday
+      d.setDate(d.getDate() - diff);
+      return d;
     }
-    if (period === 'dayBeforeYesterday') {
-      var dayBefore = new Date(today);
-      dayBefore.setDate(dayBefore.getDate() - 2);
-      return { start: dayBefore, end: new Date(today.getTime() - 86400000) };
-    }
-    if (period === 'month') return { start: new Date(now.getFullYear(), now.getMonth(), 1), end: new Date(now.getTime() + 1) };
-    if (period === 'year') return { start: new Date(now.getFullYear(), 0, 1), end: new Date(now.getTime() + 1) };
-    return null;
-  }
-  function updateDayBeforeYesterdayLabel() {
-    var tab = document.getElementById('report-day-before-yesterday');
-    if (!tab) return;
-    var now = new Date();
-    var d = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    d.setDate(d.getDate() - 2);
-    tab.textContent = d.toLocaleDateString([], { weekday: 'long' });
+    if (period === 'month') return new Date(now.getFullYear(), now.getMonth(), 1);
+    return null; // 'all'
   }
   function computeReportStats(period) {
-    var range = reportPeriodStart(period);
+    var start = reportPeriodStart(period);
     var filtered = receipts.filter(function (r) {
+      if (!start) return true;
       var d = new Date(r.createdAt);
-      if (!(d instanceof Date) || isNaN(d)) return false;
-      if (!range) return false;
-      return d >= range.start && d < range.end;
+      return d instanceof Date && !isNaN(d) && d >= start;
     });
     var revenue = 0, discountTotal = 0, bulkRevenue = 0, singleRevenue = 0;
     var itemTotals = {};
@@ -2385,7 +2377,6 @@ function renderHistory(){
   }
   function renderReports() {
     var body = document.getElementById('reports-body'); if (!body) return;
-    updateDayBeforeYesterdayLabel();
     document.querySelectorAll('.reports-tab').forEach(function (t) {
       t.classList.toggle('active', t.dataset.reportPeriod === reportPeriod);
     });
@@ -2726,6 +2717,11 @@ function renderHistory(){
   document.getElementById('search-clear').addEventListener('click', function(){
     var input=document.getElementById('sell-search'); input.value=''; sellSearchQuery='';
     this.classList.remove('visible'); renderCatalogList(); input.focus();
+  });
+  document.getElementById('search-broom').addEventListener('click', function(){
+    var input=document.getElementById('sell-search'); input.value=''; sellSearchQuery='';
+    document.getElementById('search-clear').classList.remove('visible');
+    renderCatalogList(); input.focus();
   });
 
   migrateLegacyCart();
