@@ -178,14 +178,14 @@
   .sell-titlebar.compact { min-height: 44px; padding: 5px 20px 4px; }
   .sell-titlebar.compact .theme-toggle { width:38px; height:38px; margin-left:auto; }
   .cart-switcher {
-    display:flex; align-items:center; gap:6px; padding:6px 20px 4px; flex-shrink:0;
+    display:flex; align-items:center; gap:6px; padding:4px 20px 3px; flex-shrink:0;
     background:var(--paper);
   }
   .cart-switch {
     border:1px solid var(--line); background:var(--surface); color:var(--ink-soft);
-    border-radius:999px; padding:7px 13px; font-size:12px; font-weight:700;
+    border-radius:999px; padding:6px 11px; font-size:11.5px; font-weight:700;
   }
-  .cart-switch.small { padding:5px 10px; font-size:10px; }
+  .cart-switch.small { padding:4px 9px; font-size:10px; }
   .cart-switch.active { background:var(--ink); color:#fff; border-color:var(--ink); }
   body.dark .cart-switch.active { background:var(--gold); border-color:var(--gold); }
   .search-wrap { flex-shrink: 0; padding: 5px 20px 7px; position: relative; }
@@ -216,28 +216,28 @@
      fill whatever's left over (which used to leave blank space when the
      cart was empty). Scoped to the Sell screen only so Manage/History,
      which reuse .scroll-area, are unaffected. */
-  #screen-sell .scroll-area { flex: 0 1 auto; max-height: 37dvh; min-height: 0; }
+  #screen-sell .scroll-area { flex: 0 1 auto; max-height: 40dvh; min-height: 0; }
   .cart-heading { padding: 10px 20px 4px; font-size: 12px; font-weight: 650; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.04em; flex-shrink: 0; }
 
   .cart-bar {
     flex-shrink: 0; background: var(--ink); color: #fff; display: flex; align-items: center;
-    justify-content: space-between; padding: 7px 20px; margin-bottom: 0;
+    justify-content: space-between; padding: 6px 20px; margin-bottom: 0;
   }
-  .cart-total-label { display: block; font-size: 12px; color: #B8B6AE; }
-  .cart-total-amount { display: inline-block; font-size: 22px; font-weight: 650; color: var(--gold-bright); font-variant-numeric: tabular-nums; }
+  .cart-total-label { display: block; font-size: 11px; color: #B8B6AE; }
+  .cart-total-amount { display: inline-block; font-size: 19px; font-weight: 650; color: var(--gold-bright); font-variant-numeric: tabular-nums; }
   .cart-total-amount.pulse { animation: pulseAnim .28s ease; }
   @keyframes pulseAnim { 0% { transform: scale(1); } 50% { transform: scale(1.12); } 100% { transform: scale(1); } }
   .clear-btn {
     background: rgba(255,255,255,0.10); border: 1px solid rgba(255,255,255,0.48); color: #fff;
-    padding: 7px 17px; border-radius: 999px; font-size: 13px; font-weight: 550;
+    padding: 6px 14px; border-radius: 999px; font-size: 12.5px; font-weight: 550;
   }
   .clear-btn:active { background: rgba(255,255,255,0.12); }
   .cart-actions { display: flex; align-items: center; gap: 8px; }
-  .discount-btn { background: #2D2D2D; border: 1px solid #2D2D2D; color:#fff; padding:7px 12px; border-radius:999px; font-size:12px; font-weight:650; }
+  .discount-btn { background: #2D2D2D; border: 1px solid #2D2D2D; color:#fff; padding:6px 11px; border-radius:999px; font-size:11.5px; font-weight:650; }
   .discount-btn.active { background:var(--gold); border-color:var(--gold); }
-  .discount-line { display:none; font-size:11px; color:#fff; opacity:.9; margin-top:2px; }
+  .discount-line { display:none; font-size:10.5px; color:#fff; opacity:.9; margin-top:2px; }
   .discount-line.show { display:block; }
-  .complete-btn { background: var(--gold); border: 0; color: #fff; padding: 8px 14px; border-radius: 999px; font-size: 13px; font-weight: 650; }
+  .complete-btn { background: var(--gold); border: 0; color: #fff; padding: 7px 13px; border-radius: 999px; font-size: 12.5px; font-weight: 650; }
   .complete-btn:disabled { opacity: .4; }
   .utility-bar { display:flex; gap:8px; padding: 8px 20px 0; flex-shrink:0; flex-wrap:wrap; }
   .utility-btn { border:1px solid var(--line); background:var(--surface); color:var(--ink); border-radius:999px; padding:7px 11px; font-size:12px; font-weight:600; }
@@ -318,7 +318,12 @@
     display:flex; align-items:center; justify-content:center;
   }
   .scan-torch-btn.active { background:var(--gold); border-color:var(--gold); color:#1C1B18; }
-  .scan-status { flex-shrink:0; text-align:center; color:#fff; opacity:.9; font-size:13px; padding:14px 20px calc(20px + env(safe-area-inset-bottom)); }
+  .scan-status { flex-shrink:0; text-align:center; color:#fff; opacity:.9; font-size:13px; padding:14px 20px 6px; }
+  .scan-manual-btn {
+    flex-shrink:0; display:block; margin:0 auto calc(16px + env(safe-area-inset-bottom));
+    background:none; border:0; color:var(--gold-bright); font-size:12.5px; font-weight:650;
+    text-decoration:underline; padding:6px 10px;
+  }
 
   /* Polished receipt action sheet */
   .receipt-action-panel { position:fixed; inset:0; z-index:130; background:rgba(0,0,0,.52); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); display:flex; align-items:center; justify-content:center; padding:20px; }
@@ -901,7 +906,8 @@
       <div class="scan-frame"></div>
       <button class="scan-torch-btn" id="scan-torch-btn" aria-label="Toggle flashlight" hidden>&#9679;</button>
     </div>
-    <p class="scan-status" id="scan-status">Point the camera at a barcode</p>
+    <p class="scan-status" id="scan-status">Fill the box with the barcode, flat and close</p>
+    <button class="scan-manual-btn" id="scan-manual-btn" type="button">Can't scan it? Type the number instead</button>
   </div>
 
   <div class="receipt-action-panel" id="receipt-action-panel" hidden>
@@ -1469,7 +1475,9 @@
     bumpCartRevision();
     saveCart(); renderCart(); closeFractionSheet();
   }
-  var zxingReader = null;
+  var scanStream = null;
+  var scanRAF = null;
+  var decodeCanvas = null, decodeCtx = null, coreReader = null;
   var zxingLoadPromise = null;
   var scanTarget = 'cart'; // 'cart' (Sell screen) or 'manage' (barcode field capture)
   var lastScanCode = null, lastScanAt = 0;
@@ -1491,7 +1499,7 @@
     document.getElementById('scan-status').textContent = 'Loading scanner\u2026';
     document.getElementById('scan-panel').hidden = false;
     ensureZXingLoaded().then(function () {
-      document.getElementById('scan-status').textContent = 'Point the camera at a barcode';
+      document.getElementById('scan-status').textContent = 'Fill the box with the barcode, flat and close';
       startZXingScan();
     }).catch(function (e) {
       document.getElementById('scan-status').textContent = e.message;
@@ -1500,7 +1508,7 @@
   function scannerHints() {
     // Restricting to the barcode formats real products actually use (instead of
     // ZXing's full default list, which also checks QR/Aztec/PDF417/etc. on every
-    // frame) lets each frame decode faster, which is most of why scanning felt slow.
+    // frame) lets each frame decode faster.
     var hints = new Map();
     hints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS, [
       ZXing.BarcodeFormat.EAN_13, ZXing.BarcodeFormat.EAN_8,
@@ -1511,44 +1519,85 @@
     return hints;
   }
   function startZXingScan() {
+    var wantConstraints = {
+      video: {
+        facingMode: { ideal: 'environment' },
+        width: { ideal: 1920 }, height: { ideal: 1080 },
+        advanced: [{ focusMode: 'continuous' }]
+      }
+    };
+    var fallbackConstraints = { video: { facingMode: { ideal: 'environment' } } };
+    navigator.mediaDevices.getUserMedia(wantConstraints).catch(function () {
+      // Some phones/WebViews reject the `advanced` focus constraint outright.
+      return navigator.mediaDevices.getUserMedia(fallbackConstraints);
+    }).then(function (stream) {
+      scanStream = stream;
+      var video = document.getElementById('scan-video');
+      video.srcObject = stream;
+      return video.play();
+    }).then(function () {
+      applyAutoZoom();
+      setupScannerExtras();
+      beginCroppedDecodeLoop();
+    }).catch(function (e) {
+      document.getElementById('scan-status').textContent = 'Camera unavailable: ' + (e && e.message ? e.message : 'permission denied');
+    });
+  }
+  function applyAutoZoom() {
+    // If the phone's camera supports optical/digital zoom, zoom in a bit by
+    // default so a barcode fills more of the frame without the user having
+    // to press right up against it — small, tilted codes in a busy shot
+    // (several bottles, shrink-wrap glare) are the main reason scans miss.
+    var track = scanStream && scanStream.getVideoTracks && scanStream.getVideoTracks()[0];
+    if (!track || !track.getCapabilities) return;
+    var caps = track.getCapabilities();
+    if (caps.zoom && caps.zoom.max) {
+      var target = Math.min(caps.zoom.max, Math.max(caps.zoom.min || 1, (caps.zoom.min || 1) + (caps.zoom.max - (caps.zoom.min || 1)) * 0.3));
+      track.applyConstraints({ advanced: [{ zoom: target }] }).catch(function () {});
+    }
+  }
+  function beginCroppedDecodeLoop() {
+    var video = document.getElementById('scan-video');
+    if (!decodeCanvas) { decodeCanvas = document.createElement('canvas'); decodeCtx = decodeCanvas.getContext('2d', { willReadFrequently: true }); }
+    coreReader = new ZXing.MultiFormatReader();
+    coreReader.setHints(scannerHints());
+    var lastAttempt = 0;
+    function tick(now) {
+      if (document.getElementById('scan-panel').hidden) return; // scanner closed, stop the loop
+      if (video.readyState >= 2 && (now - lastAttempt) > 90) {
+        lastAttempt = now;
+        tryDecodeCroppedFrame(video);
+      }
+      scanRAF = requestAnimationFrame(tick);
+    }
+    scanRAF = requestAnimationFrame(tick);
+  }
+  function tryDecodeCroppedFrame(video) {
+    var vw = video.videoWidth, vh = video.videoHeight;
+    if (!vw || !vh) return;
+    // Decode only the region inside the on-screen guide box (matches .scan-frame's
+    // 12%/32% insets) at full native resolution. This ignores neighboring bottles
+    // and background clutter entirely, and effectively "zooms in" for the decoder
+    // even when the camera itself has no optical zoom — the single biggest fix
+    // for small or tilted codes like the one in your last screenshot.
+    var sx = vw * 0.12, sw = vw * 0.76;
+    var sy = vh * 0.32, sh = vh * 0.36;
+    var outW = 900, outH = Math.round(outW * (sh / sw));
+    decodeCanvas.width = outW; decodeCanvas.height = outH;
+    decodeCtx.drawImage(video, sx, sy, sw, sh, 0, 0, outW, outH);
     try {
-      // A shorter delay between decode attempts (default is 500ms) plus a
-      // narrower format list makes the reader try far more often per second.
-      zxingReader = new ZXing.BrowserMultiFormatReader(scannerHints(), 80);
-      var constraints = {
-        video: {
-          facingMode: { ideal: 'environment' },
-          width: { ideal: 1920 }, height: { ideal: 1080 },
-          // Continuous autofocus is the other big lever: without it some phones
-          // pick one fixed focus distance and every close-up label comes out
-          // as motion-blur no matter how still you hold it.
-          advanced: [{ focusMode: 'continuous' }]
-        }
-      };
-      zxingReader.decodeFromConstraints(constraints, 'scan-video', function (result) {
-        if (result) handleScanResult(result.getText());
-      }).then(function () {
-        setupScannerExtras();
-      }).catch(function () {
-        // Older browsers / some Android WebViews reject the `advanced` focus
-        // constraint outright. Fall back to a plain rear-camera request.
-        zxingReader.decodeFromConstraints({ video: { facingMode: { ideal: 'environment' } } }, 'scan-video', function (result) {
-          if (result) handleScanResult(result.getText());
-        }).then(function () {
-          setupScannerExtras();
-        }).catch(function (e2) {
-          document.getElementById('scan-status').textContent = 'Camera unavailable: ' + (e2 && e2.message ? e2.message : 'permission denied');
-        });
-      });
+      var source = new ZXing.HTMLCanvasElementLuminanceSource(decodeCanvas);
+      var bitmap = new ZXing.BinaryBitmap(new ZXing.HybridBinarizer(source));
+      var result = coreReader.decode(bitmap);
+      if (result) handleScanResult(result.getText());
     } catch (e) {
-      document.getElementById('scan-status').textContent = 'Scanner failed to start.';
+      // Expected on nearly every frame until a code lines up cleanly — silent miss.
     }
   }
   function setupScannerExtras() {
-    // Tap-to-focus: on phones that don't auto-refocus reliably, letting the
-    // user tap the frame nudges the camera to refocus on that spot.
+    // Tap-to-focus / torch controls for phones that don't autofocus reliably.
     var video = document.getElementById('scan-video');
-    var track = video && video.srcObject && video.srcObject.getVideoTracks && video.srcObject.getVideoTracks()[0];
+    var track = scanStream && scanStream.getVideoTracks && scanStream.getVideoTracks()[0];
     if (!track) return;
     var caps = track.getCapabilities ? track.getCapabilities() : {};
     if (caps.torch) {
@@ -1571,9 +1620,19 @@
   }
   function closeScanner() {
     document.getElementById('scan-panel').hidden = true;
-    if (zxingReader) { try { zxingReader.reset(); } catch (e) {} zxingReader = null; }
+    if (scanRAF) { cancelAnimationFrame(scanRAF); scanRAF = null; }
+    coreReader = null;
+    if (scanStream) { scanStream.getTracks().forEach(function (t) { try { t.stop(); } catch (e) {} }); scanStream = null; }
+    var video = document.getElementById('scan-video'); if (video) video.srcObject = null;
     var torchBtn = document.getElementById('scan-torch-btn');
     if (torchBtn) { torchBtn.hidden = true; torchBtn.classList.remove('active'); }
+  }
+  function promptManualBarcode() {
+    var code = window.prompt('Type the barcode number:');
+    if (code === null) return;
+    code = code.trim();
+    if (!code) return;
+    handleScanResult(code);
   }
   function handleScanResult(code) {
     var now = Date.now();
@@ -2736,6 +2795,7 @@ function renderHistory(){
     if (e.target.closest("#scan-btn")) { openScanner('cart'); return; }
     if (e.target.closest("#item-barcode-scan-btn")) { openScanner('manage'); return; }
     if (e.target.closest("#scan-close")) { closeScanner(); return; }
+    if (e.target.closest("#scan-manual-btn")) { promptManualBarcode(); return; }
     var copyReceiptBtn=e.target.closest('[data-copy-receipt]');
     if(copyReceiptBtn){ e.stopPropagation(); return copyReceipt(Number(copyReceiptBtn.dataset.copyReceipt)); }
     var shareBtn=e.target.closest('[data-share-receipt]');
