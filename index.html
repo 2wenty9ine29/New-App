@@ -60,10 +60,15 @@
     color: var(--ink);
     font-family: "Poppins", -apple-system, BlinkMacSystemFont, "SF Pro Text", Helvetica, Arial, sans-serif;
     overscroll-behavior-y: none;
+    overflow: hidden; /* the page itself must never scroll — only #app's inner lists do */
+    position: fixed; width: 100%;
   }
   button, input, textarea, select { font-family: inherit; cursor: pointer; }
   input, textarea, select { cursor: auto; }
-  #app { height: 100dvh; height: calc(var(--app-vh, 1vh) * 100); display: flex; flex-direction: column; background-color: var(--paper); }
+  /* Pinned to the visible viewport rather than sized by document flow, so
+     Safari's collapsing/expanding bottom toolbar can never leave a gap of
+     "dead" page background between the app and the browser chrome. */
+  #app { position: fixed; inset: 0; display: flex; flex-direction: column; background-color: var(--paper); }
 
   .top-accent { height: 4px; flex-shrink: 0; background: linear-gradient(90deg, var(--gold-bright) 0 33%, var(--green) 33% 66%, var(--brick) 66% 100%); }
 
@@ -318,6 +323,13 @@
     display:flex; align-items:center; justify-content:center;
   }
   .scan-torch-btn.active { background:var(--gold); border-color:var(--gold); color:#1C1B18; }
+  .scan-capture-btn {
+    position:absolute; left:16px; bottom:16px; width:44px; height:44px; border-radius:50%;
+    border:1.5px solid rgba(255,255,255,.6); background:rgba(0,0,0,.45); color:#fff;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .scan-capture-btn svg { width:20px; height:20px; }
+  .scan-capture-btn.busy { opacity:.6; }
   .scan-status { flex-shrink:0; text-align:center; color:#fff; opacity:.9; font-size:13px; padding:14px 20px 6px; }
   .scan-manual-btn {
     flex-shrink:0; display:block; margin:0 auto calc(16px + env(safe-area-inset-bottom));
@@ -905,6 +917,9 @@
       <video id="scan-video" playsinline muted autoplay></video>
       <div class="scan-frame"></div>
       <button class="scan-torch-btn" id="scan-torch-btn" aria-label="Toggle flashlight" hidden>&#9679;</button>
+      <button class="scan-capture-btn" id="scan-capture-btn" aria-label="Capture and read printed number" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+      </button>
     </div>
     <p class="scan-status" id="scan-status">Fill the box with the barcode, flat and close</p>
     <button class="scan-manual-btn" id="scan-manual-btn" type="button">Can't scan it? Type the number instead</button>
@@ -1572,19 +1587,23 @@
     }
     scanRAF = requestAnimationFrame(tick);
   }
-  function tryDecodeCroppedFrame(video) {
+  function cropVideoToGuideBox(video) {
     var vw = video.videoWidth, vh = video.videoHeight;
-    if (!vw || !vh) return;
-    // Decode only the region inside the on-screen guide box (matches .scan-frame's
-    // 12%/32% insets) at full native resolution. This ignores neighboring bottles
-    // and background clutter entirely, and effectively "zooms in" for the decoder
-    // even when the camera itself has no optical zoom — the single biggest fix
-    // for small or tilted codes like the one in your last screenshot.
+    if (!vw || !vh) return null;
     var sx = vw * 0.12, sw = vw * 0.76;
     var sy = vh * 0.32, sh = vh * 0.36;
     var outW = 900, outH = Math.round(outW * (sh / sw));
-    decodeCanvas.width = outW; decodeCanvas.height = outH;
-    decodeCtx.drawImage(video, sx, sy, sw, sh, 0, 0, outW, outH);
+    var c = document.createElement('canvas'); c.width = outW; c.height = outH;
+    c.getContext('2d').drawImage(video, sx, sy, sw, sh, 0, 0, outW, outH);
+    return c;
+  }
+  function tryDecodeCroppedFrame(video) {
+    if (!video.videoWidth || !video.videoHeight) return;
+    decodeCanvas.width = 900;
+    var sx = video.videoWidth * 0.12, sw = video.videoWidth * 0.76;
+    var sy = video.videoHeight * 0.32, sh = video.videoHeight * 0.36;
+    decodeCanvas.height = Math.round(900 * (sh / sw));
+    decodeCtx.drawImage(video, sx, sy, sw, sh, 0, 0, decodeCanvas.width, decodeCanvas.height);
     try {
       var source = new ZXing.HTMLCanvasElementLuminanceSource(decodeCanvas);
       var bitmap = new ZXing.BinaryBitmap(new ZXing.HybridBinarizer(source));
@@ -1593,6 +1612,53 @@
     } catch (e) {
       // Expected on nearly every frame until a code lines up cleanly — silent miss.
     }
+  }
+  var tesseractLoadPromise = null;
+  var tesseractWorker = null;
+  function ensureTesseractLoaded() {
+    if (window.Tesseract) return Promise.resolve();
+    if (tesseractLoadPromise) return tesseractLoadPromise;
+    tesseractLoadPromise = new Promise(function (resolve, reject) {
+      var s = document.createElement('script');
+      s.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';
+      s.onload = function () { resolve(); };
+      s.onerror = function () { tesseractLoadPromise = null; reject(new Error('Could not load the number reader. Check your connection.')); };
+      document.head.appendChild(s);
+    });
+    return tesseractLoadPromise;
+  }
+  function captureAndReadNumber() {
+    var video = document.getElementById('scan-video');
+    var canvas = cropVideoToGuideBox(video);
+    if (!canvas) return;
+    var btn = document.getElementById('scan-capture-btn');
+    var statusEl = document.getElementById('scan-status');
+    btn.classList.add('busy'); btn.disabled = true;
+    statusEl.textContent = 'Reading the printed numbers\u2026';
+    ensureTesseractLoaded().then(function () {
+      // Digits-only whitelist: barcodes always have a plain printed number
+      // underneath, and restricting to 0-9 both speeds this up and avoids
+      // Tesseract guessing letters that were never there.
+      return Tesseract.recognize(canvas, 'eng', {
+        tessedit_char_whitelist: '0123456789'
+      });
+    }).then(function (out) {
+      var digits = (out && out.data && out.data.text || '').replace(/[^0-9]/g, '');
+      btn.classList.remove('busy'); btn.disabled = false;
+      statusEl.textContent = 'Fill the box with the barcode, flat and close';
+      if (!digits) {
+        showToast('Couldn\u2019t read a number \u2014 try Type the number instead');
+        return;
+      }
+      var confirmed = window.prompt('Is this the right number?', digits);
+      if (confirmed === null) return;
+      confirmed = confirmed.trim();
+      if (confirmed) handleScanResult(confirmed);
+    }).catch(function (e) {
+      btn.classList.remove('busy'); btn.disabled = false;
+      statusEl.textContent = 'Fill the box with the barcode, flat and close';
+      showToast((e && e.message) || 'Number reader failed to load');
+    });
   }
   function setupScannerExtras() {
     // Tap-to-focus / torch controls for phones that don't autofocus reliably.
@@ -2796,6 +2862,7 @@ function renderHistory(){
     if (e.target.closest("#item-barcode-scan-btn")) { openScanner('manage'); return; }
     if (e.target.closest("#scan-close")) { closeScanner(); return; }
     if (e.target.closest("#scan-manual-btn")) { promptManualBarcode(); return; }
+    if (e.target.closest("#scan-capture-btn")) { captureAndReadNumber(); return; }
     var copyReceiptBtn=e.target.closest('[data-copy-receipt]');
     if(copyReceiptBtn){ e.stopPropagation(); return copyReceipt(Number(copyReceiptBtn.dataset.copyReceipt)); }
     var shareBtn=e.target.closest('[data-share-receipt]');
@@ -2896,19 +2963,6 @@ function renderHistory(){
     var input=document.getElementById('sell-search'); input.value=''; sellSearchQuery='';
     this.classList.remove('visible'); renderCatalogList(); input.focus();
   });
-
-  // Real, accurate viewport height on phones. Mobile browsers resize their
-  // own chrome (address bar / home-indicator area) without always firing
-  // a layout recalculation for `dvh`, which used to leave a blank strip of
-  // "paper" background between the checkout bar and the bottom nav. This
-  // keeps --app-vh pinned to the true visible height at all times.
-  function setAppVH() {
-    document.documentElement.style.setProperty('--app-vh', (window.innerHeight * 0.01) + 'px');
-  }
-  setAppVH();
-  window.addEventListener('resize', setAppVH);
-  window.addEventListener('orientationchange', function () { setTimeout(setAppVH, 60); });
-  if (window.visualViewport) window.visualViewport.addEventListener('resize', setAppVH);
 
   migrateLegacyCart();
   normalizeCartOrder();
