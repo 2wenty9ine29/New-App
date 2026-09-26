@@ -904,9 +904,10 @@
       </div>
       <div class="reports-tabs">
         <button class="reports-tab" data-report-period="today">Today</button>
-        <button class="reports-tab" data-report-period="week">This Week</button>
+        <button class="reports-tab" data-report-period="yesterday">Yesterday</button>
+        <button class="reports-tab" data-report-period="dayBeforeYesterday" id="report-day-before-yesterday">Thursday</button>
         <button class="reports-tab" data-report-period="month">This Month</button>
-        <button class="reports-tab" data-report-period="all">All Time</button>
+        <button class="reports-tab" data-report-period="year">This Year</button>
       </div>
       <div id="reports-body"></div>
     </div>
@@ -2332,23 +2333,37 @@ function renderHistory(){
   var reportPeriod = 'today';
   function reportPeriodStart(period) {
     var now = new Date();
-    if (period === 'today') return new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    if (period === 'week') {
-      var d = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-      var day = d.getDay();
-      var diff = (day === 0 ? 6 : day - 1); // week starts Monday
-      d.setDate(d.getDate() - diff);
-      return d;
+    var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    if (period === 'today') return { start: today, end: new Date(today.getTime() + 86400000) };
+    if (period === 'yesterday') {
+      var yesterday = new Date(today);
+      yesterday.setDate(yesterday.getDate() - 1);
+      return { start: yesterday, end: today };
     }
-    if (period === 'month') return new Date(now.getFullYear(), now.getMonth(), 1);
-    return null; // 'all'
+    if (period === 'dayBeforeYesterday') {
+      var dayBefore = new Date(today);
+      dayBefore.setDate(dayBefore.getDate() - 2);
+      return { start: dayBefore, end: new Date(today.getTime() - 86400000) };
+    }
+    if (period === 'month') return { start: new Date(now.getFullYear(), now.getMonth(), 1), end: new Date(now.getTime() + 1) };
+    if (period === 'year') return { start: new Date(now.getFullYear(), 0, 1), end: new Date(now.getTime() + 1) };
+    return null;
+  }
+  function updateDayBeforeYesterdayLabel() {
+    var tab = document.getElementById('report-day-before-yesterday');
+    if (!tab) return;
+    var now = new Date();
+    var d = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    d.setDate(d.getDate() - 2);
+    tab.textContent = d.toLocaleDateString([], { weekday: 'long' });
   }
   function computeReportStats(period) {
-    var start = reportPeriodStart(period);
+    var range = reportPeriodStart(period);
     var filtered = receipts.filter(function (r) {
-      if (!start) return true;
       var d = new Date(r.createdAt);
-      return d instanceof Date && !isNaN(d) && d >= start;
+      if (!(d instanceof Date) || isNaN(d)) return false;
+      if (!range) return false;
+      return d >= range.start && d < range.end;
     });
     var revenue = 0, discountTotal = 0, bulkRevenue = 0, singleRevenue = 0;
     var itemTotals = {};
@@ -2370,6 +2385,7 @@ function renderHistory(){
   }
   function renderReports() {
     var body = document.getElementById('reports-body'); if (!body) return;
+    updateDayBeforeYesterdayLabel();
     document.querySelectorAll('.reports-tab').forEach(function (t) {
       t.classList.toggle('active', t.dataset.reportPeriod === reportPeriod);
     });
