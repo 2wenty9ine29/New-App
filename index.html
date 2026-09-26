@@ -14,7 +14,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="apple-touch-icon" href="icon-180.png">
-<title>Price List · V8.6</title>
+<title>Price List · V8.9</title>
 <style>
   :root {
     color-scheme: light;
@@ -74,6 +74,10 @@
 
   .screen { flex: 1; display: none; flex-direction: column; overflow: hidden; background-color: var(--paper); padding-top: env(safe-area-inset-top); position:relative; }
   .screen.active { display: flex; }
+  /* A screen must be invisible unless navigation explicitly marks it active.
+     Keep this rule stronger than screen-specific layout rules so one screen
+     can never bleed into another after tab changes. */
+  .screen:not(.active) { display: none !important; }
 
   header { padding: 18px 20px 12px; flex-shrink: 0; }
   header h1 { margin: 0; font-size: 22px; font-weight: 800; letter-spacing: -.01em; color: var(--ink); }
@@ -223,7 +227,7 @@
     min-height: 0;
   }
   #screen-sell.active {
-    display: grid;
+    display: grid !important;
   }
   .catalog-wrap {
     min-height: 0;
@@ -1533,7 +1537,7 @@
     showToast('Price list TXT ready');
   }
 
-  var APP_VERSION = 'v8.6';
+  var APP_VERSION = 'v8.9';
   var LAST_BACKUP_KEY = 'price-list-last-backup-v1';
   function isAppStorageKey(k) {
     return !!k && (k.indexOf('priceList') === 0 || k.indexOf('price-list-') === 0);
