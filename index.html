@@ -1508,7 +1508,7 @@
     var ul = document.getElementById("manage-list");
     var empty = document.getElementById("manage-empty");
     if (items.length === 0) { ul.innerHTML = ""; empty.hidden = false; return; }
-    var filtered = searchItems(manageSearchQuery).filter(function(item){ return showFinishedItems ? isFinishedItem(item) : !isFinishedItem(item); });
+    var filtered = searchItems(manageSearchQuery).filter(function(item){ return showFinishedItems ? isFinishedItem(item) : true; });
     document.getElementById("manage-count").textContent = filtered.length + (filtered.length === 1 ? " item" : " items");
     if (filtered.length === 0) {
       ul.innerHTML = '<li class="no-match">No items found</li>';
@@ -1695,7 +1695,6 @@
   }
 
   function catalogRow(item, mode) {
-    if (isFinishedItem(item)) return '';
     var value = priceForMode(item, mode);
     var unavailable = value === null;
     var priceHtml = unavailable
