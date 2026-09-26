@@ -72,6 +72,7 @@
 
   header { padding: 18px 20px 12px; flex-shrink: 0; }
   header h1 { margin: 0; font-size: 22px; font-weight: 800; letter-spacing: -.01em; color: var(--ink); }
+  .history-header h1 { font-weight: 700; }
   header p { margin: 4px 0 0; font-size: 13px; color: var(--ink-soft); }
 
   .scroll-area { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 0 20px; }
@@ -203,7 +204,19 @@
     font-size: 16px; line-height: 1; padding: 0; z-index: 2;
   }
   .search-clear.visible { display: flex; }
-  .catalog-wrap { flex-shrink: 0; max-height: 35dvh; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 0 20px; border-bottom: 1px solid var(--line); }
+  .search-scan-btn {
+    position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+    width: 28px; height: 28px; border: 0; border-radius: 50%; background: var(--gold-soft);
+    color: var(--ink); display: flex; align-items: center; justify-content: center;
+    font-size: 14px; padding: 0; z-index: 2;
+  }
+  .search-scan-btn:active { transform: translateY(-50%) scale(.94); }
+  .catalog-wrap { flex: 1 1 auto; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 0 20px; border-bottom: 1px solid var(--line); }
+  /* Cart area on the Sell screen is capped rather than left to expand and
+     fill whatever's left over (which used to leave blank space when the
+     cart was empty). Scoped to the Sell screen only so Manage/History,
+     which reuse .scroll-area, are unaffected. */
+  #screen-sell .scroll-area { flex: 0 1 auto; max-height: 34dvh; min-height: 0; }
   .cart-heading { padding: 10px 20px 4px; font-size: 12px; font-weight: 650; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.04em; flex-shrink: 0; }
 
   .cart-bar {
@@ -234,27 +247,27 @@
   .history-card { background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:8px 10px; margin-bottom:6px; cursor:pointer; }
   .history-card:active { background:var(--gold-soft); }
   .history-top { display:flex; justify-content:space-between; align-items:center; gap:8px; }
-  .history-receipt { font-weight:700; color:var(--ink); font-size:12px; }
-  .history-total { font-weight:750; color:var(--gold); font-variant-numeric:tabular-nums; font-size:13px; }
+  .history-receipt { font-weight:600; color:var(--ink); font-size:12px; }
+  .history-total { font-weight:650; color:var(--gold); font-variant-numeric:tabular-nums; font-size:13px; }
   .history-meta { margin-top:1px; color:var(--ink-soft); font-size:10px; }
   .history-items { display:none; margin:6px 0 0; padding-left:16px; color:var(--ink-soft); font-size:11px; line-height:1.35; }
   .history-card.expanded .history-items { display:block; }
   .history-card::after { content:'Tap for details'; display:block; margin-top:2px; color:var(--ink-soft); font-size:9px; }
   .history-card.expanded::after { content:'Tap to hide'; }
   .history-change { margin:10px 20px 0; padding:12px; border:1px solid var(--line); border-radius:14px; background:var(--surface); }
-  .history-change h2 { margin:0 0 7px; font-size:13px; font-weight:750; }
+  .history-change h2 { margin:0 0 7px; font-size:13px; font-weight:700; }
   .change-line { display:flex; justify-content:space-between; align-items:center; gap:10px; margin-top:6px; font-size:12px; }
   .change-line input { width:120px; padding:8px 9px; border:1px solid var(--line); border-radius:10px; background:var(--paper); color:var(--ink); font-size:15px; text-align:right; outline:none; }
-  .change-result { font-size:17px; font-weight:750; color:var(--gold); }
+  .change-result { font-size:17px; font-weight:650; color:var(--gold); }
   .history-empty { text-align:center; padding:35px 20px; color:var(--ink-soft); font-size:13px; }
   .restore-panel { padding: 8px 20px 0; flex-shrink:0; }
-  .restore-panel-title { margin: 2px 0 5px; color:var(--ink-soft); font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; }
+  .restore-panel-title { margin: 2px 0 5px; color:var(--ink-soft); font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:.04em; }
   .restore-list { display:grid; gap:5px; }
   .restore-row { display:flex; align-items:center; justify-content:space-between; gap:8px; padding:6px 9px; border:1px solid var(--line); border-radius:12px; background:var(--surface); font-size:11px; color:var(--ink-soft); }
-  .restore-row button { border:0; background:none; color:var(--gold); font-weight:700; padding:4px; }
+  .restore-row button { border:0; background:none; color:var(--gold); font-weight:600; padding:4px; }
   .receipt-panel { position:fixed; inset:0; z-index:100; background:rgba(0,0,0,.45); display:flex; align-items:flex-end; justify-content:center; }
   .receipt-card { width:min(480px,100%); background:var(--surface); color:var(--ink); border-radius:24px 24px 0 0; padding:22px 20px calc(24px + env(safe-area-inset-bottom)); }
-  .history-receipt-btn { border:1px solid var(--line); background:var(--surface); color:var(--ink); border-radius:999px; padding:7px 11px; font-size:11px; font-weight:700; display:inline-flex; align-items:center; gap:5px; }
+  .history-receipt-btn { border:1px solid var(--line); background:var(--surface); color:var(--ink); border-radius:999px; padding:7px 11px; font-size:11px; font-weight:600; display:inline-flex; align-items:center; gap:5px; }
   .history-receipt-btn:active { background:var(--gold-soft); transform:scale(.97); }
   .history-header { display:flex; align-items:center; justify-content:space-between; gap:10px; }
   .history-theme-toggle { position:absolute; right:18px; bottom:calc(16px + env(safe-area-inset-bottom)); z-index:5; width:42px; height:42px; border-radius:50%; background:var(--surface); border:1px solid var(--line); box-shadow:0 6px 18px rgba(28,27,24,.12); color:var(--ink); display:flex; align-items:center; justify-content:center; font-size:19px; }
@@ -262,8 +275,44 @@
   .receipt-history-panel { position:fixed; inset:0; z-index:110; background:rgba(0,0,0,.45); display:flex; align-items:flex-end; justify-content:center; }
   .receipt-history-card { width:min(480px,100%); max-height:86dvh; overflow-y:auto; background:var(--surface); color:var(--ink); border-radius:24px 24px 0 0; padding:18px 18px calc(22px + env(safe-area-inset-bottom)); }
   .receipt-history-head { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:12px; }
-  .receipt-history-head h2 { margin:0; font-size:18px; font-weight:800; letter-spacing:-.01em; }
+  .receipt-history-head h2 { margin:0; font-size:18px; font-weight:700; letter-spacing:-.01em; }
   .receipt-history-close { width:32px; height:32px; border:0; border-radius:50%; background:var(--paper); color:var(--ink); font-size:20px; line-height:1; }
+  .history-header-actions { display:flex; flex-direction:column; gap:6px; align-items:flex-end; flex-shrink:0; }
+
+  /* Reports panel */
+  .reports-panel { position:fixed; inset:0; z-index:115; background:rgba(0,0,0,.45); display:flex; align-items:flex-end; justify-content:center; }
+  .reports-card { width:min(480px,100%); max-height:88dvh; overflow-y:auto; box-sizing:border-box; background:var(--surface); color:var(--ink); border-radius:24px 24px 0 0; padding:18px 18px calc(22px + env(safe-area-inset-bottom)); }
+  .reports-head { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:12px; }
+  .reports-head h2 { margin:0; font-size:18px; font-weight:700; letter-spacing:-.01em; }
+  .reports-subtitle { font-size:10px; color:var(--ink-soft); margin-top:2px; }
+  .reports-close { width:32px; height:32px; border:0; border-radius:50%; background:var(--paper); color:var(--ink); font-size:20px; line-height:1; flex-shrink:0; }
+  .reports-tabs { display:flex; gap:6px; margin-bottom:14px; flex-wrap:wrap; }
+  .reports-tab { flex:1 1 auto; border:1px solid var(--line); background:var(--paper); color:var(--ink); border-radius:999px; padding:7px 8px; font-size:11px; font-weight:600; white-space:nowrap; }
+  .reports-tab.active { background:var(--gold); border-color:var(--gold); color:#fff; }
+  .reports-stats { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:6px; }
+  .reports-stat { border:1px solid var(--line); border-radius:14px; padding:10px 12px; background:var(--paper); }
+  .reports-stat .rs-label { font-size:10px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.03em; }
+  .reports-stat .rs-value { font-size:17px; font-weight:650; color:var(--ink); margin-top:2px; font-variant-numeric:tabular-nums; }
+  .reports-stat.gold .rs-value { color:var(--gold); }
+  .reports-section-title { font-size:11px; font-weight:600; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.03em; margin:14px 2px 6px; }
+  .reports-split { display:flex; gap:8px; }
+  .reports-split .reports-stat { flex:1; }
+  .reports-top-list { display:grid; gap:6px; }
+  .reports-top-row { display:flex; align-items:center; justify-content:space-between; gap:10px; border:1px solid var(--line); border-radius:12px; padding:8px 10px; background:var(--paper); }
+  .reports-top-row .rt-name { font-size:12px; font-weight:550; color:var(--ink); }
+  .reports-top-row .rt-qty { font-size:10px; color:var(--ink-soft); margin-top:1px; }
+  .reports-top-row .rt-revenue { font-size:12px; font-weight:650; color:var(--gold); white-space:nowrap; font-variant-numeric:tabular-nums; }
+  .reports-empty { text-align:center; padding:30px 10px; color:var(--ink-soft); font-size:13px; }
+
+  /* Barcode scanner */
+  .scan-panel { position:fixed; inset:0; z-index:160; background:#000; display:flex; flex-direction:column; }
+  .scan-header { flex-shrink:0; display:flex; align-items:center; justify-content:space-between; padding:calc(14px + env(safe-area-inset-top)) 16px 12px; color:#fff; }
+  .scan-title { font-size:15px; font-weight:600; }
+  .scan-close { width:34px; height:34px; border:0; border-radius:50%; background:rgba(255,255,255,.14); color:#fff; font-size:20px; line-height:1; }
+  .scan-video-wrap { flex:1; position:relative; overflow:hidden; background:#000; }
+  #scan-video { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .scan-frame { position:absolute; left:12%; right:12%; top:32%; bottom:32%; border:2px solid rgba(255,255,255,.85); border-radius:16px; box-shadow:0 0 0 2000px rgba(0,0,0,.35); pointer-events:none; }
+  .scan-status { flex-shrink:0; text-align:center; color:#fff; opacity:.9; font-size:13px; padding:14px 20px calc(20px + env(safe-area-inset-bottom)); }
 
   /* Polished receipt action sheet */
   .receipt-action-panel { position:fixed; inset:0; z-index:130; background:rgba(0,0,0,.52); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); display:flex; align-items:center; justify-content:center; padding:20px; }
@@ -284,8 +333,8 @@
   .receipt-history-list { display:grid; gap:8px; }
   .receipt-history-item { border:1px solid var(--line); border-radius:14px; padding:10px 11px; background:var(--paper); }
   .receipt-history-item .rh-top { display:flex; justify-content:space-between; gap:8px; align-items:center; }
-  .receipt-history-item .rh-no { font-size:12px; font-weight:750; }
-  .receipt-history-item .rh-total { font-size:13px; font-weight:750; color:var(--gold); }
+  .receipt-history-item .rh-no { font-size:12px; font-weight:600; }
+  .receipt-history-item .rh-total { font-size:13px; font-weight:650; color:var(--gold); }
   .receipt-history-item .rh-meta { color:var(--ink-soft); font-size:10px; margin-top:2px; }
   .receipt-history-item .rh-items { margin:7px 0 0; padding-left:16px; color:var(--ink-soft); font-size:10.5px; line-height:1.35; }
   .receipt-card h2 { margin:0 0 5px; font-size:20px; font-weight:800; letter-spacing:-.01em; }
@@ -301,8 +350,8 @@
   .receipt-actions .primary { background:var(--gold); color:#fff; box-shadow:0 8px 20px rgba(0,0,0,.16); }
   .receipt-actions .secondary { background:var(--paper); color:var(--ink); }
   .receipt-share-btn { background:var(--gold-soft); color:var(--ink); }
-  .receipt-history-share { margin-top:7px; border:0; background:var(--gold-soft); color:var(--ink); border-radius:999px; padding:6px 12px; font-size:10px; font-weight:750; }
-  .receipt-copy-btn { margin-top:7px; margin-left:5px; border:0; background:var(--paper); color:var(--ink); border-radius:999px; padding:6px 12px; font-size:10px; font-weight:750; }
+  .receipt-history-share { margin-top:7px; border:0; background:var(--gold-soft); color:var(--ink); border-radius:999px; padding:6px 12px; font-size:10px; font-weight:600; }
+  .receipt-copy-btn { margin-top:7px; margin-left:5px; border:0; background:var(--paper); color:var(--ink); border-radius:999px; padding:6px 12px; font-size:10px; font-weight:600; }
   .receipt-tools-title { margin:2px 0 5px; color:var(--ink-soft); font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; }
   .receipt-tools { display:flex; gap:7px; flex-wrap:wrap; margin-top:4px; }
   .receipt-tool-btn { border:1px solid var(--line); background:var(--paper); color:var(--ink); border-radius:999px; padding:8px 12px; font-size:11px; font-weight:750; }
@@ -393,14 +442,11 @@
   .tab-btn svg { width: 21px; height: 21px; }
   .tab-btn.active { color: var(--gold); background: var(--gold-soft); }
 
-  /* Sits in the sliver below the tab bar (visible when bookmarked rather
-     than installed, where that space would otherwise be blank) */
-  .app-footer-version {
-    position: fixed; left: 0; right: 0; bottom: 0; z-index: 1;
-    text-align: center; pointer-events: none;
-    padding: 3px 0 calc(3px + env(safe-area-inset-bottom));
-    font-size: 10px; font-weight: 600; letter-spacing: .02em;
-    color: var(--ink-soft); opacity: .5; background: var(--paper);
+  /* Small, subtle version label placed under the Backup area in Manage */
+  .manage-version-label {
+    margin: 10px 0 0; text-align: center;
+    font-size: 10px; font-weight: 500; letter-spacing: .02em;
+    color: var(--ink-soft); opacity: .55;
   }
 
   /* Add/Edit item sheet */
@@ -431,6 +477,13 @@
   }
   .field-row { display: flex; gap: 10px; }
   .field-row .field-col { flex: 1; }
+  .barcode-input-row { display: flex; gap: 8px; align-items: flex-start; }
+  .barcode-input-row .field-input { flex: 1; width: auto; }
+  .barcode-scan-btn {
+    flex: 0 0 48px; height: 44px; border: 1px solid var(--line); background: var(--surface);
+    color: var(--ink); border-radius: 12px; font-size: 17px;
+  }
+  .barcode-scan-btn:active { background: var(--gold-soft); }
   .sheet-actions { display: flex; gap: 10px; margin-top: 2px; }
   .sheet-btn { flex: 1; padding: 13px 0; border-radius: 999px; border: none; font-size: 15px; font-weight: 750; }
   .sheet-btn.cancel { background: var(--paper); color: var(--ink); }
@@ -621,14 +674,13 @@
     .sale-column .add-indicator { width: 22px; height: 22px; }
   }
   @media (min-width: 700px) {
-    .catalog-wrap { max-height: 26dvh; }
     .sale-column .row-name { font-size: 12.5px; }
     .sale-column .row-price { font-size: 12px; }
   }
 
 
   /* Cart overview from History */
-  .cart-history-btn { width:100%; border:1px solid var(--line); background:var(--surface); color:var(--ink); border-radius:22px; padding:16px 16px; display:flex; align-items:center; gap:12px; margin:12px 0 10px; box-shadow:0 5px 16px rgba(28,27,24,.04); font-weight:700; }
+  .cart-history-btn { width:100%; border:1px solid var(--line); background:var(--surface); color:var(--ink); border-radius:22px; padding:16px 16px; display:flex; align-items:center; gap:12px; margin:12px 0 10px; box-shadow:0 5px 16px rgba(28,27,24,.04); font-weight:600; }
   .cart-history-btn .big-cart-icon { width:44px; height:44px; border-radius:14px; background:var(--gold-soft); color:var(--gold); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
   .cart-history-btn svg { width:25px; height:25px; }
   .cart-history-btn strong { display:block; font-size:14px; text-align:left; }
@@ -711,6 +763,7 @@
         </div>
         <input type="file" id="backup-restore-input" accept="application/json,.json" hidden>
         <p class="photo-hint" id="backup-last-date" style="margin-top:8px;"></p>
+        <p class="manage-version-label" id="app-version-label"></p>
       </div>
     </div>
   </section>
@@ -722,6 +775,7 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
       <input id="sell-search" type="text" placeholder="Search items" autocomplete="off">
       <button class="search-clear" id="search-clear" aria-label="Clear search">×</button>
+      <button class="search-scan-btn" id="scan-btn" aria-label="Scan barcode">▦</button>
     </div>
     <div class="catalog-wrap">
       <div class="sale-columns">
@@ -774,7 +828,10 @@
     <header>
       <div class="history-header">
         <div><h1>History</h1><p>Last 3 receipts</p></div>
-        <button class="history-receipt-btn" id="receipt-history-btn" aria-label="View available receipts">▤ Receipts <span id="receipt-count">0</span></button>
+        <div class="history-header-actions">
+          <button class="history-receipt-btn" id="receipt-history-btn" aria-label="View available receipts">▤ Receipts <span id="receipt-count">0</span></button>
+          <button class="history-receipt-btn" id="history-reports-btn" aria-label="View sales reports">▦ Reports</button>
+        </div>
       </div>
     </header>
     <button class="theme-toggle history-theme-toggle" id="theme-toggle" aria-label="Switch light or dark mode">☾</button>
@@ -810,6 +867,34 @@
       </div>
       <div class="receipt-history-list" id="receipt-history-list"></div>
     </div>
+  </div>
+
+  <div class="reports-panel" id="reports-panel" hidden>
+    <div class="reports-card">
+      <div class="reports-head">
+        <div><h2>Reports</h2><div class="reports-subtitle">Built from your completed sales</div></div>
+        <button class="reports-close" id="reports-close" aria-label="Close reports">×</button>
+      </div>
+      <div class="reports-tabs">
+        <button class="reports-tab" data-report-period="today">Today</button>
+        <button class="reports-tab" data-report-period="week">This Week</button>
+        <button class="reports-tab" data-report-period="month">This Month</button>
+        <button class="reports-tab" data-report-period="all">All Time</button>
+      </div>
+      <div id="reports-body"></div>
+    </div>
+  </div>
+
+  <div class="scan-panel" id="scan-panel" hidden>
+    <div class="scan-header">
+      <div class="scan-title">Scan barcode</div>
+      <button class="scan-close" id="scan-close" aria-label="Close scanner">×</button>
+    </div>
+    <div class="scan-video-wrap">
+      <video id="scan-video" playsinline muted autoplay></video>
+      <div class="scan-frame"></div>
+    </div>
+    <p class="scan-status" id="scan-status">Point the camera at a barcode</p>
   </div>
 
   <div class="receipt-action-panel" id="receipt-action-panel" hidden>
@@ -927,7 +1012,6 @@
     </button>
   </nav>
 </div>
-<div class="app-footer-version" id="app-version-label"></div>
 
 <!-- FRACTIONAL BULK SHEET -->
 <div id="fraction-backdrop" hidden></div>
@@ -966,6 +1050,11 @@
       <label class="field-label">Single price (¢)</label>
       <input class="field-input" id="item-single-input" type="number" inputmode="decimal" placeholder="0.00">
     </div>
+  </div>
+  <label class="field-label">Barcode (optional)</label>
+  <div class="barcode-input-row">
+    <input class="field-input" id="item-barcode-input" type="text" inputmode="numeric" placeholder="Scan or type barcode">
+    <button class="barcode-scan-btn" id="item-barcode-scan-btn" type="button" aria-label="Scan barcode">▦</button>
   </div>
   <div class="sheet-actions">
     <button class="sheet-btn cancel" id="sheet-cancel-btn">Cancel</button>
@@ -1372,6 +1461,77 @@
     moveCartKeyToTop(key);
     bumpCartRevision();
     saveCart(); renderCart(); closeFractionSheet();
+  }
+  var zxingReader = null;
+  var zxingLoadPromise = null;
+  var scanTarget = 'cart'; // 'cart' (Sell screen) or 'manage' (barcode field capture)
+  var lastScanCode = null, lastScanAt = 0;
+  function ensureZXingLoaded() {
+    if (window.ZXing) return Promise.resolve();
+    if (zxingLoadPromise) return zxingLoadPromise;
+    zxingLoadPromise = new Promise(function (resolve, reject) {
+      var s = document.createElement('script');
+      s.src = 'https://cdn.jsdelivr.net/npm/@zxing/library@0.20.0/umd/index.min.js';
+      s.onload = function () { resolve(); };
+      s.onerror = function () { zxingLoadPromise = null; reject(new Error('Could not load the scanner. Check your connection and try again.')); };
+      document.head.appendChild(s);
+    });
+    return zxingLoadPromise;
+  }
+  function openScanner(target) {
+    scanTarget = target || 'cart';
+    lastScanCode = null; lastScanAt = 0;
+    document.getElementById('scan-status').textContent = 'Loading scanner\u2026';
+    document.getElementById('scan-panel').hidden = false;
+    ensureZXingLoaded().then(function () {
+      document.getElementById('scan-status').textContent = 'Point the camera at a barcode';
+      startZXingScan();
+    }).catch(function (e) {
+      document.getElementById('scan-status').textContent = e.message;
+    });
+  }
+  function startZXingScan() {
+    try {
+      zxingReader = new ZXing.BrowserMultiFormatReader();
+      zxingReader.decodeFromVideoDevice(null, 'scan-video', function (result) {
+        if (result) handleScanResult(result.getText());
+      }).catch(function (e) {
+        document.getElementById('scan-status').textContent = 'Camera unavailable: ' + (e && e.message ? e.message : 'permission denied');
+      });
+    } catch (e) {
+      document.getElementById('scan-status').textContent = 'Scanner failed to start.';
+    }
+  }
+  function closeScanner() {
+    document.getElementById('scan-panel').hidden = true;
+    if (zxingReader) { try { zxingReader.reset(); } catch (e) {} zxingReader = null; }
+  }
+  function handleScanResult(code) {
+    var now = Date.now();
+    if (code === lastScanCode && (now - lastScanAt) < 1500) return; // ignore rapid repeats of the same code
+    lastScanCode = code; lastScanAt = now;
+    hapticTick();
+    if (scanTarget === 'manage') {
+      document.getElementById('item-barcode-input').value = code;
+      document.getElementById('scan-status').textContent = 'Captured: ' + code;
+      setTimeout(closeScanner, 450);
+      return;
+    }
+    var item = items.find(function (i) { return i.barcode && i.barcode === code; });
+    if (!item) {
+      document.getElementById('scan-status').textContent = 'No item matches this barcode.';
+      showToast('No match for that barcode \u2014 add it from Manage');
+      return;
+    }
+    var mode = (item.single !== null && item.single !== undefined) ? 'single' : 'bulk';
+    if (mode === 'bulk' && isFractionalBulkProduct(item)) {
+      closeScanner();
+      openFractionSheet(item.id);
+      return;
+    }
+    addToCart(item.id, mode);
+    document.getElementById('scan-status').textContent = 'Added: ' + item.name;
+    showToast('Added ' + item.name);
   }
   function renderManageList() {
     var ul = document.getElementById("manage-list");
@@ -2216,6 +2376,71 @@ function renderHistory(){
     var btn=document.getElementById('receipt-history-btn');
     if(btn) btn.setAttribute('aria-label','View '+receipts.length+' available receipts');
   }
+  var reportPeriod = 'today';
+  function reportPeriodStart(period) {
+    var now = new Date();
+    if (period === 'today') return new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    if (period === 'week') {
+      var d = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      var day = d.getDay();
+      var diff = (day === 0 ? 6 : day - 1); // week starts Monday
+      d.setDate(d.getDate() - diff);
+      return d;
+    }
+    if (period === 'month') return new Date(now.getFullYear(), now.getMonth(), 1);
+    return null; // 'all'
+  }
+  function computeReportStats(period) {
+    var start = reportPeriodStart(period);
+    var filtered = receipts.filter(function (r) {
+      if (!start) return true;
+      var d = new Date(r.createdAt);
+      return d instanceof Date && !isNaN(d) && d >= start;
+    });
+    var revenue = 0, discountTotal = 0, bulkRevenue = 0, singleRevenue = 0;
+    var itemTotals = {};
+    filtered.forEach(function (r) {
+      revenue += Number(r.total) || 0;
+      discountTotal += Number(r.discount) || 0;
+      (r.items || []).forEach(function (e) {
+        var sub = Number(e.subtotal) || 0;
+        if ((e.mode || 'bulk') === 'single') singleRevenue += sub; else bulkRevenue += sub;
+        var key = e.id != null ? e.id : e.name;
+        if (!itemTotals[key]) itemTotals[key] = { name: e.name, qty: 0, revenue: 0 };
+        itemTotals[key].qty += Number(e.qty) || 0;
+        itemTotals[key].revenue += sub;
+      });
+    });
+    var topItems = Object.keys(itemTotals).map(function (k) { return itemTotals[k]; })
+      .sort(function (a, b) { return b.revenue - a.revenue; }).slice(0, 8);
+    return { saleCount: filtered.length, revenue: revenue, discountTotal: discountTotal, bulkRevenue: bulkRevenue, singleRevenue: singleRevenue, topItems: topItems };
+  }
+  function renderReports() {
+    var body = document.getElementById('reports-body'); if (!body) return;
+    document.querySelectorAll('.reports-tab').forEach(function (t) {
+      t.classList.toggle('active', t.dataset.reportPeriod === reportPeriod);
+    });
+    var s = computeReportStats(reportPeriod);
+    if (!s.saleCount) { body.innerHTML = '<div class="reports-empty">No completed sales in this period.</div>'; return; }
+    var avg = s.saleCount ? (s.revenue / s.saleCount) : 0;
+    var html = '';
+    html += '<div class="reports-stats">';
+    html += '<div class="reports-stat gold"><div class="rs-label">Revenue</div><div class="rs-value">\u00A2' + formatCedis(s.revenue) + '</div></div>';
+    html += '<div class="reports-stat"><div class="rs-label">Sales</div><div class="rs-value">' + s.saleCount + '</div></div>';
+    html += '<div class="reports-stat"><div class="rs-label">Discounts given</div><div class="rs-value">\u00A2' + formatCedis(s.discountTotal) + '</div></div>';
+    html += '<div class="reports-stat"><div class="rs-label">Avg. sale</div><div class="rs-value">\u00A2' + formatCedis(avg) + '</div></div>';
+    html += '</div>';
+    html += '<div class="reports-section-title">Bulk vs Singles</div>';
+    html += '<div class="reports-split">';
+    html += '<div class="reports-stat"><div class="rs-label">Bulk</div><div class="rs-value">\u00A2' + formatCedis(s.bulkRevenue) + '</div></div>';
+    html += '<div class="reports-stat"><div class="rs-label">Singles</div><div class="rs-value">\u00A2' + formatCedis(s.singleRevenue) + '</div></div>';
+    html += '</div>';
+    html += '<div class="reports-section-title">Top items</div>';
+    html += '<div class="reports-top-list">' + s.topItems.map(function (it) {
+      return '<div class="reports-top-row"><div><div class="rt-name">' + escapeHtml(it.name) + '</div><div class="rt-qty">' + it.qty + ' sold</div></div><div class="rt-revenue">\u00A2' + formatCedis(it.revenue) + '</div></div>';
+    }).join('') + '</div>';
+    body.innerHTML = html;
+  }
   function renderReceiptHistory(){
     updateReceiptCount();
     var list=document.getElementById('receipt-history-list'); if(!list) return;
@@ -2243,6 +2468,7 @@ function renderHistory(){
     document.getElementById("screen-history").classList.toggle("active", tab === "history");
     document.querySelectorAll(".tab-btn").forEach(function (b) { b.classList.toggle("active", b.dataset.tab === tab); });
     if(tab==='history') renderHistory();
+    if (!document.getElementById('scan-panel').hidden) closeScanner();
   }
 
   function editCartQuantity(key, value) {
@@ -2266,6 +2492,7 @@ function renderHistory(){
     document.getElementById("item-name-input").value = item.name;
     document.getElementById("item-bulk-input").value = (item.bulk !== null && item.bulk !== undefined) ? item.bulk : "";
     document.getElementById("item-single-input").value = (item.single !== null && item.single !== undefined) ? item.single : "";
+    document.getElementById("item-barcode-input").value = item.barcode || "";
     pendingPhoto = item.photo;
     if (item.photo) {
       document.getElementById("photo-picker").innerHTML = '<img src="' + item.photo + '" alt="">' +
@@ -2282,6 +2509,7 @@ function renderHistory(){
     document.getElementById("item-name-input").value = "";
     document.getElementById("item-bulk-input").value = "";
     document.getElementById("item-single-input").value = "";
+    document.getElementById("item-barcode-input").value = "";
     document.getElementById("photo-picker").innerHTML =
       '<input type="file" accept="image/*" id="photo-input" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>';
     pendingPhoto = null;
@@ -2299,11 +2527,16 @@ function renderHistory(){
     if (!name) return;
     var bulk = parsePriceField("item-bulk-input");
     var single = parsePriceField("item-single-input");
+    var barcode = document.getElementById("item-barcode-input").value.trim() || null;
+    if (barcode) {
+      var dup = items.find(function (i) { return i.barcode === barcode && i.id !== editingId; });
+      if (dup) showToast('Heads up: "' + dup.name + '" already uses this barcode');
+    }
     if (editingId !== null) {
       var idx = items.findIndex(function (i) { return i.id === editingId; });
-      if (idx !== -1) items[idx] = { id: editingId, name: name, bulk: bulk, single: single, photo: pendingPhoto };
+      if (idx !== -1) items[idx] = { id: editingId, name: name, bulk: bulk, single: single, photo: pendingPhoto, barcode: barcode };
     } else {
-      items.push({ id: Date.now(), name: name, bulk: bulk, single: single, photo: pendingPhoto });
+      items.push({ id: Date.now(), name: name, bulk: bulk, single: single, photo: pendingPhoto, barcode: barcode });
     }
     saveItems();
     renderManageList();
@@ -2431,6 +2664,9 @@ function renderHistory(){
     if (e.target.closest("#sheet-save-btn")) return handleSheetSave();
     if (e.target.closest("#sheet-delete-btn")) return handleSheetDelete();
     if (e.target.closest("#discount-btn")) return setDiscount();
+    if (e.target.closest("#scan-btn")) { openScanner('cart'); return; }
+    if (e.target.closest("#item-barcode-scan-btn")) { openScanner('manage'); return; }
+    if (e.target.closest("#scan-close")) { closeScanner(); return; }
     var copyReceiptBtn=e.target.closest('[data-copy-receipt]');
     if(copyReceiptBtn){ e.stopPropagation(); return copyReceipt(Number(copyReceiptBtn.dataset.copyReceipt)); }
     var shareBtn=e.target.closest('[data-share-receipt]');
@@ -2438,6 +2674,10 @@ function renderHistory(){
     if (e.target.closest("#clear-btn")) return clearCart();
     if (e.target.closest("#complete-btn")) return completeSale();
     if (e.target.closest("#receipt-history-btn")) { renderReceiptHistory(); document.getElementById('receipt-history-panel').hidden=false; return; }
+    if (e.target.closest("#history-reports-btn")) { reportPeriod='today'; renderReports(); document.getElementById('reports-panel').hidden=false; return; }
+    if (e.target.closest("#reports-close") || e.target === document.getElementById('reports-panel')) { document.getElementById('reports-panel').hidden=true; return; }
+    var reportTab = e.target.closest('[data-report-period]');
+    if (reportTab) { reportPeriod = reportTab.dataset.reportPeriod; renderReports(); return; }
     if (e.target.closest("#unsettled-debts-btn")) { openSettlements('debt'); return; }
     if (e.target.closest("#change-owed-btn")) { openSettlements('change'); return; }
     if (e.target.closest("#settlement-close") || e.target === document.getElementById('settlement-panel')) { document.getElementById('settlement-panel').hidden=true; return; }
