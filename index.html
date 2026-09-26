@@ -10,6 +10,9 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#F6F5F0" id="theme-color-meta">
 <link rel="manifest" href="manifest.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="apple-touch-icon" href="icon-180.png">
 <title>Price List · V6</title>
 <style>
@@ -55,10 +58,11 @@
     margin: 0; padding: 0; height: 100%;
     background-color: var(--paper);
     color: var(--ink);
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", Helvetica, Arial, sans-serif;
+    font-family: "Poppins", -apple-system, BlinkMacSystemFont, "SF Pro Text", Helvetica, Arial, sans-serif;
     overscroll-behavior-y: none;
   }
-  button { font-family: inherit; cursor: pointer; }
+  button, input, textarea, select { font-family: inherit; cursor: pointer; }
+  input, textarea, select { cursor: auto; }
   #app { height: 100dvh; display: flex; flex-direction: column; background-color: var(--paper); }
 
   .top-accent { height: 4px; flex-shrink: 0; background: linear-gradient(90deg, var(--gold-bright) 0 33%, var(--green) 33% 66%, var(--brick) 66% 100%); }
@@ -67,7 +71,7 @@
   .screen.active { display: flex; }
 
   header { padding: 18px 20px 12px; flex-shrink: 0; }
-  header h1 { margin: 0; font-size: 22px; font-weight: 650; color: var(--ink); }
+  header h1 { margin: 0; font-size: 22px; font-weight: 800; letter-spacing: -.01em; color: var(--ink); }
   header p { margin: 4px 0 0; font-size: 13px; color: var(--ink-soft); }
 
   .scroll-area { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 0 20px; }
@@ -75,8 +79,9 @@
   .add-btn-wrap { padding: 0 20px 14px; flex-shrink: 0; }
   .add-btn {
     width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;
-    background: var(--gold); color: #fff; border: none; border-radius: 14px;
-    padding: 13px 0; font-size: 15px; font-weight: 600;
+    background: var(--gold); color: #fff; border: none; border-radius: 999px;
+    padding: 13px 0; font-size: 15px; font-weight: 750; letter-spacing: -.01em;
+    box-shadow: 0 8px 20px rgba(0,0,0,.16);
   }
   .add-btn:active { opacity: 0.85; }
   .add-btn svg { width: 18px; height: 18px; }
@@ -103,7 +108,7 @@
   }
   .manage-copy-wrap { padding: 12px 0 20px; }
   .manage-copy-row { display: flex; gap: 8px; }
-  .manage-copy-btn { width: 100%; border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 14px; padding: 12px 14px; font-size: 14px; font-weight: 650; }
+  .manage-copy-btn { width: 100%; border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 999px; padding: 12px 14px; font-size: 14px; font-weight: 700; }
   .manage-copy-row .manage-copy-btn { width: auto; flex: 1; }
   .manage-copy-btn:active { opacity: .8; transform: scale(.99); }
   #price-import-text { width:100%; min-height:220px; box-sizing:border-box; resize:vertical; border:1px solid var(--line); border-radius:12px; padding:10px; background:var(--paper); color:var(--ink); font:11px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace; }
@@ -237,7 +242,7 @@
   .history-card::after { content:'Tap for details'; display:block; margin-top:2px; color:var(--ink-soft); font-size:9px; }
   .history-card.expanded::after { content:'Tap to hide'; }
   .history-change { margin:10px 20px 0; padding:12px; border:1px solid var(--line); border-radius:14px; background:var(--surface); }
-  .history-change h2 { margin:0 0 7px; font-size:13px; }
+  .history-change h2 { margin:0 0 7px; font-size:13px; font-weight:750; }
   .change-line { display:flex; justify-content:space-between; align-items:center; gap:10px; margin-top:6px; font-size:12px; }
   .change-line input { width:120px; padding:8px 9px; border:1px solid var(--line); border-radius:10px; background:var(--paper); color:var(--ink); font-size:15px; text-align:right; outline:none; }
   .change-result { font-size:17px; font-weight:750; color:var(--gold); }
@@ -257,7 +262,7 @@
   .receipt-history-panel { position:fixed; inset:0; z-index:110; background:rgba(0,0,0,.45); display:flex; align-items:flex-end; justify-content:center; }
   .receipt-history-card { width:min(480px,100%); max-height:86dvh; overflow-y:auto; background:var(--surface); color:var(--ink); border-radius:24px 24px 0 0; padding:18px 18px calc(22px + env(safe-area-inset-bottom)); }
   .receipt-history-head { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:12px; }
-  .receipt-history-head h2 { margin:0; font-size:18px; }
+  .receipt-history-head h2 { margin:0; font-size:18px; font-weight:800; letter-spacing:-.01em; }
   .receipt-history-close { width:32px; height:32px; border:0; border-radius:50%; background:var(--paper); color:var(--ink); font-size:20px; line-height:1; }
 
   /* Polished receipt action sheet */
@@ -265,11 +270,11 @@
   .receipt-action-card { width:min(430px,100%); box-sizing:border-box; background:var(--surface); color:var(--ink); border:1px solid var(--line); border-radius:24px; padding:20px; box-shadow:0 22px 60px rgba(0,0,0,.28); }
   .receipt-action-head { display:flex; align-items:center; justify-content:space-between; gap:14px; margin-bottom:18px; }
   .receipt-action-kicker { font-size:10px; font-weight:800; letter-spacing:.12em; color:var(--ink-soft); margin-bottom:3px; }
-  .receipt-action-card h2 { margin:0; font-size:22px; line-height:1.15; }
+  .receipt-action-card h2 { margin:0; font-size:22px; font-weight:800; letter-spacing:-.01em; line-height:1.15; }
   .receipt-action-close { flex:0 0 auto; width:38px; height:38px; border:0; border-radius:50%; background:var(--paper); color:var(--ink); font-size:28px; line-height:1; display:flex; align-items:center; justify-content:center; }
   .receipt-action-close:active { transform:scale(.94); }
   .receipt-action-list { display:grid; gap:10px; }
-  .receipt-action-btn { width:100%; min-height:58px; border:1px solid var(--line); border-radius:15px; padding:12px 15px; background:var(--paper); color:var(--ink); display:flex; align-items:center; gap:12px; text-align:left; font-size:17px; font-weight:750; letter-spacing:-.01em; }
+  .receipt-action-btn { width:100%; min-height:58px; border:1px solid var(--line); border-radius:18px; padding:12px 15px; background:var(--paper); color:var(--ink); display:flex; align-items:center; gap:12px; text-align:left; font-size:17px; font-weight:800; letter-spacing:-.01em; }
   .receipt-action-btn .action-icon { width:34px; height:34px; flex:0 0 34px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:800; background:var(--surface); color:var(--ink); }
   .receipt-action-btn.debt .action-icon { color:var(--gold); }
   .receipt-action-btn.change .action-icon { color:#0ea5e9; }
@@ -283,7 +288,7 @@
   .receipt-history-item .rh-total { font-size:13px; font-weight:750; color:var(--gold); }
   .receipt-history-item .rh-meta { color:var(--ink-soft); font-size:10px; margin-top:2px; }
   .receipt-history-item .rh-items { margin:7px 0 0; padding-left:16px; color:var(--ink-soft); font-size:10.5px; line-height:1.35; }
-  .receipt-card h2 { margin:0 0 5px; font-size:20px; }
+  .receipt-card h2 { margin:0 0 5px; font-size:20px; font-weight:800; letter-spacing:-.01em; }
   .receipt-number { color:var(--gold); font-weight:750; font-size:14px; }
   .receipt-summary { margin:14px 0 20px; display:grid; gap:7px; }
   .receipt-summary-line { display:flex; justify-content:space-between; gap:18px; font-size:15px; }
@@ -292,15 +297,15 @@
   .receipt-new-total { padding-top:8px; border-top:1px solid var(--line); font-size:18px; }
   .receipt-new-total strong { font-size:28px; color:var(--gold); }
   .receipt-actions { display:flex; gap:10px; }
-  .receipt-actions button { flex:1; border:0; border-radius:12px; padding:12px; font-size:14px; font-weight:650; }
-  .receipt-actions .primary { background:var(--gold); color:#fff; }
+  .receipt-actions button { flex:1; border:0; border-radius:999px; padding:12px; font-size:14px; font-weight:750; }
+  .receipt-actions .primary { background:var(--gold); color:#fff; box-shadow:0 8px 20px rgba(0,0,0,.16); }
   .receipt-actions .secondary { background:var(--paper); color:var(--ink); }
   .receipt-share-btn { background:var(--gold-soft); color:var(--ink); }
-  .receipt-history-share { margin-top:7px; border:0; background:var(--gold-soft); color:var(--ink); border-radius:9px; padding:6px 10px; font-size:10px; font-weight:700; }
-  .receipt-copy-btn { margin-top:7px; margin-left:5px; border:0; background:var(--paper); color:var(--ink); border-radius:9px; padding:6px 10px; font-size:10px; font-weight:700; }
+  .receipt-history-share { margin-top:7px; border:0; background:var(--gold-soft); color:var(--ink); border-radius:999px; padding:6px 12px; font-size:10px; font-weight:750; }
+  .receipt-copy-btn { margin-top:7px; margin-left:5px; border:0; background:var(--paper); color:var(--ink); border-radius:999px; padding:6px 12px; font-size:10px; font-weight:750; }
   .receipt-tools-title { margin:2px 0 5px; color:var(--ink-soft); font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; }
   .receipt-tools { display:flex; gap:7px; flex-wrap:wrap; margin-top:4px; }
-  .receipt-tool-btn { border:1px solid var(--line); background:var(--paper); color:var(--ink); border-radius:10px; padding:8px 11px; font-size:11px; font-weight:700; }
+  .receipt-tool-btn { border:1px solid var(--line); background:var(--paper); color:var(--ink); border-radius:999px; padding:8px 12px; font-size:11px; font-weight:750; }
 
   /* Change/Debt status chips shown directly on a receipt */
   .receipt-status-row { display:flex; gap:6px; flex-wrap:wrap; margin-top:6px; }
@@ -313,23 +318,46 @@
   .status-popup-overlay { position:fixed; inset:0; z-index:140; background:rgba(0,0,0,.45); display:flex; align-items:center; justify-content:center; padding:20px; }
   .status-popup { width:min(280px,100%); box-sizing:border-box; background:var(--surface); color:var(--ink); border:1px solid var(--line); border-radius:18px; padding:16px 18px; box-shadow:0 18px 46px rgba(0,0,0,.28); }
   .status-popup-head { display:flex; align-items:center; justify-content:space-between; gap:10px; }
-  .status-popup-head h3 { margin:0; font-size:14px; font-weight:750; }
+  .status-popup-head h3 { margin:0; font-size:14px; font-weight:800; }
   .status-popup-close { flex:0 0 auto; width:28px; height:28px; border:0; border-radius:50%; background:var(--paper); color:var(--ink); font-size:17px; line-height:1; display:flex; align-items:center; justify-content:center; }
   .status-popup-close:active { transform:scale(.94); }
   .status-popup-amount { margin:12px 0 16px; font-size:24px; font-weight:800; color:var(--gold); text-align:center; }
-  .status-popup-settle { width:100%; border:0; border-radius:12px; padding:11px; background:var(--gold); color:#fff; font-size:13px; font-weight:700; }
+  .status-popup-settle { width:100%; border:0; border-radius:999px; padding:11px; background:var(--gold); color:#fff; font-size:13px; font-weight:750; box-shadow:0 8px 20px rgba(0,0,0,.16); }
   .status-popup-settle:active { transform:scale(.98); }
 
   /* Consistent line-icon style shared by receipt action buttons */
   .action-icon svg { width:18px; height:18px; display:block; }
 
+  /* Prevent iOS/Android native text-selection callout from racing with our
+     custom long-press menus (receipt action sheet, history cards, etc.) */
+  [data-receipt-index], [data-history-index],
+  .receipt-action-panel, .receipt-action-card, .receipt-action-btn,
+  .status-chip, .receipt-history-share, .receipt-copy-btn {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  /* Inline expanded debt/change details, shown together with the rest of
+     an expanded receipt card instead of behind a separate popup tap */
+  .receipt-status-details { display:none; margin-top:8px; gap:6px; }
+  .history-card.expanded .receipt-status-details,
+  .receipt-history-item.expanded .receipt-status-details { display:grid; }
+  .status-detail-row { display:flex; align-items:center; justify-content:space-between; gap:8px; padding:8px 10px; border-radius:10px; background:var(--paper); border:1px solid var(--line); font-size:11px; }
+  .status-detail-row.change { border-color:rgba(14,165,233,.3); }
+  .status-detail-row.debt { border-color:rgba(184,132,26,.3); }
+  .status-detail-label { font-weight:700; color:var(--ink-soft); }
+  .status-detail-amount { font-weight:800; color:var(--gold); font-size:13px; margin-right:auto; margin-left:8px; }
+  .status-detail-settle { border:0; background:var(--gold); color:#fff; border-radius:999px; padding:5px 12px; font-size:10px; font-weight:800; flex:0 0 auto; }
+  .status-detail-settle:active { transform:scale(.95); }
+
   /* Unsettled Debts / Change panel */
   .settlement-panel { position:fixed; inset:0; z-index:120; background:rgba(0,0,0,.45); display:flex; align-items:flex-end; justify-content:center; }
   .settlement-card { width:min(480px,100%); max-height:86dvh; overflow-y:auto; box-sizing:border-box; background:var(--surface); color:var(--ink); border-radius:24px 24px 0 0; padding:18px 18px calc(22px + env(safe-area-inset-bottom)); }
   .settlement-head { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:12px; }
-  .settlement-head h2 { margin:0; font-size:18px; }
+  .settlement-head h2 { margin:0; font-size:18px; font-weight:800; letter-spacing:-.01em; }
   .settlement-tabs { display:flex; gap:7px; margin-bottom:12px; }
-  .settlement-tab { flex:1; border:1px solid var(--line); background:var(--paper); color:var(--ink); border-radius:10px; padding:8px 11px; font-size:12px; font-weight:700; }
+  .settlement-tab { flex:1; border:1px solid var(--line); background:var(--paper); color:var(--ink); border-radius:999px; padding:8px 11px; font-size:12px; font-weight:750; }
   .settlement-tab.active { background:var(--gold); border-color:var(--gold); color:#fff; }
   .settlement-list { display:grid; gap:8px; }
   .settlement-item { border:1px solid var(--line); border-radius:14px; padding:10px 11px; background:var(--paper); }
@@ -337,7 +365,7 @@
   .settlement-item-top strong { font-size:12px; font-weight:750; }
   .settlement-amount { font-size:13px; font-weight:750; color:var(--gold); font-variant-numeric:tabular-nums; }
   .settlement-meta { color:var(--ink-soft); font-size:10px; margin-top:2px; }
-  .settlement-action { margin-top:7px; border:0; background:var(--gold-soft); color:var(--ink); border-radius:9px; padding:6px 10px; font-size:10px; font-weight:700; }
+  .settlement-action { margin-top:7px; border:0; background:var(--gold-soft); color:var(--ink); border-radius:999px; padding:6px 12px; font-size:10px; font-weight:750; }
   .settlement-action:active { transform:scale(.97); }
   .settlement-empty { text-align:center; padding:35px 20px; color:var(--ink-soft); font-size:13px; }
   .receipt-import-panel { position:fixed; inset:0; z-index:120; background:rgba(0,0,0,.45); display:flex; align-items:flex-end; justify-content:center; }
@@ -346,7 +374,7 @@
   .receipt-import-card p { margin:5px 0 10px; color:var(--ink-soft); font-size:11px; line-height:1.4; }
   #receipt-import-text { width:100%; min-height:220px; box-sizing:border-box; resize:vertical; border:1px solid var(--line); border-radius:12px; padding:10px; background:var(--paper); color:var(--ink); font:11px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace; }
   .receipt-import-actions { display:flex; gap:8px; margin-top:10px; }
-  .receipt-import-actions button { flex:1; border:0; border-radius:11px; padding:11px; font-size:12px; font-weight:700; }
+  .receipt-import-actions button { flex:1; border:0; border-radius:999px; padding:11px; font-size:12px; font-weight:750; }
 
   .toast { position:fixed; left:50%; bottom:calc(90px + env(safe-area-inset-bottom)); transform:translateX(-50%) translateY(10px); background:var(--ink); color:var(--paper); padding:9px 13px; border-radius:999px; font-size:12px; opacity:0; pointer-events:none; transition:.2s ease; z-index:120; }
   .toast.show { opacity:1; transform:translateX(-50%) translateY(0); pointer-events:auto; }
@@ -373,7 +401,7 @@
     max-width: 480px; margin: 0 auto; max-height: 88dvh; overflow-y: auto;
   }
   .sheet-handle { width: 40px; height: 5px; border-radius: 999px; background: var(--line); margin: 0 auto 18px; }
-  #add-sheet h2 { margin: 0 0 18px; font-size: 17px; font-weight: 650; color: var(--ink); }
+  #add-sheet h2 { margin: 0 0 18px; font-size: 17px; font-weight: 800; letter-spacing: -.01em; color: var(--ink); }
 
   .photo-row { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; }
   .photo-picker {
@@ -394,9 +422,9 @@
   .field-row { display: flex; gap: 10px; }
   .field-row .field-col { flex: 1; }
   .sheet-actions { display: flex; gap: 10px; margin-top: 2px; }
-  .sheet-btn { flex: 1; padding: 13px 0; border-radius: 12px; border: none; font-size: 15px; font-weight: 600; }
+  .sheet-btn { flex: 1; padding: 13px 0; border-radius: 999px; border: none; font-size: 15px; font-weight: 750; }
   .sheet-btn.cancel { background: var(--paper); color: var(--ink); }
-  .sheet-btn.save { background: var(--gold); color: #fff; }
+  .sheet-btn.save { background: var(--gold); color: #fff; box-shadow: 0 8px 20px rgba(0,0,0,.16); }
   .delete-link { display: block; width: 100%; text-align: center; background: none; border: none; color: var(--brick); font-size: 14px; font-weight: 550; margin-top: 14px; padding: 4px 0; }
 
 
@@ -590,7 +618,7 @@
 
 
   /* Cart overview from History */
-  .cart-history-btn { width:100%; border:1px solid var(--line); background:var(--surface); color:var(--ink); border-radius:18px; padding:16px 16px; display:flex; align-items:center; gap:12px; margin:12px 0 10px; box-shadow:0 5px 16px rgba(28,27,24,.04); }
+  .cart-history-btn { width:100%; border:1px solid var(--line); background:var(--surface); color:var(--ink); border-radius:22px; padding:16px 16px; display:flex; align-items:center; gap:12px; margin:12px 0 10px; box-shadow:0 5px 16px rgba(28,27,24,.04); font-weight:700; }
   .cart-history-btn .big-cart-icon { width:44px; height:44px; border-radius:14px; background:var(--gold-soft); color:var(--gold); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
   .cart-history-btn svg { width:25px; height:25px; }
   .cart-history-btn strong { display:block; font-size:14px; text-align:left; }
@@ -622,7 +650,7 @@
   .quantity-control button { width:46px; height:46px; border-radius:50%; border:1px solid var(--line); background:var(--paper); color:var(--ink); font-size:24px; }
   #quantity-value { width:80px; text-align:center; border:1px solid var(--line); border-radius:12px; background:var(--paper); color:var(--ink); font-size:20px; padding:10px 5px; outline:none; }
   .quantity-actions { display:flex; gap:9px; }
-  .quantity-actions button { flex:1; border:0; border-radius:12px; padding:12px; font-size:14px; font-weight:700; }
+  .quantity-actions button { flex:1; border:0; border-radius:999px; padding:12px; font-size:14px; font-weight:750; }
   #quantity-cancel { background:var(--paper); color:var(--ink); }
   #quantity-add { background:var(--gold); color:#fff; }
 
@@ -666,6 +694,13 @@
           <button class="manage-copy-btn" id="manage-copy-btn">Copy price list</button>
           <button class="manage-copy-btn" id="manage-paste-btn">Paste price list</button>
         </div>
+        <p class="receipt-tools-title" style="margin-top:14px;">Full app backup</p>
+        <div class="manage-copy-row">
+          <button class="manage-copy-btn" id="backup-export-btn">Backup all data</button>
+          <button class="manage-copy-btn" id="backup-restore-btn">Restore all data</button>
+        </div>
+        <input type="file" id="backup-restore-input" accept="application/json,.json" hidden>
+        <p class="photo-hint" style="margin-top:8px;">Saves a file with your whole price list, carts, receipts, and debts/change — so you can move to a new phone or recover if this one's storage is cleared.</p>
       </div>
     </div>
   </section>
@@ -1387,6 +1422,51 @@
     showToast('Price list TXT ready');
   }
 
+  function isAppStorageKey(k) {
+    return !!k && (k.indexOf('priceList') === 0 || k.indexOf('price-list-') === 0);
+  }
+  function exportAllData() {
+    var data = {};
+    for (var i = 0; i < localStorage.length; i++) {
+      var k = localStorage.key(i);
+      if (isAppStorageKey(k)) data[k] = localStorage.getItem(k);
+    }
+    var payload = { app: 'price-list-sales-calculator', backupVersion: 1, exportedAt: new Date().toISOString(), data: data };
+    var blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = 'price-list-backup-' + new Date().toISOString().slice(0,10) + '.json';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 1500);
+    showToast('Backup file downloaded');
+  }
+  function importAllData(file) {
+    var reader = new FileReader();
+    reader.onload = function() {
+      var data;
+      try {
+        var payload = JSON.parse(reader.result);
+        data = (payload && typeof payload === 'object' && payload.data) ? payload.data : payload;
+        if (!data || typeof data !== 'object') throw new Error('empty');
+      } catch (e) {
+        alert("Could not read that file — make sure it's an unedited backup exported from this app.");
+        return;
+      }
+      var keys = Object.keys(data).filter(isAppStorageKey);
+      if (!keys.length) { alert("That file doesn't look like a backup from this app."); return; }
+      if (!confirm('This replaces the price list, carts, receipts, and debts/change currently on this device with the backup file. This cannot be undone. Continue?')) return;
+      for (var i = localStorage.length - 1; i >= 0; i--) {
+        var k = localStorage.key(i);
+        if (isAppStorageKey(k)) localStorage.removeItem(k);
+      }
+      keys.forEach(function(k){ localStorage.setItem(k, data[k]); });
+      showToast('Backup restored — reloading…');
+      setTimeout(function(){ location.reload(); }, 700);
+    };
+    reader.onerror = function(){ alert('Could not read that file.'); };
+    reader.readAsText(file);
+  }
+
   function openPriceImport() {
     var panel = document.getElementById('price-import-panel'); if (!panel) return;
     document.getElementById('price-import-text').value = '';
@@ -1767,11 +1847,19 @@
   function receiptStatusChipsHtml(receiptNumber) {
     var s = getReceiptSettlements(receiptNumber);
     if (!s.change && !s.debt) return '';
-    var html = '<div class="receipt-status-row">';
-    if (s.change) html += '<button type="button" class="status-chip change" data-status-chip="change" data-status-id="'+escapeHtml(String(s.change.id))+'">Change</button>';
-    if (s.debt) html += '<button type="button" class="status-chip debt" data-status-chip="debt" data-status-id="'+escapeHtml(String(s.debt.id))+'">Debt</button>';
-    html += '</div>';
-    return html;
+    var chips = '<div class="receipt-status-row">';
+    var details = '<div class="receipt-status-details">';
+    if (s.change) {
+      chips += '<button type="button" class="status-chip change" data-status-chip="change" data-status-id="'+escapeHtml(String(s.change.id))+'">Change</button>';
+      details += '<div class="status-detail-row change"><span class="status-detail-label">Change owed</span><span class="status-detail-amount">¢'+formatCedis(s.change.amount)+'</span><button type="button" class="status-detail-settle" data-settle-chip="change" data-status-id="'+escapeHtml(String(s.change.id))+'">Settle</button></div>';
+    }
+    if (s.debt) {
+      chips += '<button type="button" class="status-chip debt" data-status-chip="debt" data-status-id="'+escapeHtml(String(s.debt.id))+'">Debt</button>';
+      details += '<div class="status-detail-row debt"><span class="status-detail-label">Debt owed</span><span class="status-detail-amount">¢'+formatCedis(s.debt.amount)+'</span><button type="button" class="status-detail-settle" data-settle-chip="debt" data-status-id="'+escapeHtml(String(s.debt.id))+'">Settle</button></div>';
+    }
+    chips += '</div>';
+    details += '</div>';
+    return chips + details;
   }
   function settleRecord(type, id) {
     var arr = type==='debt' ? unsettledDebts : changeOwed;
@@ -2105,7 +2193,7 @@ function renderHistory(){
         var mode=i.mode==='bulk'?(i.fraction===0.5?'½ BULK':i.fraction===0.25?'¼ BULK':'Full BULK'):'SINGLE';
         return '<li>'+escapeHtml(i.name)+' — '+mode+' × '+(Number(i.qty)||0)+' — ¢'+formatCedis(i.subtotal)+'</li>';
       }).join('');
-      return '<div class="receipt-history-item" data-receipt-index="'+receipts.indexOf(r)+'"><div class="rh-top"><span class="rh-no">'+escapeHtml(r.number)+'</span><span class="rh-total">¢'+formatCedis(r.total)+'</span></div>'+receiptStatusChipsHtml(r.number)+'<div class="rh-meta">'+when+'</div><ul class="rh-items">'+itemsHtml+'</ul><button class="receipt-history-share" data-share-receipt="'+receipts.indexOf(r)+'">Share as image</button><button class="receipt-copy-btn" data-copy-receipt="'+receipts.indexOf(r)+'">Copy</button></div>';
+      return '<div class="receipt-history-item expanded" data-receipt-index="'+receipts.indexOf(r)+'"><div class="rh-top"><span class="rh-no">'+escapeHtml(r.number)+'</span><span class="rh-total">¢'+formatCedis(r.total)+'</span></div>'+receiptStatusChipsHtml(r.number)+'<div class="rh-meta">'+when+'</div><ul class="rh-items">'+itemsHtml+'</ul><button class="receipt-history-share" data-share-receipt="'+receipts.indexOf(r)+'">Share as image</button><button class="receipt-copy-btn" data-copy-receipt="'+receipts.indexOf(r)+'">Copy</button></div>';
     }).join('');
   }
   function updateChangeCalculator(){
@@ -2350,6 +2438,12 @@ function renderHistory(){
     if (statusChip) { openStatusPopup(statusChip.dataset.statusChip, statusChip.dataset.statusId); return; }
     if (e.target.closest("#status-popup-close") || e.target === document.getElementById('status-popup-overlay')) { closeStatusPopup(); return; }
     if (e.target.closest("#status-popup-settle")) { return settleStatusPopup(); }
+    var settleChip=e.target.closest('[data-settle-chip]');
+    if (settleChip) {
+      var settled = settleRecord(settleChip.dataset.settleChip, settleChip.dataset.statusId);
+      if (settled) showToast(settleChip.dataset.settleChip==='debt' ? 'Debt marked as paid' : 'Change marked as collected');
+      return;
+    }
     var historyCard=e.target.closest('[data-history-index]');
     if (historyCard) { if(receiptHoldTriggered){ receiptHoldTriggered=false; return; } historyCard.classList.toggle('expanded'); return; }
     var receiptHistoryItem=e.target.closest('[data-receipt-index]');
@@ -2379,6 +2473,15 @@ function renderHistory(){
   });
   document.getElementById('manage-copy-btn').addEventListener('click', copyPriceList);
   document.getElementById('manage-paste-btn').addEventListener('click', openPriceImport);
+  document.getElementById('backup-export-btn').addEventListener('click', exportAllData);
+  document.getElementById('backup-restore-btn').addEventListener('click', function(){
+    document.getElementById('backup-restore-input').click();
+  });
+  document.getElementById('backup-restore-input').addEventListener('change', function(e){
+    var file = e.target.files && e.target.files[0];
+    if (file) importAllData(file);
+    e.target.value = '';
+  });
 
   document.getElementById("sell-search").addEventListener("input", function (e) {
     sellSearchQuery = e.target.value;
