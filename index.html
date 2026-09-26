@@ -14,7 +14,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="apple-touch-icon" href="icon-180.png">
-<title>Price List · V8.1</title>
+<title>Price List · V8.5</title>
 <style>
   :root {
     color-scheme: light;
@@ -209,13 +209,6 @@
     font-size: 16px; line-height: 1; padding: 0; z-index: 2;
   }
   .search-clear.visible { display: flex; }
-  .search-scan-btn {
-    position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
-    width: 28px; height: 28px; border: 0; border-radius: 50%; background: var(--gold-soft);
-    color: var(--ink); display: flex; align-items: center; justify-content: center;
-    font-size: 14px; padding: 0; z-index: 2;
-  }
-  .search-scan-btn:active { transform: translateY(-50%) scale(.94); }
   .catalog-wrap { flex: 1 1 auto; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 0 20px; border-bottom: 1px solid var(--line); }
   /* Cart area on the Sell screen is capped rather than left to expand and
      fill whatever's left over (which used to leave blank space when the
@@ -309,34 +302,6 @@
   .reports-top-row .rt-revenue { font-size:12px; font-weight:650; color:var(--gold); white-space:nowrap; font-variant-numeric:tabular-nums; }
   .reports-empty { text-align:center; padding:30px 10px; color:var(--ink-soft); font-size:13px; }
 
-  /* Barcode scanner */
-  .scan-panel { position:fixed; inset:0; z-index:160; background:#000; display:flex; flex-direction:column; }
-  .scan-header { flex-shrink:0; display:flex; align-items:center; justify-content:space-between; padding:calc(14px + env(safe-area-inset-top)) 16px 12px; color:#fff; }
-  .scan-title { font-size:15px; font-weight:600; }
-  .scan-close { width:34px; height:34px; border:0; border-radius:50%; background:rgba(255,255,255,.14); color:#fff; font-size:20px; line-height:1; }
-  .scan-video-wrap { flex:1; position:relative; overflow:hidden; background:#000; }
-  #scan-video { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
-  .scan-frame { position:absolute; left:12%; right:12%; top:32%; bottom:32%; border:2px solid rgba(255,255,255,.85); border-radius:16px; box-shadow:0 0 0 2000px rgba(0,0,0,.35); pointer-events:none; }
-  .scan-torch-btn {
-    position:absolute; right:16px; bottom:16px; width:44px; height:44px; border-radius:50%;
-    border:1.5px solid rgba(255,255,255,.6); background:rgba(0,0,0,.45); color:#fff; font-size:18px;
-    display:flex; align-items:center; justify-content:center;
-  }
-  .scan-torch-btn.active { background:var(--gold); border-color:var(--gold); color:#1C1B18; }
-  .scan-capture-btn {
-    position:absolute; left:16px; bottom:16px; width:44px; height:44px; border-radius:50%;
-    border:1.5px solid rgba(255,255,255,.6); background:rgba(0,0,0,.45); color:#fff;
-    display:flex; align-items:center; justify-content:center;
-  }
-  .scan-capture-btn svg { width:20px; height:20px; }
-  .scan-capture-btn.busy { opacity:.6; }
-  .scan-status { flex-shrink:0; text-align:center; color:#fff; opacity:.9; font-size:13px; padding:14px 20px 6px; }
-  .scan-manual-btn {
-    flex-shrink:0; display:block; margin:0 auto calc(16px + env(safe-area-inset-bottom));
-    background:none; border:0; color:var(--gold-bright); font-size:12.5px; font-weight:650;
-    text-decoration:underline; padding:6px 10px;
-  }
-
   /* Polished receipt action sheet */
   .receipt-action-panel { position:fixed; inset:0; z-index:130; background:rgba(0,0,0,.52); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); display:flex; align-items:center; justify-content:center; padding:20px; }
   .receipt-action-card { width:min(430px,100%); box-sizing:border-box; background:var(--surface); color:var(--ink); border:1px solid var(--line); border-radius:24px; padding:20px; box-shadow:0 22px 60px rgba(0,0,0,.28); }
@@ -350,6 +315,7 @@
   .receipt-action-btn .action-icon { width:34px; height:34px; flex:0 0 34px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:800; background:var(--surface); color:var(--ink); }
   .receipt-action-btn.debt .action-icon { color:var(--gold); }
   .receipt-action-btn.change .action-icon { color:#0ea5e9; }
+  .receipt-action-btn.momo .action-icon { color:var(--green); }
   .receipt-action-btn.restore .action-icon { color:#8b5cf6; }
   .receipt-action-btn:active { transform:scale(.985); }
 
@@ -385,6 +351,7 @@
   .status-chip:active { transform:scale(.96); }
   .status-chip.change { color:#0ea5e9; background:rgba(14,165,233,.12); border-color:rgba(14,165,233,.3); }
   .status-chip.debt { color:var(--gold); background:var(--gold-soft); border-color:rgba(184,132,26,.3); }
+  .status-chip.momo { color:var(--green); background:rgba(30,92,70,.12); border-color:rgba(30,92,70,.3); }
 
   /* Small settlement detail popup opened from a status chip */
   .status-popup-overlay { position:fixed; inset:0; z-index:140; background:rgba(0,0,0,.45); display:flex; align-items:center; justify-content:center; padding:20px; }
@@ -418,6 +385,7 @@
   .status-detail-row { display:flex; align-items:center; justify-content:space-between; gap:8px; padding:8px 10px; border-radius:10px; background:var(--paper); border:1px solid var(--line); font-size:11px; }
   .status-detail-row.change { border-color:rgba(14,165,233,.3); }
   .status-detail-row.debt { border-color:rgba(184,132,26,.3); }
+  .status-detail-row.momo { border-color:rgba(30,92,70,.3); }
   .status-detail-label { font-weight:700; color:var(--ink-soft); }
   .status-detail-amount { font-weight:800; color:var(--gold); font-size:13px; margin-right:auto; margin-left:8px; }
   .status-detail-settle { border:0; background:var(--gold); color:#fff; border-radius:999px; padding:5px 12px; font-size:10px; font-weight:800; flex:0 0 auto; }
@@ -500,13 +468,6 @@
   }
   .field-row { display: flex; gap: 10px; }
   .field-row .field-col { flex: 1; }
-  .barcode-input-row { display: flex; gap: 8px; align-items: flex-start; }
-  .barcode-input-row .field-input { flex: 1; width: auto; }
-  .barcode-scan-btn {
-    flex: 0 0 48px; height: 44px; border: 1px solid var(--line); background: var(--surface);
-    color: var(--ink); border-radius: 12px; font-size: 17px;
-  }
-  .barcode-scan-btn:active { background: var(--gold-soft); }
   .sheet-actions { display: flex; gap: 10px; margin-top: 2px; }
   .sheet-btn { flex: 1; padding: 13px 0; border-radius: 999px; border: none; font-size: 15px; font-weight: 750; }
   .sheet-btn.cancel { background: var(--paper); color: var(--ink); }
@@ -522,7 +483,6 @@
   }
   #sell-search:focus { transform: translateY(-1px); }
   .catalog-wrap {
-    max-height: 29dvh;
     padding: 0 8px 8px;
     border-bottom: 1px solid var(--line);
   }
@@ -798,7 +758,6 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
       <input id="sell-search" type="text" placeholder="Search items" autocomplete="off">
       <button class="search-clear" id="search-clear" aria-label="Clear search">×</button>
-      <button class="search-scan-btn" id="scan-btn" aria-label="Scan barcode">▦</button>
     </div>
     <div class="catalog-wrap">
       <div class="sale-columns">
@@ -908,23 +867,6 @@
     </div>
   </div>
 
-  <div class="scan-panel" id="scan-panel" hidden>
-    <div class="scan-header">
-      <div class="scan-title">Scan barcode</div>
-      <button class="scan-close" id="scan-close" aria-label="Close scanner">×</button>
-    </div>
-    <div class="scan-video-wrap">
-      <video id="scan-video" playsinline muted autoplay></video>
-      <div class="scan-frame"></div>
-      <button class="scan-torch-btn" id="scan-torch-btn" aria-label="Toggle flashlight" hidden>&#9679;</button>
-      <button class="scan-capture-btn" id="scan-capture-btn" aria-label="Capture and read printed number" type="button">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-      </button>
-    </div>
-    <p class="scan-status" id="scan-status">Fill the box with the barcode, flat and close</p>
-    <button class="scan-manual-btn" id="scan-manual-btn" type="button">Can't scan it? Type the number instead</button>
-  </div>
-
   <div class="receipt-action-panel" id="receipt-action-panel" hidden>
     <div class="receipt-action-card">
       <div class="receipt-action-head">
@@ -937,6 +879,7 @@
       <div class="receipt-action-list">
         <button class="receipt-action-btn debt" id="receipt-add-debt-btn"><span class="action-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h8l4 4v14a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M15 3v4a1 1 0 0 0 1 1h4"/><line x1="9" y1="13" x2="14" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/><circle cx="18" cy="17" r="3.4" fill="var(--surface)"/><line x1="18" y1="15.6" x2="18" y2="18.4"/><line x1="16.6" y1="17" x2="19.4" y2="17"/></svg></span><span>Add Debt</span></button>
         <button class="receipt-action-btn change" id="receipt-add-change-btn"><span class="action-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h13"/><polyline points="14 4 17 8 14 12"/><path d="M20 16H7"/><polyline points="10 12 7 16 10 20"/></svg></span><span>Add Change</span></button>
+        <button class="receipt-action-btn momo" id="receipt-add-momo-btn"><span class="action-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="3"/><line x1="6" y1="9" x2="6" y2="9.01"/><line x1="18" y1="15" x2="18" y2="15.01"/></svg></span><span>Add Momo</span></button>
         <button class="receipt-action-btn restore" id="receipt-restore-btn"><span class="action-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><polyline points="3 3 3 6.5 6.5 6.5"/></svg></span><span>Restore to Cart</span></button>
       </div>
     </div>
@@ -945,7 +888,7 @@
   <div class="settlement-panel" id="settlement-panel" hidden>
     <div class="settlement-card">
       <div class="settlement-head"><h2 id="settlement-title">Unsettled Debts</h2><button class="receipt-history-close" id="settlement-close" aria-label="Close">×</button></div>
-      <div class="settlement-tabs"><button class="settlement-tab" id="settlement-change-tab">Change</button><button class="settlement-tab active" id="settlement-debt-tab">Debt</button></div>
+      <div class="settlement-tabs"><button class="settlement-tab" id="settlement-change-tab">Change</button><button class="settlement-tab active" id="settlement-debt-tab">Debt</button><button class="settlement-tab" id="settlement-momo-tab">Momo</button></div>
       <div class="settlement-list" id="settlement-list"></div>
     </div>
   </div>
@@ -1078,11 +1021,6 @@
       <label class="field-label">Single price (¢)</label>
       <input class="field-input" id="item-single-input" type="number" inputmode="decimal" placeholder="0.00">
     </div>
-  </div>
-  <label class="field-label">Barcode (optional)</label>
-  <div class="barcode-input-row">
-    <input class="field-input" id="item-barcode-input" type="text" inputmode="numeric" placeholder="Scan or type barcode">
-    <button class="barcode-scan-btn" id="item-barcode-scan-btn" type="button" aria-label="Scan barcode">▦</button>
   </div>
   <div class="sheet-actions">
     <button class="sheet-btn cancel" id="sheet-cancel-btn">Cancel</button>
@@ -1217,6 +1155,7 @@
   var receiptCounter = Number(localStorage.getItem('price-list-receipt-counter-v1') || 0);
   var unsettledDebts = loadJson('price-list-unsettled-debts-v1', []);
   var changeOwed = loadJson('price-list-change-owed-v1', []);
+  var momoPayments = loadJson('price-list-momo-payments-v1', []);
   var settlementView = 'debt';
   var receiptActionIndex = null;
   var statusPopupType = null;
@@ -1490,243 +1429,6 @@
     bumpCartRevision();
     saveCart(); renderCart(); closeFractionSheet();
   }
-  var scanStream = null;
-  var scanRAF = null;
-  var decodeCanvas = null, decodeCtx = null, coreReader = null;
-  var zxingLoadPromise = null;
-  var scanTarget = 'cart'; // 'cart' (Sell screen) or 'manage' (barcode field capture)
-  var lastScanCode = null, lastScanAt = 0;
-  function ensureZXingLoaded() {
-    if (window.ZXing) return Promise.resolve();
-    if (zxingLoadPromise) return zxingLoadPromise;
-    zxingLoadPromise = new Promise(function (resolve, reject) {
-      var s = document.createElement('script');
-      s.src = 'https://cdn.jsdelivr.net/npm/@zxing/library@0.20.0/umd/index.min.js';
-      s.onload = function () { resolve(); };
-      s.onerror = function () { zxingLoadPromise = null; reject(new Error('Could not load the scanner. Check your connection and try again.')); };
-      document.head.appendChild(s);
-    });
-    return zxingLoadPromise;
-  }
-  function openScanner(target) {
-    scanTarget = target || 'cart';
-    lastScanCode = null; lastScanAt = 0;
-    document.getElementById('scan-status').textContent = 'Loading scanner\u2026';
-    document.getElementById('scan-panel').hidden = false;
-    ensureZXingLoaded().then(function () {
-      document.getElementById('scan-status').textContent = 'Fill the box with the barcode, flat and close';
-      startZXingScan();
-    }).catch(function (e) {
-      document.getElementById('scan-status').textContent = e.message;
-    });
-  }
-  function scannerHints() {
-    // Restricting to the barcode formats real products actually use (instead of
-    // ZXing's full default list, which also checks QR/Aztec/PDF417/etc. on every
-    // frame) lets each frame decode faster.
-    var hints = new Map();
-    hints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS, [
-      ZXing.BarcodeFormat.EAN_13, ZXing.BarcodeFormat.EAN_8,
-      ZXing.BarcodeFormat.UPC_A, ZXing.BarcodeFormat.UPC_E,
-      ZXing.BarcodeFormat.CODE_128, ZXing.BarcodeFormat.CODE_39
-    ]);
-    hints.set(ZXing.DecodeHintType.TRY_HARDER, true);
-    return hints;
-  }
-  function startZXingScan() {
-    var wantConstraints = {
-      video: {
-        facingMode: { ideal: 'environment' },
-        width: { ideal: 1920 }, height: { ideal: 1080 },
-        advanced: [{ focusMode: 'continuous' }]
-      }
-    };
-    var fallbackConstraints = { video: { facingMode: { ideal: 'environment' } } };
-    navigator.mediaDevices.getUserMedia(wantConstraints).catch(function () {
-      // Some phones/WebViews reject the `advanced` focus constraint outright.
-      return navigator.mediaDevices.getUserMedia(fallbackConstraints);
-    }).then(function (stream) {
-      scanStream = stream;
-      var video = document.getElementById('scan-video');
-      video.srcObject = stream;
-      return video.play();
-    }).then(function () {
-      applyAutoZoom();
-      setupScannerExtras();
-      beginCroppedDecodeLoop();
-    }).catch(function (e) {
-      document.getElementById('scan-status').textContent = 'Camera unavailable: ' + (e && e.message ? e.message : 'permission denied');
-    });
-  }
-  function applyAutoZoom() {
-    // If the phone's camera supports optical/digital zoom, zoom in a bit by
-    // default so a barcode fills more of the frame without the user having
-    // to press right up against it — small, tilted codes in a busy shot
-    // (several bottles, shrink-wrap glare) are the main reason scans miss.
-    var track = scanStream && scanStream.getVideoTracks && scanStream.getVideoTracks()[0];
-    if (!track || !track.getCapabilities) return;
-    var caps = track.getCapabilities();
-    if (caps.zoom && caps.zoom.max) {
-      var target = Math.min(caps.zoom.max, Math.max(caps.zoom.min || 1, (caps.zoom.min || 1) + (caps.zoom.max - (caps.zoom.min || 1)) * 0.3));
-      track.applyConstraints({ advanced: [{ zoom: target }] }).catch(function () {});
-    }
-  }
-  function beginCroppedDecodeLoop() {
-    var video = document.getElementById('scan-video');
-    if (!decodeCanvas) { decodeCanvas = document.createElement('canvas'); decodeCtx = decodeCanvas.getContext('2d', { willReadFrequently: true }); }
-    coreReader = new ZXing.MultiFormatReader();
-    coreReader.setHints(scannerHints());
-    var lastAttempt = 0;
-    function tick(now) {
-      if (document.getElementById('scan-panel').hidden) return; // scanner closed, stop the loop
-      if (video.readyState >= 2 && (now - lastAttempt) > 90) {
-        lastAttempt = now;
-        tryDecodeCroppedFrame(video);
-      }
-      scanRAF = requestAnimationFrame(tick);
-    }
-    scanRAF = requestAnimationFrame(tick);
-  }
-  function cropVideoToGuideBox(video) {
-    var vw = video.videoWidth, vh = video.videoHeight;
-    if (!vw || !vh) return null;
-    var sx = vw * 0.12, sw = vw * 0.76;
-    var sy = vh * 0.32, sh = vh * 0.36;
-    var outW = 900, outH = Math.round(outW * (sh / sw));
-    var c = document.createElement('canvas'); c.width = outW; c.height = outH;
-    c.getContext('2d').drawImage(video, sx, sy, sw, sh, 0, 0, outW, outH);
-    return c;
-  }
-  function tryDecodeCroppedFrame(video) {
-    if (!video.videoWidth || !video.videoHeight) return;
-    decodeCanvas.width = 900;
-    var sx = video.videoWidth * 0.12, sw = video.videoWidth * 0.76;
-    var sy = video.videoHeight * 0.32, sh = video.videoHeight * 0.36;
-    decodeCanvas.height = Math.round(900 * (sh / sw));
-    decodeCtx.drawImage(video, sx, sy, sw, sh, 0, 0, decodeCanvas.width, decodeCanvas.height);
-    try {
-      var source = new ZXing.HTMLCanvasElementLuminanceSource(decodeCanvas);
-      var bitmap = new ZXing.BinaryBitmap(new ZXing.HybridBinarizer(source));
-      var result = coreReader.decode(bitmap);
-      if (result) handleScanResult(result.getText());
-    } catch (e) {
-      // Expected on nearly every frame until a code lines up cleanly — silent miss.
-    }
-  }
-  var tesseractLoadPromise = null;
-  var tesseractWorker = null;
-  function ensureTesseractLoaded() {
-    if (window.Tesseract) return Promise.resolve();
-    if (tesseractLoadPromise) return tesseractLoadPromise;
-    tesseractLoadPromise = new Promise(function (resolve, reject) {
-      var s = document.createElement('script');
-      s.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';
-      s.onload = function () { resolve(); };
-      s.onerror = function () { tesseractLoadPromise = null; reject(new Error('Could not load the number reader. Check your connection.')); };
-      document.head.appendChild(s);
-    });
-    return tesseractLoadPromise;
-  }
-  function captureAndReadNumber() {
-    var video = document.getElementById('scan-video');
-    var canvas = cropVideoToGuideBox(video);
-    if (!canvas) return;
-    var btn = document.getElementById('scan-capture-btn');
-    var statusEl = document.getElementById('scan-status');
-    btn.classList.add('busy'); btn.disabled = true;
-    statusEl.textContent = 'Reading the printed numbers\u2026';
-    ensureTesseractLoaded().then(function () {
-      // Digits-only whitelist: barcodes always have a plain printed number
-      // underneath, and restricting to 0-9 both speeds this up and avoids
-      // Tesseract guessing letters that were never there.
-      return Tesseract.recognize(canvas, 'eng', {
-        tessedit_char_whitelist: '0123456789'
-      });
-    }).then(function (out) {
-      var digits = (out && out.data && out.data.text || '').replace(/[^0-9]/g, '');
-      btn.classList.remove('busy'); btn.disabled = false;
-      statusEl.textContent = 'Fill the box with the barcode, flat and close';
-      if (!digits) {
-        showToast('Couldn\u2019t read a number \u2014 try Type the number instead');
-        return;
-      }
-      var confirmed = window.prompt('Is this the right number?', digits);
-      if (confirmed === null) return;
-      confirmed = confirmed.trim();
-      if (confirmed) handleScanResult(confirmed);
-    }).catch(function (e) {
-      btn.classList.remove('busy'); btn.disabled = false;
-      statusEl.textContent = 'Fill the box with the barcode, flat and close';
-      showToast((e && e.message) || 'Number reader failed to load');
-    });
-  }
-  function setupScannerExtras() {
-    // Tap-to-focus / torch controls for phones that don't autofocus reliably.
-    var video = document.getElementById('scan-video');
-    var track = scanStream && scanStream.getVideoTracks && scanStream.getVideoTracks()[0];
-    if (!track) return;
-    var caps = track.getCapabilities ? track.getCapabilities() : {};
-    if (caps.torch) {
-      var torchBtn = document.getElementById('scan-torch-btn');
-      if (torchBtn) {
-        torchBtn.hidden = false;
-        var torchOn = false;
-        torchBtn.onclick = function () {
-          torchOn = !torchOn;
-          track.applyConstraints({ advanced: [{ torch: torchOn }] }).catch(function () {});
-          torchBtn.classList.toggle('active', torchOn);
-        };
-      }
-    }
-    if (caps.focusMode && caps.focusMode.indexOf('continuous') === -1 && caps.focusDistance) {
-      video.onclick = function () {
-        track.applyConstraints({ advanced: [{ focusMode: 'manual', focusDistance: caps.focusDistance.min }] }).catch(function () {});
-      };
-    }
-  }
-  function closeScanner() {
-    document.getElementById('scan-panel').hidden = true;
-    if (scanRAF) { cancelAnimationFrame(scanRAF); scanRAF = null; }
-    coreReader = null;
-    if (scanStream) { scanStream.getTracks().forEach(function (t) { try { t.stop(); } catch (e) {} }); scanStream = null; }
-    var video = document.getElementById('scan-video'); if (video) video.srcObject = null;
-    var torchBtn = document.getElementById('scan-torch-btn');
-    if (torchBtn) { torchBtn.hidden = true; torchBtn.classList.remove('active'); }
-  }
-  function promptManualBarcode() {
-    var code = window.prompt('Type the barcode number:');
-    if (code === null) return;
-    code = code.trim();
-    if (!code) return;
-    handleScanResult(code);
-  }
-  function handleScanResult(code) {
-    var now = Date.now();
-    if (code === lastScanCode && (now - lastScanAt) < 1500) return; // ignore rapid repeats of the same code
-    lastScanCode = code; lastScanAt = now;
-    hapticTick();
-    if (scanTarget === 'manage') {
-      document.getElementById('item-barcode-input').value = code;
-      document.getElementById('scan-status').textContent = 'Captured: ' + code;
-      setTimeout(closeScanner, 450);
-      return;
-    }
-    var item = items.find(function (i) { return i.barcode && i.barcode === code; });
-    if (!item) {
-      document.getElementById('scan-status').textContent = 'No item matches this barcode.';
-      showToast('No match for that barcode \u2014 add it from Manage');
-      return;
-    }
-    var mode = (item.single !== null && item.single !== undefined) ? 'single' : 'bulk';
-    if (mode === 'bulk' && isFractionalBulkProduct(item)) {
-      closeScanner();
-      openFractionSheet(item.id);
-      return;
-    }
-    addToCart(item.id, mode);
-    document.getElementById('scan-status').textContent = 'Added: ' + item.name;
-    showToast('Added ' + item.name);
-  }
   function renderManageList() {
     var ul = document.getElementById("manage-list");
     var empty = document.getElementById("manage-empty");
@@ -1790,7 +1492,7 @@
     showToast('Price list TXT ready');
   }
 
-  var APP_VERSION = 'v8.1';
+  var APP_VERSION = 'v8.5';
   var LAST_BACKUP_KEY = 'price-list-last-backup-v1';
   function isAppStorageKey(k) {
     return !!k && (k.indexOf('priceList') === 0 || k.indexOf('price-list-') === 0);
@@ -2221,19 +1923,24 @@
     renderCartOverview();
   }
 
+  function settlementArray(type) {
+    return type==='debt' ? unsettledDebts : type==='momo' ? momoPayments : changeOwed;
+  }
   function saveSettlements() {
     saveJson('price-list-unsettled-debts-v1', unsettledDebts);
     saveJson('price-list-change-owed-v1', changeOwed);
+    saveJson('price-list-momo-payments-v1', momoPayments);
   }
   function getReceiptSettlements(receiptNumber) {
     return {
       debt: unsettledDebts.find(function(x){ return x.receiptNumber===receiptNumber; }) || null,
-      change: changeOwed.find(function(x){ return x.receiptNumber===receiptNumber; }) || null
+      change: changeOwed.find(function(x){ return x.receiptNumber===receiptNumber; }) || null,
+      momo: momoPayments.find(function(x){ return x.receiptNumber===receiptNumber; }) || null
     };
   }
   function receiptStatusChipsHtml(receiptNumber) {
     var s = getReceiptSettlements(receiptNumber);
-    if (!s.change && !s.debt) return '';
+    if (!s.change && !s.debt && !s.momo) return '';
     var chips = '<div class="receipt-status-row">';
     var details = '<div class="receipt-status-details">';
     if (s.change) {
@@ -2244,12 +1951,16 @@
       chips += '<button type="button" class="status-chip debt" data-status-chip="debt" data-status-id="'+escapeHtml(String(s.debt.id))+'">Debt</button>';
       details += '<div class="status-detail-row debt"><span class="status-detail-label">Debt owed</span><span class="status-detail-amount">¢'+formatCedis(s.debt.amount)+'</span><button type="button" class="status-detail-settle" data-settle-chip="debt" data-status-id="'+escapeHtml(String(s.debt.id))+'">Settle</button></div>';
     }
+    if (s.momo) {
+      chips += '<button type="button" class="status-chip momo" data-status-chip="momo" data-status-id="'+escapeHtml(String(s.momo.id))+'">Momo</button>';
+      details += '<div class="status-detail-row momo"><span class="status-detail-label">Paid via Momo</span><span class="status-detail-amount">¢'+formatCedis(s.momo.amount)+'</span><button type="button" class="status-detail-settle" data-settle-chip="momo" data-status-id="'+escapeHtml(String(s.momo.id))+'">Clear</button></div>';
+    }
     chips += '</div>';
     details += '</div>';
     return chips + details;
   }
   function settleRecord(type, id) {
-    var arr = type==='debt' ? unsettledDebts : changeOwed;
+    var arr = settlementArray(type);
     var idx = arr.findIndex(function(x){ return String(x.id)===String(id); });
     if (idx < 0) return false;
     arr.splice(idx,1);
@@ -2259,11 +1970,11 @@
     return true;
   }
   function openStatusPopup(type, id) {
-    var arr = type==='debt' ? unsettledDebts : changeOwed;
+    var arr = settlementArray(type);
     var rec = arr.find(function(x){ return String(x.id)===String(id); });
     if (!rec) return;
     statusPopupType = type; statusPopupId = id;
-    document.getElementById('status-popup-title').textContent = type==='debt' ? 'Debt' : 'Change';
+    document.getElementById('status-popup-title').textContent = type==='debt' ? 'Debt' : type==='momo' ? 'Momo' : 'Change';
     document.getElementById('status-popup-amount').textContent = '¢'+formatCedis(rec.amount);
     document.getElementById('status-popup-overlay').hidden = false;
   }
@@ -2276,7 +1987,7 @@
     var type = statusPopupType;
     settleRecord(type, statusPopupId);
     closeStatusPopup();
-    showToast(type==='debt' ? 'Debt marked as paid' : 'Change marked as collected');
+    showToast(type==='debt' ? 'Debt marked as paid' : type==='momo' ? 'Momo entry cleared' : 'Change marked as collected');
   }
   function openReceiptActionMenu(receiptIndex) {
     var r=receipts[receiptIndex]; if(!r) return;
@@ -2287,15 +1998,15 @@
   function closeReceiptActionMenu() { receiptActionIndex=null; document.getElementById('receipt-action-panel').hidden=true; }
   function addSettlement(type) {
     var idx=receiptActionIndex, r=receipts[idx]; if(!r) return;
-    var label=type==='debt'?'Debt amount (¢)':'Change owed (¢)';
+    var label=type==='debt'?'Debt amount (¢)':type==='momo'?'Momo amount (¢)':'Change owed (¢)';
     var input=window.prompt(label,''); if(input===null) return;
     var amount=Number(input);
     if(!isFinite(amount) || amount<=0){ showToast('Enter a valid amount'); return; }
     var record={id:Date.now()+Math.random(),receiptNumber:r.number||'Receipt',receiptCreatedAt:r.createdAt||new Date().toISOString(),amount:Number(amount.toFixed(2)),createdAt:new Date().toISOString()};
-    if(type==='debt') unsettledDebts.unshift(record); else changeOwed.unshift(record);
+    settlementArray(type).unshift(record);
     saveSettlements();
     closeReceiptActionMenu();
-    showToast(type==='debt'?'Debt added':'Change added');
+    showToast(type==='debt'?'Debt added':type==='momo'?'Momo payment recorded':'Change added');
     renderSettlementList();
     renderHistory();
   }
@@ -2306,21 +2017,24 @@
   }
   function renderSettlementList() {
     var list=document.getElementById('settlement-list'); if(!list) return;
-    var isDebt=settlementView==='debt', data=isDebt?unsettledDebts:changeOwed;
-    document.getElementById('settlement-title').textContent='Unsettled Debts';
+    var type=settlementView, isDebt=type==='debt', isMomo=type==='momo', data=settlementArray(type);
+    document.getElementById('settlement-title').textContent = isDebt ? 'Unsettled Debts' : isMomo ? 'Momo Payments' : 'Change Owed';
     document.getElementById('settlement-debt-tab').classList.toggle('active',isDebt);
-    document.getElementById('settlement-change-tab').classList.toggle('active',!isDebt);
-    if(!data.length){ list.innerHTML='<div class="settlement-empty">No '+(isDebt?'unsettled debts':'change waiting to be collected')+'.</div>'; return; }
+    document.getElementById('settlement-change-tab').classList.toggle('active',type==='change');
+    document.getElementById('settlement-momo-tab').classList.toggle('active',isMomo);
+    var emptyLabel = isDebt ? 'unsettled debts' : isMomo ? 'momo payments recorded' : 'change waiting to be collected';
+    if(!data.length){ list.innerHTML='<div class="settlement-empty">No '+emptyLabel+'.</div>'; return; }
+    var actionLabel = isDebt ? 'Mark as paid' : isMomo ? 'Clear' : 'Mark as collected';
     list.innerHTML=data.map(function(x,i){
       var d=new Date(x.createdAt), when=isNaN(d.getTime())?'':d.toLocaleString([], {month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
-      return '<div class="settlement-item"><div class="settlement-item-top"><strong>'+escapeHtml(x.receiptNumber)+'</strong><span class="settlement-amount">¢'+formatCedis(x.amount)+'</span></div><div class="settlement-meta">Recorded '+escapeHtml(when)+'</div><button class="settlement-action" data-settlement-complete="'+i+'">'+(isDebt?'Mark as paid':'Mark as collected')+'</button></div>';
+      return '<div class="settlement-item"><div class="settlement-item-top"><strong>'+escapeHtml(x.receiptNumber)+'</strong><span class="settlement-amount">¢'+formatCedis(x.amount)+'</span></div><div class="settlement-meta">Recorded '+escapeHtml(when)+'</div><button class="settlement-action" data-settlement-complete="'+i+'">'+actionLabel+'</button></div>';
     }).join('');
   }
   function completeSettlement(index) {
-    var data=settlementView==='debt'?unsettledDebts:changeOwed; if(!data[index]) return;
+    var data=settlementArray(settlementView); if(!data[index]) return;
     var id=data[index].id;
     settleRecord(settlementView, id);
-    showToast(settlementView==='debt'?'Debt marked as paid':'Change marked as collected');
+    showToast(settlementView==='debt'?'Debt marked as paid':settlementView==='momo'?'Momo entry cleared':'Change marked as collected');
   }
 
   function restoreReceiptToCart(receiptIndex) {
@@ -2662,7 +2376,6 @@ function renderHistory(){
     document.getElementById("screen-history").classList.toggle("active", tab === "history");
     document.querySelectorAll(".tab-btn").forEach(function (b) { b.classList.toggle("active", b.dataset.tab === tab); });
     if(tab==='history') renderHistory();
-    if (!document.getElementById('scan-panel').hidden) closeScanner();
   }
 
   function editCartQuantity(key, value) {
@@ -2686,7 +2399,6 @@ function renderHistory(){
     document.getElementById("item-name-input").value = item.name;
     document.getElementById("item-bulk-input").value = (item.bulk !== null && item.bulk !== undefined) ? item.bulk : "";
     document.getElementById("item-single-input").value = (item.single !== null && item.single !== undefined) ? item.single : "";
-    document.getElementById("item-barcode-input").value = item.barcode || "";
     pendingPhoto = item.photo;
     if (item.photo) {
       document.getElementById("photo-picker").innerHTML = '<img src="' + item.photo + '" alt="">' +
@@ -2703,7 +2415,6 @@ function renderHistory(){
     document.getElementById("item-name-input").value = "";
     document.getElementById("item-bulk-input").value = "";
     document.getElementById("item-single-input").value = "";
-    document.getElementById("item-barcode-input").value = "";
     document.getElementById("photo-picker").innerHTML =
       '<input type="file" accept="image/*" id="photo-input" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>';
     pendingPhoto = null;
@@ -2721,16 +2432,11 @@ function renderHistory(){
     if (!name) return;
     var bulk = parsePriceField("item-bulk-input");
     var single = parsePriceField("item-single-input");
-    var barcode = document.getElementById("item-barcode-input").value.trim() || null;
-    if (barcode) {
-      var dup = items.find(function (i) { return i.barcode === barcode && i.id !== editingId; });
-      if (dup) showToast('Heads up: "' + dup.name + '" already uses this barcode');
-    }
     if (editingId !== null) {
       var idx = items.findIndex(function (i) { return i.id === editingId; });
-      if (idx !== -1) items[idx] = { id: editingId, name: name, bulk: bulk, single: single, photo: pendingPhoto, barcode: barcode };
+      if (idx !== -1) items[idx] = { id: editingId, name: name, bulk: bulk, single: single, photo: pendingPhoto };
     } else {
-      items.push({ id: Date.now(), name: name, bulk: bulk, single: single, photo: pendingPhoto, barcode: barcode });
+      items.push({ id: Date.now(), name: name, bulk: bulk, single: single, photo: pendingPhoto });
     }
     saveItems();
     renderManageList();
@@ -2858,11 +2564,6 @@ function renderHistory(){
     if (e.target.closest("#sheet-save-btn")) return handleSheetSave();
     if (e.target.closest("#sheet-delete-btn")) return handleSheetDelete();
     if (e.target.closest("#discount-btn")) return setDiscount();
-    if (e.target.closest("#scan-btn")) { openScanner('cart'); return; }
-    if (e.target.closest("#item-barcode-scan-btn")) { openScanner('manage'); return; }
-    if (e.target.closest("#scan-close")) { closeScanner(); return; }
-    if (e.target.closest("#scan-manual-btn")) { promptManualBarcode(); return; }
-    if (e.target.closest("#scan-capture-btn")) { captureAndReadNumber(); return; }
     var copyReceiptBtn=e.target.closest('[data-copy-receipt]');
     if(copyReceiptBtn){ e.stopPropagation(); return copyReceipt(Number(copyReceiptBtn.dataset.copyReceipt)); }
     var shareBtn=e.target.closest('[data-share-receipt]');
@@ -2879,11 +2580,13 @@ function renderHistory(){
     if (e.target.closest("#settlement-close") || e.target === document.getElementById('settlement-panel')) { document.getElementById('settlement-panel').hidden=true; return; }
     if (e.target.closest("#settlement-debt-tab")) { settlementView='debt'; renderSettlementList(); return; }
     if (e.target.closest("#settlement-change-tab")) { settlementView='change'; renderSettlementList(); return; }
+    if (e.target.closest("#settlement-momo-tab")) { settlementView='momo'; renderSettlementList(); return; }
     var settlementDone=e.target.closest('[data-settlement-complete]');
     if (settlementDone) { return completeSettlement(Number(settlementDone.dataset.settlementComplete)); }
     if (e.target.closest("#receipt-action-cancel") || e.target === document.getElementById('receipt-action-panel')) { closeReceiptActionMenu(); return; }
     if (e.target.closest("#receipt-add-debt-btn")) { return addSettlement('debt'); }
     if (e.target.closest("#receipt-add-change-btn")) { return addSettlement('change'); }
+    if (e.target.closest("#receipt-add-momo-btn")) { return addSettlement('momo'); }
     if (e.target.closest("#receipt-restore-btn")) { var ri=receiptActionIndex; closeReceiptActionMenu(); return restoreReceiptToCart(ri); }
     if (e.target.closest("#copy-all-receipts-btn")) return copyAllReceipts();
     if (e.target.closest("#paste-receipts-btn")) return openReceiptImport();
@@ -2912,7 +2615,7 @@ function renderHistory(){
     var settleChip=e.target.closest('[data-settle-chip]');
     if (settleChip) {
       var settled = settleRecord(settleChip.dataset.settleChip, settleChip.dataset.statusId);
-      if (settled) showToast(settleChip.dataset.settleChip==='debt' ? 'Debt marked as paid' : 'Change marked as collected');
+      if (settled) showToast(settleChip.dataset.settleChip==='debt' ? 'Debt marked as paid' : settleChip.dataset.settleChip==='momo' ? 'Momo entry cleared' : 'Change marked as collected');
       return;
     }
     var historyCard=e.target.closest('[data-history-index]');
