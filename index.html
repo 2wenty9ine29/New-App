@@ -259,6 +259,23 @@
   .receipt-history-head { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:12px; }
   .receipt-history-head h2 { margin:0; font-size:18px; }
   .receipt-history-close { width:32px; height:32px; border:0; border-radius:50%; background:var(--paper); color:var(--ink); font-size:20px; line-height:1; }
+
+  /* Polished receipt action sheet */
+  .receipt-action-panel { position:fixed; inset:0; z-index:130; background:rgba(0,0,0,.52); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); display:flex; align-items:center; justify-content:center; padding:20px; }
+  .receipt-action-card { width:min(430px,100%); box-sizing:border-box; background:var(--surface); color:var(--ink); border:1px solid var(--line); border-radius:24px; padding:20px; box-shadow:0 22px 60px rgba(0,0,0,.28); }
+  .receipt-action-head { display:flex; align-items:center; justify-content:space-between; gap:14px; margin-bottom:18px; }
+  .receipt-action-kicker { font-size:10px; font-weight:800; letter-spacing:.12em; color:var(--ink-soft); margin-bottom:3px; }
+  .receipt-action-card h2 { margin:0; font-size:22px; line-height:1.15; }
+  .receipt-action-close { flex:0 0 auto; width:38px; height:38px; border:0; border-radius:50%; background:var(--paper); color:var(--ink); font-size:28px; line-height:1; display:flex; align-items:center; justify-content:center; }
+  .receipt-action-close:active { transform:scale(.94); }
+  .receipt-action-list { display:grid; gap:10px; }
+  .receipt-action-btn { width:100%; min-height:58px; border:1px solid var(--line); border-radius:15px; padding:12px 15px; background:var(--paper); color:var(--ink); display:flex; align-items:center; gap:12px; text-align:left; font-size:17px; font-weight:750; letter-spacing:-.01em; }
+  .receipt-action-btn .action-icon { width:34px; height:34px; flex:0 0 34px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:800; background:var(--surface); color:var(--ink); }
+  .receipt-action-btn.debt .action-icon { color:var(--gold); }
+  .receipt-action-btn.change .action-icon { color:#0ea5e9; }
+  .receipt-action-btn.restore .action-icon { color:#8b5cf6; }
+  .receipt-action-btn:active { transform:scale(.985); }
+
   .receipt-history-list { display:grid; gap:8px; }
   .receipt-history-item { border:1px solid var(--line); border-radius:14px; padding:10px 11px; background:var(--paper); }
   .receipt-history-item .rh-top { display:flex; justify-content:space-between; gap:8px; align-items:center; }
@@ -672,7 +689,7 @@
     <header>
       <div class="history-header">
         <div><h1>History</h1><p>Last 3 receipts</p></div>
-        <button class="history-receipt-btn" id="receipt-history-btn" aria-label="View last 20 receipts">▤ Receipts 20</button>
+        <button class="history-receipt-btn" id="receipt-history-btn" aria-label="View available receipts">▤ Receipts <span id="receipt-count">0</span></button>
       </div>
     </header>
     <button class="theme-toggle history-theme-toggle" id="theme-toggle" aria-label="Switch light or dark mode">☾</button>
@@ -709,13 +726,17 @@
 
   <div class="receipt-action-panel" id="receipt-action-panel" hidden>
     <div class="receipt-action-card">
-      <h2 id="receipt-action-title">Receipt actions</h2>
-      <p>Choose what you want to record for this receipt.</p>
+      <div class="receipt-action-head">
+        <div>
+          <div class="receipt-action-kicker">RECEIPT</div>
+          <h2 id="receipt-action-title">Receipt #0000</h2>
+        </div>
+        <button class="receipt-action-close" id="receipt-action-cancel" aria-label="Close">×</button>
+      </div>
       <div class="receipt-action-list">
-        <button class="receipt-action-btn primary" id="receipt-add-debt-btn">Add Debt</button>
-        <button class="receipt-action-btn primary" id="receipt-add-change-btn">Add Change</button>
-        <button class="receipt-action-btn" id="receipt-restore-btn">Restore to Cart</button>
-        <button class="receipt-action-btn" id="receipt-action-cancel">Cancel</button>
+        <button class="receipt-action-btn debt" id="receipt-add-debt-btn"><span class="action-icon">₵</span><span>Add Debt</span></button>
+        <button class="receipt-action-btn change" id="receipt-add-change-btn"><span class="action-icon">↩</span><span>Add Change</span></button>
+        <button class="receipt-action-btn restore" id="receipt-restore-btn"><span class="action-icon">↻</span><span>Restore to Cart</span></button>
       </div>
     </div>
   </div>
@@ -1687,7 +1708,7 @@
   function openReceiptActionMenu(receiptIndex) {
     var r=receipts[receiptIndex]; if(!r) return;
     receiptActionIndex=receiptIndex;
-    document.getElementById('receipt-action-title').textContent=(r.number||'Receipt')+' · Actions';
+    document.getElementById('receipt-action-title').textContent=(r.number||'Receipt');
     document.getElementById('receipt-action-panel').hidden=false;
   }
   function closeReceiptActionMenu() { receiptActionIndex=null; document.getElementById('receipt-action-panel').hidden=true; }
@@ -1963,10 +1984,18 @@ function renderHistory(){
       }).join('');
       return '<div class="history-card" data-history-index="'+idx+'" data-receipt-index="'+idx+'"><div class="history-top"><span class="history-receipt">'+escapeHtml(r.number)+'</span><span class="history-total">¢'+formatCedis(r.total)+'</span></div><div class="history-meta">'+when+'</div><ul class="history-items">'+itemsHtml+'</ul><button class="receipt-history-share" data-share-receipt="'+idx+'">Share receipt</button><button class="receipt-copy-btn" data-copy-receipt="'+idx+'">Copy</button></div>';
     }).join('');
+    updateReceiptCount();
     renderReceiptHistory();
     updateChangeCalculator();
   }
+  function updateReceiptCount(){
+    var countEl=document.getElementById('receipt-count');
+    if(countEl) countEl.textContent=String(receipts.length);
+    var btn=document.getElementById('receipt-history-btn');
+    if(btn) btn.setAttribute('aria-label','View '+receipts.length+' available receipts');
+  }
   function renderReceiptHistory(){
+    updateReceiptCount();
     var list=document.getElementById('receipt-history-list'); if(!list) return;
     if(!receipts.length){ list.innerHTML='<div class="history-empty">No completed sales yet.</div>'; return; }
     list.innerHTML=receipts.map(function(r){
