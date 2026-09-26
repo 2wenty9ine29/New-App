@@ -14,7 +14,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="apple-touch-icon" href="icon-180.png">
-<title>Price List · V8.5</title>
+<title>Price List · V8.6</title>
 <style>
   :root {
     color-scheme: light;
@@ -209,12 +209,45 @@
     font-size: 16px; line-height: 1; padding: 0; z-index: 2;
   }
   .search-clear.visible { display: flex; }
-  .catalog-wrap { flex: 1 1 auto; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 0 20px; border-bottom: 1px solid var(--line); }
-  /* Cart area on the Sell screen is capped rather than left to expand and
-     fill whatever's left over (which used to leave blank space when the
-     cart was empty). Scoped to the Sell screen only so Manage/History,
-     which reuse .scroll-area, are unaffected. */
-  #screen-sell .scroll-area { flex: 0 1 auto; max-height: 40dvh; min-height: 0; }
+  /* Sell layout: split the space left between the search/switcher and the
+     pinned total evenly between the item catalog and the cart. Both panes
+     scroll internally, so neither section can steal space from the other. */
+  /* Sell workspace: the catalog and the entire cart section get exactly
+     half of the flexible middle height. The total bar remains pinned. */
+  #screen-sell {
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr) minmax(0, 1fr) auto;
+    min-height: 0;
+  }
+  .catalog-wrap {
+    min-height: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 0 20px 8px;
+    border-bottom: 1px solid var(--line);
+  }
+  .cart-panel {
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  #screen-sell .scroll-area {
+    flex: 1 1 auto;
+    min-height: 0;
+    max-height: none;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  #screen-sell #cart-empty {
+    min-height: 100%;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px 24px;
+  }
   .cart-heading { padding: 10px 20px 4px; font-size: 12px; font-weight: 650; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.04em; flex-shrink: 0; }
 
   .cart-bar {
@@ -643,7 +676,7 @@
      sections so product names remain readable instead of wrapping letter-by-letter. */
   @media (max-width: 360px) {
     .sale-columns { grid-template-columns: 1fr; gap: 12px; }
-    .catalog-wrap { max-height: 42dvh; }
+    .catalog-wrap { max-height: none; }
     .sale-column-heading { padding: 9px 12px 7px; }
     .sale-column-heading strong { font-size: 13px; }
     .sale-column-heading small { font-size: 9.5px; }
@@ -777,19 +810,21 @@
         </div>
       </div>
     </div>
-    <div class="cart-switcher" aria-label="Choose cart">
-      <button class="cart-switch active" id="cart-1-btn" data-cart-switch="0">Cart 1</button>
-      <button class="cart-switch small" id="cart-2-btn" data-cart-switch="1">Cart 2</button>
-      <button class="discount-btn" id="discount-btn">DISCOUNT</button>
-    </div>
-    <div class="scroll-area">
-      <ul class="rows" id="cart-list"></ul>
-      <div class="empty-state" id="cart-empty">
-        <div class="empty-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 2-1.58l1.65-7.42H5.12"/></svg>
+    <div class="cart-panel">
+      <div class="cart-switcher" aria-label="Choose cart">
+        <button class="cart-switch active" id="cart-1-btn" data-cart-switch="0">Cart 1</button>
+        <button class="cart-switch small" id="cart-2-btn" data-cart-switch="1">Cart 2</button>
+        <button class="discount-btn" id="discount-btn">DISCOUNT</button>
+      </div>
+      <div class="scroll-area">
+        <ul class="rows" id="cart-list"></ul>
+        <div class="empty-state" id="cart-empty">
+          <div class="empty-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 2-1.58l1.65-7.42H5.12"/></svg>
+          </div>
+          <p class="title">Cart is empty</p>
+          <p class="body">Tap an item above to add it to this sale.</p>
         </div>
-        <p class="title">Cart is empty</p>
-        <p class="body">Tap an item above to add it to this sale.</p>
       </div>
     </div>
     <div class="cart-bar">
@@ -1492,7 +1527,7 @@
     showToast('Price list TXT ready');
   }
 
-  var APP_VERSION = 'v8.5';
+  var APP_VERSION = 'v8.6';
   var LAST_BACKUP_KEY = 'price-list-last-backup-v1';
   function isAppStorageKey(k) {
     return !!k && (k.indexOf('priceList') === 0 || k.indexOf('price-list-') === 0);
