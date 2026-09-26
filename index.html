@@ -214,10 +214,16 @@
      scroll internally, so neither section can steal space from the other. */
   /* Sell workspace: the catalog and the entire cart section get exactly
      half of the flexible middle height. The total bar remains pinned. */
+  /* Keep the Sell screen hidden unless it is the active tab. The ID selector
+     is more specific than .screen.active, so the active state must explicitly
+     switch it back to grid; otherwise Sell can leak into Manage/History. */
   #screen-sell {
-    display: grid;
+    display: none;
     grid-template-rows: auto minmax(0, 1fr) minmax(0, 1fr) auto;
     min-height: 0;
+  }
+  #screen-sell.active {
+    display: grid;
   }
   .catalog-wrap {
     min-height: 0;
