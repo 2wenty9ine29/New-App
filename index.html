@@ -11,7 +11,7 @@
 <meta name="theme-color" content="#F6F5F0" id="theme-color-meta">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-180.png">
-<title>Price List</title>
+<title>Price List · V6</title>
 <style>
   :root {
     color-scheme: light;
@@ -27,29 +27,29 @@
     --line: #E6E2D8;
   }
   body.dark {
-    --paper: #0B1020; --surface: #111827; --ink: #E5E7EB; --ink-soft: #9CA3AF;
-    --gold: #F59E0B; --gold-bright: #F59E0B; --gold-soft: #33240A; --green: #10B981;
-    --brick: #EF4444; --line: #263244;
-    --blue: #3B82F6; --violet: #8B5CF6; --cyan: #06B6D4; --pink: #EC4899;
-    --orange: #F97316; --lime: #84CC16; --sky: #38BDF8; --fuchsia: #D946EF;
-    --soft-white: #E5E7EB;
+    --paper: #080808; --surface: #2D2D2D; --ink: #F4F4F4; --ink-soft: #A9A9A9;
+    --gold: #F5A000; --gold-bright: #F5A000; --gold-soft: #3A2B12; --green: #16B892;
+    --brick: #E84B43; --line: #414141;
+    --blue: #536875; --violet: #6F63A8; --cyan: #1597C7; --pink: #D95B92;
+    --orange: #F08A00; --lime: #86A84D; --sky: #5D8FA7; --fuchsia: #B45BC7;
+    --soft-white: #F4F4F4;
   }
-  body.dark .sale-column { background: rgba(17,24,39,.94); }
-  body.dark .sale-column-heading { background: var(--surface); }
-  body.dark .minus-btn, body.dark .add-indicator { background: #172033; }
-  body.dark .row[data-edit]:active, body.dark .row[data-add]:active { background: #17284A; }
-  body.dark .empty-icon { background: #1E2A44; }
-  body.dark #sell-search { box-shadow: 0 4px 14px rgba(0,0,0,.24); }
-  body.dark .clear-btn { background: #2a2a2e; border-color: #2a2a2e; color: var(--soft-white); }
-  body.dark .complete-btn { background: var(--blue); }
-  body.dark .theme-toggle { color: var(--cyan); }
-  body.dark .tab-btn.active { color: var(--violet); background: rgba(139,92,246,.16); }
+  body.dark .sale-column { background: #111111; }
+  body.dark .sale-column-heading { background: #2D2D2D; }
+  body.dark .minus-btn, body.dark .add-indicator { background: #3A4650; }
+  body.dark .row[data-edit]:active, body.dark .row[data-add]:active { background: #3A3A3A; }
+  body.dark .empty-icon { background: #394B56; }
+  body.dark #sell-search { box-shadow: 0 4px 14px rgba(0,0,0,.30); }
+  body.dark .clear-btn { background: #333333; border-color: #4A4A4A; color: var(--soft-white); }
+  body.dark .complete-btn { background: #4F6572; }
+  body.dark .theme-toggle { color: #F5A000; }
+  body.dark .tab-btn.active { color: #F5A000; background: rgba(245,160,0,.14); }
 
-  body.dark .bulk-dot { background: #10B981; box-shadow: 0 0 0 4px rgba(16,185,129,.13); }
-  body.dark .single-dot { background: #F59E0B; box-shadow: 0 0 0 4px rgba(245,158,11,.14); }
-  body.dark .sale-column .catalog-status { color: #F59E0B; }
-  body.dark .sale-column .add-indicator { color: #F59E0B; }
-  body.dark .remove-btn, body.dark .delete-link { color: #EF4444; }
+  body.dark .bulk-dot { background: #16B892; box-shadow: 0 0 0 4px rgba(22,184,146,.13); }
+  body.dark .single-dot { background: #F5A000; box-shadow: 0 0 0 4px rgba(245,160,0,.14); }
+  body.dark .sale-column .catalog-status { color: #F5A000; }
+  body.dark .sale-column .add-indicator { color: #F5A000; }
+  body.dark .remove-btn, body.dark .delete-link { color: #E84B43; }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   html, body {
     margin: 0; padding: 0; height: 100%;
@@ -215,7 +215,7 @@
   }
   .clear-btn:active { background: rgba(255,255,255,0.12); }
   .cart-actions { display: flex; align-items: center; gap: 8px; }
-  .discount-btn { background: rgba(255,255,255,0.10); border: 1px solid rgba(255,255,255,0.48); color:#fff; padding:7px 12px; border-radius:999px; font-size:12px; font-weight:650; }
+  .discount-btn { background: #2D2D2D; border: 1px solid #2D2D2D; color:#fff; padding:7px 12px; border-radius:999px; font-size:12px; font-weight:650; }
   .discount-btn.active { background:var(--gold); border-color:var(--gold); }
   .discount-line { display:none; font-size:11px; color:#fff; opacity:.9; margin-top:2px; }
   .discount-line.show { display:block; }
@@ -700,8 +700,31 @@
       <div class="receipt-tools">
         <button class="receipt-tool-btn" id="copy-all-receipts-btn">Copy receipts</button>
         <button class="receipt-tool-btn" id="paste-receipts-btn">Paste receipts</button>
+        <button class="receipt-tool-btn" id="unsettled-debts-btn">Unsettled Debts</button>
+        <button class="receipt-tool-btn" id="change-owed-btn">Change Owed</button>
       </div>
       <div class="receipt-history-list" id="receipt-history-list"></div>
+    </div>
+  </div>
+
+  <div class="receipt-action-panel" id="receipt-action-panel" hidden>
+    <div class="receipt-action-card">
+      <h2 id="receipt-action-title">Receipt actions</h2>
+      <p>Choose what you want to record for this receipt.</p>
+      <div class="receipt-action-list">
+        <button class="receipt-action-btn primary" id="receipt-add-debt-btn">Add Debt</button>
+        <button class="receipt-action-btn primary" id="receipt-add-change-btn">Add Change</button>
+        <button class="receipt-action-btn" id="receipt-restore-btn">Restore to Cart</button>
+        <button class="receipt-action-btn" id="receipt-action-cancel">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="settlement-panel" id="settlement-panel" hidden>
+    <div class="settlement-card">
+      <div class="settlement-head"><h2 id="settlement-title">Unsettled Debts</h2><button class="receipt-history-close" id="settlement-close" aria-label="Close">×</button></div>
+      <div class="settlement-tabs"><button class="settlement-tab active" id="settlement-debt-tab">Unsettled Debts</button><button class="settlement-tab" id="settlement-change-tab">Change Owed</button></div>
+      <div class="settlement-list" id="settlement-list"></div>
     </div>
   </div>
 
@@ -844,77 +867,110 @@
   var CART_STORAGE_KEY = "priceListCarts_v2";
 
   var defaultItems = [
-    {id:1,name:"Angel Cola",bulk:41.00,single:4.00},
-    {id:2,name:"Awake 1L (Large)",bulk:8.00,single:null},
-    {id:3,name:"Awake (Tiny Bottles)",bulk:25.00,single:null},
-    {id:4,name:"Awake (Small)",bulk:35.00,single:3.00},
-    {id:5,name:"Awake (Medium)",bulk:45.00,single:4.00},
-    {id:6,name:"Bel Active",bulk:50.00,single:6.00},
-    {id:7,name:"Bel Aqua (Small)",bulk:35.00,single:null},
-    {id:8,name:"Bel Aqua (Medium)",bulk:45.00,single:null},
-    {id:9,name:"Bel Aqua (1 Litre)",bulk:45.00,single:null},
-    {id:10,name:"Bel Cola",bulk:45.00,single:4.00},
-    {id:11,name:"Beta Malt",bulk:95.00,single:null},
-    {id:12,name:"Bigoo",bulk:50.00,single:4.00},
-    {id:13,name:"Breeze",bulk:47.00,single:null},
-    {id:14,name:"Can Coke",bulk:165.00,single:null},
-    {id:15,name:"Can Fanta",bulk:165.00,single:null},
-    {id:16,name:"Can Malt Ghana (Slim)",bulk:240.00,single:14.00},
-    {id:17,name:"Can Malt Nigeria",bulk:190.00,single:10.00},
-    {id:18,name:"Ceres (Medium)",bulk:16.00,single:null},
-    {id:19,name:"Ceres (Large)",bulk:35.00,single:null},
-    {id:65,name:"Frutelli Large",bulk:30.00,single:null},
-    {id:20,name:"ChocoMalt",bulk:75.00,single:null},
-    {id:64,name:"ChocoMalt (Small)",bulk:52.00,single:null},
-      {id:65,name:"Frutelli Large",bulk:30.00,single:null},
-    {id:21,name:"Coke Bottle (Large)",bulk:25.00,single:null},
-    {id:22,name:"Coke Bottle (Medium, 450ml)",bulk:90.00,single:null},
-    {id:23,name:"Coke Bottle (Small)",bulk:65.00,single:null},
-    {id:24,name:"Communion Wine",bulk:40.00,single:null},
-    {id:25,name:"Dj Cocktail",bulk:40.00,single:null},
-    {id:26,name:"Don Simon (Large, 1L)",bulk:30.00,single:30.00},
-    {id:27,name:"Don Simon (Medium)",bulk:17.00,single:null},
-    {id:28,name:"Eden (Medium)",bulk:45.00,single:null},
-    {id:29,name:"Fanta Bottle",bulk:65.00,single:9.00},
-    {id:30,name:"Fruitful Grapes",bulk:15.00,single:null},
-    {id:31,name:"Jingo",bulk:40.00,single:null},
-    {id:32,name:"Kaesar",bulk:50.00,single:null},
-    {id:33,name:"Kalyppo",bulk:97.00,single:5.00},
-    {id:34,name:"Kangen (Small)",bulk:30.00,single:null},
-    {id:35,name:"Kangen (Big)",bulk:30.00,single:null},
-    {id:36,name:"Lucozade (Per 6)",bulk:80.00,single:null},
-    {id:37,name:"Malt Guinness Bottle",bulk:120.00,single:null},
-    {id:38,name:"Multi Fruit (Big Red)",bulk:75.00,single:null},
-    {id:39,name:"Multi Fruit (Small)",bulk:null,single:null},
-    {id:40,name:"Multi Fruit Kiki (Per 6)",bulk:20.00,single:null},
-    {id:41,name:"Niche",bulk:null,single:6.00},
-    {id:42,name:"Perla",bulk:35.00,single:null},
-    {id:43,name:"PET Malt",bulk:120.00,single:null},
-    {id:44,name:"Planet",bulk:42.00,single:4.00},
-    {id:45,name:"Puma Cola",bulk:42.00,single:null},
-    {id:46,name:"Rendez Vous",bulk:35.00,single:null},
-    {id:47,name:"Royal Apple and Drinks",bulk:45.00,single:null},
-    {id:48,name:"Run",bulk:72.00,single:null},
-    {id:49,name:"Squeeze",bulk:50.00,single:4.00},
-    {id:50,name:"Storm (Big)",bulk:75.00,single:7.00},
-    {id:51,name:"Storm (Small)",bulk:52.00,single:5.00},
-    {id:52,name:"Tampico (Medium)",bulk:67.00,single:null},
-    {id:53,name:"U-Fresh Choco or Soy",bulk:67.00,single:null},
-    {id:54,name:"U-Fresh Grapes (Medium)",bulk:38.00,single:null},
-    {id:55,name:"Verna 36 (Small)",bulk:60.00,single:null},
-    {id:56,name:"Vitamilk (Singles-14)",bulk:80.00,single:14.00},
-    {id:57,name:"Vitamilk Kallypo Champion (Per 6)",bulk:25.00,single:null},
-    {id:58,name:"Voltic (Medium)",bulk:35.00,single:null},
-    {id:59,name:"Voltic (Big)",bulk:35.00,single:8.00},
-    {id:60,name:"Wheat Drink (Medium)",bulk:160.00,single:null},
-    {id:61,name:"5 Star",bulk:47.00,single:5.00},
-    {id:62,name:"Blue Jeans (Per 6)",bulk:115.00,single:null},
-    {id:63,name:"Lucozade Bottle and Can (Per 6)",bulk:115.00,single:null}
+    {id:1,name:"Angel Cola",bulk:41,single:4 },
+    {id:2,name:"Awake 1L (Large)",bulk:null,single:8 },
+    {id:3,name:"Awake (Tiny Bottles)",bulk:25,single:null },
+    {id:4,name:"Awake (Small)",bulk:35,single:3 },
+    {id:5,name:"Awake (Medium)",bulk:45,single:4 },
+    {id:6,name:"Bel Active",bulk:50,single:6 },
+    {id:7,name:"Bel Aqua (Small)",bulk:30,single:null },
+    {id:8,name:"Bel Aqua (Medium)",bulk:45,single:4 },
+    {id:9,name:"Bel Aqua (1 Litre)",bulk:45,single:null },
+    {id:10,name:"Bel Cola",bulk:45,single:4 },
+    {id:11,name:"Beta Malt",bulk:95,single:null },
+    {id:12,name:"Bigoo",bulk:50,single:4 },
+    {id:13,name:"Breeze",bulk:47,single:null },
+    {id:14,name:"Can Coke",bulk:165,single:8 },
+    {id:15,name:"Can Fanta",bulk:165,single:8 },
+    {id:16,name:"Can Malt Ghana (Slim)",bulk:240,single:14 },
+    {id:17,name:"Can Malt Nigeria",bulk:190,single:10 },
+    {id:18,name:"Ceres (Medium)",bulk:16,single:null },
+    {id:19,name:"Ceres (Large)",bulk:35,single:null },
+    {id:20,name:"ChocoMalt",bulk:75,single:null },
+    {id:64,name:"ChocoMalt (Small)",bulk:52,single:null },
+    {id:21,name:"Coke Bottle 1L (Large)",bulk:null,single:25 },
+    {id:22,name:"Coke Bottle (Medium, 450ml)",bulk:90,single:null },
+    {id:23,name:"Coke Bottle (Small)",bulk:65,single:null },
+    {id:24,name:"Communion Wine ( Wine )",bulk:40,single:null },
+    {id:25,name:"Dj Cocktail",bulk:40,single:null },
+    {id:26,name:"Don Simon (Large, 1L)",bulk:30,single:30 },
+    {id:27,name:"Don Simon (Medium)",bulk:15,single:null },
+    {id:28,name:"Eden (Medium)",bulk:45,single:null },
+    {id:29,name:"Fanta Bottle",bulk:65,single:9 },
+    {id:30,name:"Fruitfun Grapes",bulk:15,single:null },
+    {id:31,name:"Jingo",bulk:40,single:null },
+    {id:32,name:"Kaesar",bulk:50,single:null },
+    {id:33,name:"Kalyppo",bulk:97,single:5 },
+    {id:34,name:"Kangen (Small)",bulk:30,single:null },
+    {id:35,name:"Kangen (Big)",bulk:30,single:null },
+    {id:36,name:"Lucozade (Per 6)",bulk:80,single:null },
+    {id:37,name:"Malt Guinness Bottle",bulk:120,single:null },
+    {id:38,name:"Multi Fruit (Big Red)",bulk:75,single:null },
+    {id:39,name:"Multi Fruit (Small)",bulk:null,single:null },
+    {id:40,name:"Multi Fruit Kiki (Per 6)",bulk:20,single:null },
+    {id:42,name:"Perla",bulk:35,single:null },
+    {id:43,name:"PET Malt",bulk:120,single:11 },
+    {id:44,name:"Planet",bulk:42,single:4 },
+    {id:45,name:"Puma Cola",bulk:42,single:null },
+    {id:46,name:"Rendez Vous (Champagne)",bulk:35,single:null },
+    {id:47,name:"Royal Apple and Drinks",bulk:45,single:null },
+    {id:48,name:"Run (Large)",bulk:70,single:null },
+    {id:49,name:"Squeeze",bulk:50,single:4 },
+    {id:50,name:"Storm (Large)",bulk:75,single:7 },
+    {id:51,name:"Storm (Small)",bulk:52,single:5 },
+    {id:52,name:"Tampico (Medium)",bulk:67,single:null },
+    {id:53,name:"U-Fresh Choco or Soy",bulk:67,single:null },
+    {id:54,name:"U-Fresh Grapes (Medium)",bulk:38,single:null },
+    {id:55,name:"Verna 36 (Small)",bulk:60,single:null },
+    {id:56,name:"Vitamilk (Bottle)",bulk:80,single:14 },
+    {id:57,name:"Vitamilk Kallypo Champion (Per 6)",bulk:25,single:null },
+    {id:58,name:"Voltic (Medium)",bulk:35,single:null },
+    {id:59,name:"Voltic (Big)",bulk:35,single:8 },
+    {id:60,name:"Wheat Drink (Medium)",bulk:160,single:null },
+    {id:61,name:"5 Star (small)",bulk:47,single:5 },
+    {id:62,name:"Blue Jeans (Per 6)",bulk:115,single:null },
+    {id:63,name:"Lucozade Bottle and Can (Per 6)",bulk:115,single:null },
+    {id:1789024028868,name:"Milo (Can per 6)",bulk:80,single:14 },
+    {id:1789024106241,name:"Niche (per 6)",bulk:35,single:6 },
+    {id:1789050609250,name:"Fanta Bottle 1L (Large)",bulk:null,single:25 },
+    {id:1789050625457,name:"Sprite Bottle 1L (Large)",bulk:null,single:25 },
+    {id:1789052873689,name:"Run (Small)",bulk:45,single:null },
+    {id:1789672465732,name:"Malt - 5 Star",bulk:55,single:null },
+    {id:1789832810515,name:"Senak Pink (Champagne)",bulk:47,single:null },
+    {id:1790013085865,name:"Frutelli (Large)",bulk:30,single:null },
+    {id:65,name:"Frutelli Large",bulk:30,single:null },
+    {id:1790187089255,name:"Alvaro",bulk:null,single:10 },
+    {id:1790187245575,name:"Festival (Champagne)",bulk:35,single:null }
   ];
   defaultItems.forEach(function(i){ i.photo = null; });
 
   var items = loadItems();
   ensureLatestItems();
+
+  // Version 6 price sync: apply the supplied 26-09 price list by product ID.
+  // Existing custom photos are preserved; custom products not in the supplied list remain untouched.
+  function syncV6Prices() {
+    var changed = false;
+    var latest = [{"id":1,"name":"Angel Cola","bulk":41,"single":4},{"id":2,"name":"Awake 1L (Large)","bulk":null,"single":8},{"id":3,"name":"Awake (Tiny Bottles)","bulk":25,"single":null},{"id":4,"name":"Awake (Small)","bulk":35,"single":3},{"id":5,"name":"Awake (Medium)","bulk":45,"single":4},{"id":6,"name":"Bel Active","bulk":50,"single":6},{"id":7,"name":"Bel Aqua (Small)","bulk":30,"single":null},{"id":8,"name":"Bel Aqua (Medium)","bulk":45,"single":4},{"id":9,"name":"Bel Aqua (1 Litre)","bulk":45,"single":null},{"id":10,"name":"Bel Cola","bulk":45,"single":4},{"id":11,"name":"Beta Malt","bulk":95,"single":null},{"id":12,"name":"Bigoo","bulk":50,"single":4},{"id":13,"name":"Breeze","bulk":47,"single":null},{"id":14,"name":"Can Coke","bulk":165,"single":8},{"id":15,"name":"Can Fanta","bulk":165,"single":8},{"id":16,"name":"Can Malt Ghana (Slim)","bulk":240,"single":14},{"id":17,"name":"Can Malt Nigeria","bulk":190,"single":10},{"id":18,"name":"Ceres (Medium)","bulk":16,"single":null},{"id":19,"name":"Ceres (Large)","bulk":35,"single":null},{"id":20,"name":"ChocoMalt","bulk":75,"single":null},{"id":64,"name":"ChocoMalt (Small)","bulk":52,"single":null},{"id":21,"name":"Coke Bottle 1L (Large)","bulk":null,"single":25},{"id":22,"name":"Coke Bottle (Medium, 450ml)","bulk":90,"single":null},{"id":23,"name":"Coke Bottle (Small)","bulk":65,"single":null},{"id":24,"name":"Communion Wine ( Wine )","bulk":40,"single":null},{"id":25,"name":"Dj Cocktail","bulk":40,"single":null},{"id":26,"name":"Don Simon (Large, 1L)","bulk":30,"single":30},{"id":27,"name":"Don Simon (Medium)","bulk":15,"single":null},{"id":28,"name":"Eden (Medium)","bulk":45,"single":null},{"id":29,"name":"Fanta Bottle","bulk":65,"single":9},{"id":30,"name":"Fruitfun Grapes","bulk":15,"single":null},{"id":31,"name":"Jingo","bulk":40,"single":null},{"id":32,"name":"Kaesar","bulk":50,"single":null},{"id":33,"name":"Kalyppo","bulk":97,"single":5},{"id":34,"name":"Kangen (Small)","bulk":30,"single":null},{"id":35,"name":"Kangen (Big)","bulk":30,"single":null},{"id":36,"name":"Lucozade (Per 6)","bulk":80,"single":null},{"id":37,"name":"Malt Guinness Bottle","bulk":120,"single":null},{"id":38,"name":"Multi Fruit (Big Red)","bulk":75,"single":null},{"id":39,"name":"Multi Fruit (Small)","bulk":null,"single":null},{"id":40,"name":"Multi Fruit Kiki (Per 6)","bulk":20,"single":null},{"id":42,"name":"Perla","bulk":35,"single":null},{"id":43,"name":"PET Malt","bulk":120,"single":11},{"id":44,"name":"Planet","bulk":42,"single":4},{"id":45,"name":"Puma Cola","bulk":42,"single":null},{"id":46,"name":"Rendez Vous (Champagne)","bulk":35,"single":null},{"id":47,"name":"Royal Apple and Drinks","bulk":45,"single":null},{"id":48,"name":"Run (Large)","bulk":70,"single":null},{"id":49,"name":"Squeeze","bulk":50,"single":4},{"id":50,"name":"Storm (Large)","bulk":75,"single":7},{"id":51,"name":"Storm (Small)","bulk":52,"single":5},{"id":52,"name":"Tampico (Medium)","bulk":67,"single":null},{"id":53,"name":"U-Fresh Choco or Soy","bulk":67,"single":null},{"id":54,"name":"U-Fresh Grapes (Medium)","bulk":38,"single":null},{"id":55,"name":"Verna 36 (Small)","bulk":60,"single":null},{"id":56,"name":"Vitamilk (Bottle)","bulk":80,"single":14},{"id":57,"name":"Vitamilk Kallypo Champion (Per 6)","bulk":25,"single":null},{"id":58,"name":"Voltic (Medium)","bulk":35,"single":null},{"id":59,"name":"Voltic (Big)","bulk":35,"single":8},{"id":60,"name":"Wheat Drink (Medium)","bulk":160,"single":null},{"id":61,"name":"5 Star (small)","bulk":47,"single":5},{"id":62,"name":"Blue Jeans (Per 6)","bulk":115,"single":null},{"id":63,"name":"Lucozade Bottle and Can (Per 6)","bulk":115,"single":null},{"id":1789024028868,"name":"Milo (Can per 6)","bulk":80,"single":14},{"id":1789024106241,"name":"Niche (per 6)","bulk":35,"single":6},{"id":1789050609250,"name":"Fanta Bottle 1L (Large)","bulk":null,"single":25},{"id":1789050625457,"name":"Sprite Bottle 1L (Large)","bulk":null,"single":25},{"id":1789052873689,"name":"Run (Small)","bulk":45,"single":null},{"id":1789672465732,"name":"Malt - 5 Star","bulk":55,"single":null},{"id":1789832810515,"name":"Senak Pink (Champagne)","bulk":47,"single":null},{"id":1790013085865,"name":"Frutelli (Large)","bulk":30,"single":null},{"id":65,"name":"Frutelli Large","bulk":30,"single":null},{"id":1790187089255,"name":"Alvaro","bulk":null,"single":10},{"id":1790187245575,"name":"Festival (Champagne)","bulk":35,"single":null}];
+    var legacyNiche = items.find(function(i){ return Number(i.id) === 41 && normalizeSearchText(i.name) === 'niche'; });
+    if (legacyNiche && !items.some(function(i){ return Number(i.id) === 1789024106241; })) {
+      latest = latest.map(function(u){ return Number(u.id) === 1789024106241 ? Object.assign({},u,{id:41}) : u; });
+    }
+    latest.forEach(function(u){
+      var existing = items.find(function(i){ return Number(i.id) === Number(u.id); });
+      if (existing) {
+        if (existing.name !== u.name) { existing.name = u.name; changed = true; }
+        if ((existing.bulk == null ? null : Number(existing.bulk)) !== u.bulk) { existing.bulk = u.bulk; changed = true; }
+        if ((existing.single == null ? null : Number(existing.single)) !== u.single) { existing.single = u.single; changed = true; }
+        if (!Object.prototype.hasOwnProperty.call(existing,'photo')) { existing.photo = null; changed = true; }
+      } else {
+        items.push({id:u.id,name:u.name,bulk:u.bulk,single:u.single,photo:null});
+        changed = true;
+      }
+    });
+    if (changed) saveItems();
+  }
+  syncV6Prices();
   var carts = loadCarts();
   var DISCOUNT_STORAGE_KEY = 'price-list-cart-discounts-v1';
   var discounts = loadJson(DISCOUNT_STORAGE_KEY, [0,0]);
@@ -924,6 +980,10 @@
   try { localStorage.removeItem('price-list-cleared-carts-v1'); } catch(e) {}
   var receipts = loadJson('price-list-receipts-v1', []);
   var receiptCounter = Number(localStorage.getItem('price-list-receipt-counter-v1') || 0);
+  var unsettledDebts = loadJson('price-list-unsettled-debts-v1', []);
+  var changeOwed = loadJson('price-list-change-owed-v1', []);
+  var settlementView = 'debt';
+  var receiptActionIndex = null;
 
   // Keep the visible receipt numbers orderly by date while the counter itself
   // always moves forward. This means the newest saved receipt has the largest
@@ -1620,6 +1680,52 @@
     renderCartOverview();
   }
 
+  function saveSettlements() {
+    saveJson('price-list-unsettled-debts-v1', unsettledDebts);
+    saveJson('price-list-change-owed-v1', changeOwed);
+  }
+  function openReceiptActionMenu(receiptIndex) {
+    var r=receipts[receiptIndex]; if(!r) return;
+    receiptActionIndex=receiptIndex;
+    document.getElementById('receipt-action-title').textContent=(r.number||'Receipt')+' · Actions';
+    document.getElementById('receipt-action-panel').hidden=false;
+  }
+  function closeReceiptActionMenu() { receiptActionIndex=null; document.getElementById('receipt-action-panel').hidden=true; }
+  function addSettlement(type) {
+    var idx=receiptActionIndex, r=receipts[idx]; if(!r) return;
+    var label=type==='debt'?'Debt amount (¢)':'Change owed (¢)';
+    var input=window.prompt(label,''); if(input===null) return;
+    var amount=Number(input);
+    if(!isFinite(amount) || amount<=0){ showToast('Enter a valid amount'); return; }
+    var record={id:Date.now()+Math.random(),receiptNumber:r.number||'Receipt',receiptCreatedAt:r.createdAt||new Date().toISOString(),amount:Number(amount.toFixed(2)),createdAt:new Date().toISOString()};
+    if(type==='debt') unsettledDebts.unshift(record); else changeOwed.unshift(record);
+    saveSettlements();
+    closeReceiptActionMenu();
+    showToast(type==='debt'?'Debt added':'Change added');
+    renderSettlementList();
+  }
+  function openSettlements(type) {
+    settlementView=type||'debt';
+    document.getElementById('settlement-panel').hidden=false;
+    renderSettlementList();
+  }
+  function renderSettlementList() {
+    var list=document.getElementById('settlement-list'); if(!list) return;
+    var isDebt=settlementView==='debt', data=isDebt?unsettledDebts:changeOwed;
+    document.getElementById('settlement-title').textContent=isDebt?'Unsettled Debts':'Change Owed';
+    document.getElementById('settlement-debt-tab').classList.toggle('active',isDebt);
+    document.getElementById('settlement-change-tab').classList.toggle('active',!isDebt);
+    if(!data.length){ list.innerHTML='<div class="settlement-empty">No '+(isDebt?'unsettled debts':'change waiting to be collected')+'.</div>'; return; }
+    list.innerHTML=data.map(function(x,i){
+      var d=new Date(x.createdAt), when=isNaN(d.getTime())?'':d.toLocaleString([], {month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
+      return '<div class="settlement-item"><div class="settlement-item-top"><strong>'+escapeHtml(x.receiptNumber)+'</strong><span class="settlement-amount">¢'+formatCedis(x.amount)+'</span></div><div class="settlement-meta">Recorded '+escapeHtml(when)+'</div><button class="settlement-action" data-settlement-complete="'+i+'">'+(isDebt?'Mark as paid':'Mark as collected')+'</button></div>';
+    }).join('');
+  }
+  function completeSettlement(index) {
+    var data=settlementView==='debt'?unsettledDebts:changeOwed; if(!data[index]) return;
+    data.splice(index,1); saveSettlements(); renderSettlementList(); showToast(settlementView==='debt'?'Debt marked as paid':'Change marked as collected');
+  }
+
   function restoreReceiptToCart(receiptIndex) {
     var r=receipts[receiptIndex]; if(!r || !Array.isArray(r.items) || !r.items.length) return;
     // Restore into any empty cart so the user's current cart is never overwritten.
@@ -2028,8 +2134,8 @@ function renderHistory(){
     receiptHoldTriggered=false; clearTimeout(receiptHoldTimer);
     receiptHoldTimer=setTimeout(function(){
       receiptHoldTriggered=true;
-      var idx=Number(row.dataset.receiptIndex), r=receipts[idx];
-      if(r && window.confirm('Send '+(r.number||'this receipt')+' back to a cart?')) restoreReceiptToCart(idx);
+      var idx=Number(row.dataset.receiptIndex);
+      openReceiptActionMenu(idx);
     },650);
   },{passive:true});
   document.addEventListener('touchend', function(){ clearTimeout(receiptHoldTimer); receiptHoldTimer=null; },{passive:true});
@@ -2079,6 +2185,17 @@ function renderHistory(){
     if (e.target.closest("#clear-btn")) return clearCart();
     if (e.target.closest("#complete-btn")) return completeSale();
     if (e.target.closest("#receipt-history-btn")) { renderReceiptHistory(); document.getElementById('receipt-history-panel').hidden=false; return; }
+    if (e.target.closest("#unsettled-debts-btn")) { openSettlements('debt'); return; }
+    if (e.target.closest("#change-owed-btn")) { openSettlements('change'); return; }
+    if (e.target.closest("#settlement-close") || e.target === document.getElementById('settlement-panel')) { document.getElementById('settlement-panel').hidden=true; return; }
+    if (e.target.closest("#settlement-debt-tab")) { settlementView='debt'; renderSettlementList(); return; }
+    if (e.target.closest("#settlement-change-tab")) { settlementView='change'; renderSettlementList(); return; }
+    var settlementDone=e.target.closest('[data-settlement-complete]');
+    if (settlementDone) { return completeSettlement(Number(settlementDone.dataset.settlementComplete)); }
+    if (e.target.closest("#receipt-action-cancel") || e.target === document.getElementById('receipt-action-panel')) { closeReceiptActionMenu(); return; }
+    if (e.target.closest("#receipt-add-debt-btn")) { return addSettlement('debt'); }
+    if (e.target.closest("#receipt-add-change-btn")) { return addSettlement('change'); }
+    if (e.target.closest("#receipt-restore-btn")) { var ri=receiptActionIndex; closeReceiptActionMenu(); return restoreReceiptToCart(ri); }
     if (e.target.closest("#copy-all-receipts-btn")) return copyAllReceipts();
     if (e.target.closest("#paste-receipts-btn")) return openReceiptImport();
     if (e.target.closest("#receipt-import-close") || e.target === document.getElementById('receipt-import-panel')) return closeReceiptImport();
