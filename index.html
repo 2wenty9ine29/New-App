@@ -392,7 +392,11 @@
   .receipt-copy-btn { margin-top:7px; margin-left:5px; border:0; background:var(--paper); color:var(--ink); border-radius:999px; padding:6px 12px; font-size:10px; font-weight:600; }
   .receipt-tools-title { margin:2px 0 5px; color:var(--ink-soft); font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; }
   .receipt-tools { display:flex; gap:7px; flex-wrap:wrap; margin-top:4px; }
-  .receipt-tool-btn { border:1px solid var(--line); background:var(--paper); color:var(--ink); border-radius:999px; padding:8px 12px; font-size:11px; font-weight:750; }
+  .receipt-tool-btn { border:1px solid var(--line); background:var(--paper); color:var(--ink); border-radius:999px; padding:8px 12px; font-size:11px; font-weight:750; transition:transform .12s ease, filter .12s ease, border-color .12s ease; }
+  .receipt-tool-btn:active { transform:scale(.97); }
+  .receipt-tool-btn.change { color:#2563eb; background:rgba(37,99,235,.09); border-color:rgba(37,99,235,.25); }
+  .receipt-tool-btn.debt { color:#a16207; background:rgba(161,98,7,.09); border-color:rgba(161,98,7,.25); }
+  .receipt-tool-btn.momo { color:#0f766e; background:rgba(15,118,110,.09); border-color:rgba(15,118,110,.25); }
 
   /* Change/Debt status chips shown directly on a receipt */
   .receipt-status-row { display:flex; gap:6px; flex-wrap:wrap; margin-top:6px; }
@@ -894,10 +898,11 @@
         <button class="receipt-tool-btn" id="copy-all-receipts-btn">Copy receipts</button>
         <button class="receipt-tool-btn" id="paste-receipts-btn">Paste receipts</button>
       </div>
-      <div class="receipt-tools-title">Unsettled Debts</div>
+      <div class="receipt-tools-title">Unsettled / Pending</div>
       <div class="receipt-tools">
-        <button class="receipt-tool-btn" id="change-owed-btn">Change</button>
-        <button class="receipt-tool-btn" id="unsettled-debts-btn">Debt</button>
+        <button class="receipt-tool-btn change" id="change-owed-btn">Change</button>
+        <button class="receipt-tool-btn debt" id="unsettled-debts-btn">Debt</button>
+        <button class="receipt-tool-btn momo" id="momo-payments-btn">Momo</button>
       </div>
       <div class="receipt-history-list" id="receipt-history-list"></div>
     </div>
@@ -2650,6 +2655,7 @@ function renderHistory(){
     if (reportTab) { reportPeriod = reportTab.dataset.reportPeriod; renderReports(); return; }
     if (e.target.closest("#unsettled-debts-btn")) { openSettlements('debt'); return; }
     if (e.target.closest("#change-owed-btn")) { openSettlements('change'); return; }
+    if (e.target.closest("#momo-payments-btn")) { openSettlements('momo'); return; }
     if (e.target.closest("#settlement-close") || e.target === document.getElementById('settlement-panel')) { document.getElementById('settlement-panel').hidden=true; return; }
     if (e.target.closest("#settlement-debt-tab")) { settlementView='debt'; renderSettlementList(); return; }
     if (e.target.closest("#settlement-change-tab")) { settlementView='change'; renderSettlementList(); return; }
