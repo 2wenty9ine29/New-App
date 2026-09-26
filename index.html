@@ -1310,7 +1310,12 @@
     activeCartIndex = index;
     cart = carts[activeCartIndex] || {};
     cartOrder = loadJson('price-list-cart-order-v1-' + activeCartIndex, []);
-    migrateLegacyCart();
+    document.getElementById('broom-clear').addEventListener('click', function(){
+    var input=document.getElementById('sell-search'); input.value=''; sellSearchQuery='';
+    document.getElementById('search-clear').classList.remove('visible'); renderCatalogList(); input.focus();
+  });
+
+  migrateLegacyCart();
     normalizeCartOrder();
     renderCart();
     updateCartSwitcher();
@@ -1545,7 +1550,7 @@
     showToast('Price list TXT ready');
   }
 
-  var APP_VERSION = 'v8.9';
+  var APP_VERSION = 'v8.5';
   var LAST_BACKUP_KEY = 'price-list-last-backup-v1';
   function isAppStorageKey(k) {
     return !!k && (k.indexOf('priceList') === 0 || k.indexOf('price-list-') === 0);
@@ -2733,10 +2738,6 @@ function renderHistory(){
   document.getElementById('search-clear').addEventListener('click', function(){
     var input=document.getElementById('sell-search'); input.value=''; sellSearchQuery='';
     this.classList.remove('visible'); renderCatalogList(); input.focus();
-  });
-  document.getElementById('broom-clear').addEventListener('click', function(){
-    var input=document.getElementById('sell-search'); input.value=''; sellSearchQuery='';
-    document.getElementById('search-clear').classList.remove('visible'); renderCatalogList(); input.focus();
   });
 
   migrateLegacyCart();
