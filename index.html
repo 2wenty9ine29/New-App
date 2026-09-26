@@ -14,7 +14,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="apple-touch-icon" href="icon-180.png">
-<title>Price List · V7</title>
+<title>Price List · V8.1</title>
 <style>
   :root {
     color-scheme: light;
@@ -63,7 +63,7 @@
   }
   button, input, textarea, select { font-family: inherit; cursor: pointer; }
   input, textarea, select { cursor: auto; }
-  #app { height: 100dvh; display: flex; flex-direction: column; background-color: var(--paper); }
+  #app { height: 100dvh; height: calc(var(--app-vh, 1vh) * 100); display: flex; flex-direction: column; background-color: var(--paper); }
 
   .top-accent { height: 4px; flex-shrink: 0; background: linear-gradient(90deg, var(--gold-bright) 0 33%, var(--green) 33% 66%, var(--brick) 66% 100%); }
 
@@ -216,12 +216,12 @@
      fill whatever's left over (which used to leave blank space when the
      cart was empty). Scoped to the Sell screen only so Manage/History,
      which reuse .scroll-area, are unaffected. */
-  #screen-sell .scroll-area { flex: 0 1 auto; max-height: 34dvh; min-height: 0; }
+  #screen-sell .scroll-area { flex: 0 1 auto; max-height: 37dvh; min-height: 0; }
   .cart-heading { padding: 10px 20px 4px; font-size: 12px; font-weight: 650; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.04em; flex-shrink: 0; }
 
   .cart-bar {
     flex-shrink: 0; background: var(--ink); color: #fff; display: flex; align-items: center;
-    justify-content: space-between; padding: 9px 20px; margin-bottom: 0;
+    justify-content: space-between; padding: 7px 20px; margin-bottom: 0;
   }
   .cart-total-label { display: block; font-size: 12px; color: #B8B6AE; }
   .cart-total-amount { display: inline-block; font-size: 22px; font-weight: 650; color: var(--gold-bright); font-variant-numeric: tabular-nums; }
@@ -312,6 +312,12 @@
   .scan-video-wrap { flex:1; position:relative; overflow:hidden; background:#000; }
   #scan-video { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
   .scan-frame { position:absolute; left:12%; right:12%; top:32%; bottom:32%; border:2px solid rgba(255,255,255,.85); border-radius:16px; box-shadow:0 0 0 2000px rgba(0,0,0,.35); pointer-events:none; }
+  .scan-torch-btn {
+    position:absolute; right:16px; bottom:16px; width:44px; height:44px; border-radius:50%;
+    border:1.5px solid rgba(255,255,255,.6); background:rgba(0,0,0,.45); color:#fff; font-size:18px;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .scan-torch-btn.active { background:var(--gold); border-color:var(--gold); color:#1C1B18; }
   .scan-status { flex-shrink:0; text-align:center; color:#fff; opacity:.9; font-size:13px; padding:14px 20px calc(20px + env(safe-area-inset-bottom)); }
 
   /* Polished receipt action sheet */
@@ -432,11 +438,11 @@
   /* Tab bar */
   .tabbar {
     flex-shrink: 0; display: flex; background: var(--surface); border-top: 1px solid var(--line);
-    padding: 10px 0 calc(7px + env(safe-area-inset-bottom));
+    padding: 5px 0 calc(4px + env(safe-area-inset-bottom));
   }
   .tab-btn {
     flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
-    padding: 8px 0 4px; margin: 0 6px; background: none; border: none; border-radius: 14px;
+    padding: 6px 0 3px; margin: 0 6px; background: none; border: none; border-radius: 14px;
     color: var(--ink-soft); font-size: 11px; font-weight: 550; transition: background-color .15s ease, color .15s ease;
   }
   .tab-btn svg { width: 21px; height: 21px; }
@@ -893,6 +899,7 @@
     <div class="scan-video-wrap">
       <video id="scan-video" playsinline muted autoplay></video>
       <div class="scan-frame"></div>
+      <button class="scan-torch-btn" id="scan-torch-btn" aria-label="Toggle flashlight" hidden>&#9679;</button>
     </div>
     <p class="scan-status" id="scan-status">Point the camera at a barcode</p>
   </div>
@@ -1490,21 +1497,83 @@
       document.getElementById('scan-status').textContent = e.message;
     });
   }
+  function scannerHints() {
+    // Restricting to the barcode formats real products actually use (instead of
+    // ZXing's full default list, which also checks QR/Aztec/PDF417/etc. on every
+    // frame) lets each frame decode faster, which is most of why scanning felt slow.
+    var hints = new Map();
+    hints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS, [
+      ZXing.BarcodeFormat.EAN_13, ZXing.BarcodeFormat.EAN_8,
+      ZXing.BarcodeFormat.UPC_A, ZXing.BarcodeFormat.UPC_E,
+      ZXing.BarcodeFormat.CODE_128, ZXing.BarcodeFormat.CODE_39
+    ]);
+    hints.set(ZXing.DecodeHintType.TRY_HARDER, true);
+    return hints;
+  }
   function startZXingScan() {
     try {
-      zxingReader = new ZXing.BrowserMultiFormatReader();
-      zxingReader.decodeFromVideoDevice(null, 'scan-video', function (result) {
+      // A shorter delay between decode attempts (default is 500ms) plus a
+      // narrower format list makes the reader try far more often per second.
+      zxingReader = new ZXing.BrowserMultiFormatReader(scannerHints(), 80);
+      var constraints = {
+        video: {
+          facingMode: { ideal: 'environment' },
+          width: { ideal: 1920 }, height: { ideal: 1080 },
+          // Continuous autofocus is the other big lever: without it some phones
+          // pick one fixed focus distance and every close-up label comes out
+          // as motion-blur no matter how still you hold it.
+          advanced: [{ focusMode: 'continuous' }]
+        }
+      };
+      zxingReader.decodeFromConstraints(constraints, 'scan-video', function (result) {
         if (result) handleScanResult(result.getText());
-      }).catch(function (e) {
-        document.getElementById('scan-status').textContent = 'Camera unavailable: ' + (e && e.message ? e.message : 'permission denied');
+      }).then(function () {
+        setupScannerExtras();
+      }).catch(function () {
+        // Older browsers / some Android WebViews reject the `advanced` focus
+        // constraint outright. Fall back to a plain rear-camera request.
+        zxingReader.decodeFromConstraints({ video: { facingMode: { ideal: 'environment' } } }, 'scan-video', function (result) {
+          if (result) handleScanResult(result.getText());
+        }).then(function () {
+          setupScannerExtras();
+        }).catch(function (e2) {
+          document.getElementById('scan-status').textContent = 'Camera unavailable: ' + (e2 && e2.message ? e2.message : 'permission denied');
+        });
       });
     } catch (e) {
       document.getElementById('scan-status').textContent = 'Scanner failed to start.';
     }
   }
+  function setupScannerExtras() {
+    // Tap-to-focus: on phones that don't auto-refocus reliably, letting the
+    // user tap the frame nudges the camera to refocus on that spot.
+    var video = document.getElementById('scan-video');
+    var track = video && video.srcObject && video.srcObject.getVideoTracks && video.srcObject.getVideoTracks()[0];
+    if (!track) return;
+    var caps = track.getCapabilities ? track.getCapabilities() : {};
+    if (caps.torch) {
+      var torchBtn = document.getElementById('scan-torch-btn');
+      if (torchBtn) {
+        torchBtn.hidden = false;
+        var torchOn = false;
+        torchBtn.onclick = function () {
+          torchOn = !torchOn;
+          track.applyConstraints({ advanced: [{ torch: torchOn }] }).catch(function () {});
+          torchBtn.classList.toggle('active', torchOn);
+        };
+      }
+    }
+    if (caps.focusMode && caps.focusMode.indexOf('continuous') === -1 && caps.focusDistance) {
+      video.onclick = function () {
+        track.applyConstraints({ advanced: [{ focusMode: 'manual', focusDistance: caps.focusDistance.min }] }).catch(function () {});
+      };
+    }
+  }
   function closeScanner() {
     document.getElementById('scan-panel').hidden = true;
     if (zxingReader) { try { zxingReader.reset(); } catch (e) {} zxingReader = null; }
+    var torchBtn = document.getElementById('scan-torch-btn');
+    if (torchBtn) { torchBtn.hidden = true; torchBtn.classList.remove('active'); }
   }
   function handleScanResult(code) {
     var now = Date.now();
@@ -1596,7 +1665,7 @@
     showToast('Price list TXT ready');
   }
 
-  var APP_VERSION = 'v7.0';
+  var APP_VERSION = 'v8.1';
   var LAST_BACKUP_KEY = 'price-list-last-backup-v1';
   function isAppStorageKey(k) {
     return !!k && (k.indexOf('priceList') === 0 || k.indexOf('price-list-') === 0);
@@ -2767,6 +2836,19 @@ function renderHistory(){
     var input=document.getElementById('sell-search'); input.value=''; sellSearchQuery='';
     this.classList.remove('visible'); renderCatalogList(); input.focus();
   });
+
+  // Real, accurate viewport height on phones. Mobile browsers resize their
+  // own chrome (address bar / home-indicator area) without always firing
+  // a layout recalculation for `dvh`, which used to leave a blank strip of
+  // "paper" background between the checkout bar and the bottom nav. This
+  // keeps --app-vh pinned to the true visible height at all times.
+  function setAppVH() {
+    document.documentElement.style.setProperty('--app-vh', (window.innerHeight * 0.01) + 'px');
+  }
+  setAppVH();
+  window.addEventListener('resize', setAppVH);
+  window.addEventListener('orientationchange', function () { setTimeout(setAppVH, 60); });
+  if (window.visualViewport) window.visualViewport.addEventListener('resize', setAppVH);
 
   migrateLegacyCart();
   normalizeCartOrder();
