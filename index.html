@@ -14,7 +14,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="apple-touch-icon" href="icon-180.png">
-<title>Price List · V6</title>
+<title>Price List · V7</title>
 <style>
   :root {
     color-scheme: light;
@@ -700,7 +700,9 @@
           <button class="manage-copy-btn" id="backup-restore-btn">Restore all data</button>
         </div>
         <input type="file" id="backup-restore-input" accept="application/json,.json" hidden>
-        <p class="photo-hint" style="margin-top:8px;">Saves a file with your whole price list, carts, receipts, and debts/change — so you can move to a new phone or recover if this one's storage is cleared.</p>
+        <p class="photo-hint" id="backup-last-date" style="margin-top:8px;"></p>
+        <p class="photo-hint" style="margin-top:2px;">Saves a file with your whole price list, carts, receipts, and debts/change — so you can move to a new phone or recover if this one's storage is cleared.</p>
+        <p class="photo-hint" id="app-version-label" style="margin-top:14px; text-align:center; opacity:.55;"></p>
       </div>
     </div>
   </section>
@@ -1232,6 +1234,9 @@
       return item ? {key:k,item:item,mode:parsed.mode,fraction:parsed.fraction,qty:Number(snapshot[k])} : null;
     }).filter(Boolean);
   }
+  function hapticTick() {
+    try { if (navigator.vibrate) navigator.vibrate(10); } catch (e) {}
+  }
   function showToast(message) {
     var t=document.getElementById('toast'); t.textContent=message; t.classList.add('show');
     clearTimeout(showToast.timer); showToast.timer=setTimeout(function(){t.classList.remove('show');},1800);
@@ -1422,8 +1427,25 @@
     showToast('Price list TXT ready');
   }
 
+  var APP_VERSION = 'v7.0';
+  var LAST_BACKUP_KEY = 'price-list-last-backup-v1';
   function isAppStorageKey(k) {
     return !!k && (k.indexOf('priceList') === 0 || k.indexOf('price-list-') === 0);
+  }
+  function formatBackupStamp(iso) {
+    var d = new Date(iso);
+    if (isNaN(d.getTime())) return '';
+    return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) +
+      ' at ' + d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+  }
+  function renderBackupMeta() {
+    var el = document.getElementById('backup-last-date'); if (!el) return;
+    var raw = localStorage.getItem(LAST_BACKUP_KEY);
+    el.textContent = raw ? ('Last backup: ' + formatBackupStamp(raw)) : 'No backup saved yet on this device.';
+  }
+  function renderAppVersion() {
+    var el = document.getElementById('app-version-label'); if (!el) return;
+    el.textContent = 'Price List · ' + APP_VERSION;
   }
   function exportAllData() {
     var data = {};
@@ -1438,6 +1460,8 @@
     a.href = url; a.download = 'price-list-backup-' + new Date().toISOString().slice(0,10) + '.json';
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(function(){ URL.revokeObjectURL(url); }, 1500);
+    localStorage.setItem(LAST_BACKUP_KEY, new Date().toISOString());
+    renderBackupMeta();
     showToast('Backup file downloaded');
   }
   function importAllData(file) {
@@ -2334,6 +2358,7 @@ function renderHistory(){
     clearTimeout(longPressTimer);
     longPressTimer=setTimeout(function(){
       longPressTriggered=true;
+      hapticTick();
       var id=Number(row.dataset.add), mode=row.dataset.mode||'bulk', item=items.find(function(i){return i.id===id;});
       if(!item) return;
       if(mode==='bulk' && isFractionalBulkProduct(item)){ closeFractionSheet(); openQuantitySheet(id,mode,1); } else openQuantitySheet(id,mode,1);
@@ -2352,6 +2377,7 @@ function renderHistory(){
     receiptHoldTriggered=false; clearTimeout(receiptHoldTimer);
     receiptHoldTimer=setTimeout(function(){
       receiptHoldTriggered=true;
+      hapticTick();
       var idx=Number(row.dataset.receiptIndex);
       openReceiptActionMenu(idx);
     },650);
@@ -2502,6 +2528,8 @@ function renderHistory(){
   renderCart();
  
   renderHistory();
+  renderBackupMeta();
+  renderAppVersion();
   document.getElementById("money-received").addEventListener("input", updateChangeCalculator);
   updateCartSwitcher();
   switchTab("sell");
