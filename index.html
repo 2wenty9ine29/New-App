@@ -1567,7 +1567,7 @@
     showToast('Price list TXT ready');
   }
 
-  var APP_VERSION = 'v9.0';
+  var APP_VERSION = 'v9.1';
   var LAST_BACKUP_KEY = 'price-list-last-backup-v1';
   function isAppStorageKey(k) {
     return !!k && (k.indexOf('priceList') === 0 || k.indexOf('price-list-') === 0);
@@ -1917,6 +1917,15 @@
     var previousOrder=cartOrder.slice();
     var previousDiscount=Number(discounts[activeCartIndex])||0;
     if (pendingRestoredReceipt && pendingRestoredReceipt.cartIndex === activeCartIndex) {
+      // Restored receipts are temporarily removed from history while being edited.
+      // If the edit is cancelled/cleared, put the exact original receipt back.
+      var cancelledOriginal = pendingRestoredReceipt.originalReceipt;
+      if (cancelledOriginal && cancelledOriginal.number) {
+        var restoreAt = Math.max(0, Math.min(Number(pendingRestoredReceipt.originalIndex)||0, receipts.length));
+        receipts.splice(restoreAt, 0, cancelledOriginal);
+        receipts=receipts.slice(0,500);
+        saveJson('price-list-receipts-v1',receipts);
+      }
       pendingRestoredReceipt = null;
       saveJson(PENDING_RESTORE_KEY, null);
     }
@@ -1952,14 +1961,15 @@
     var discount=Math.min(grossTotal, Number(discounts[activeCartIndex])||0);
     var total=Math.max(0,grossTotal-discount);
     var restoring = pendingRestoredReceipt && pendingRestoredReceipt.receiptNumber ? pendingRestoredReceipt : null;
-    var restoredIndex = restoring ? receipts.findIndex(function(r){ return String(r.number||'') === String(restoring.receiptNumber); }) : -1;
     var receiptNo;
     var createdAt;
-    if (restoring && restoredIndex >= 0) {
-      // A restored sale is an edit of the original receipt: keep its number,
-      // original timestamp, and position instead of creating a new sale.
-      receiptNo = receipts[restoredIndex].number;
-      createdAt = receipts[restoredIndex].createdAt || restoring.createdAt || new Date().toISOString();
+    var restoredIndex = -1;
+    if (restoring) {
+      // The original receipt was removed from history when it was sent to the cart.
+      // Recreate it at its original position using its original number/time.
+      receiptNo = restoring.receiptNumber;
+      createdAt = restoring.createdAt || (restoring.originalReceipt && restoring.originalReceipt.createdAt) || new Date().toISOString();
+      restoredIndex = Number(restoring.originalIndex);
     } else {
       receiptCounter += 1; localStorage.setItem('price-list-receipt-counter-v1', String(receiptCounter));
       receiptNo='Receipt #' + String(receiptCounter).padStart(4,'0');
@@ -1968,8 +1978,9 @@
     var receipt={number:receiptNo,total:total,grossTotal:grossTotal,discount:discount,createdAt:createdAt,cartIndex:activeCartIndex,items:entries.map(function(e){
       return {id:e.item.id,key:e.key,name:e.item.name,mode:e.mode,fraction:e.fraction,qty:e.qty,subtotal:(priceForMode(e.item,e.mode,e.fraction)||0)*e.qty};
     })};
-    if (restoring && restoredIndex >= 0) {
-      receipts[restoredIndex] = receipt;
+    if (restoring) {
+      var insertAt = Math.max(0, Math.min(isFinite(restoredIndex) ? restoredIndex : receipts.length, receipts.length));
+      receipts.splice(insertAt, 0, receipt);
     } else {
       receipts.unshift(receipt);
     }
@@ -2158,14 +2169,17 @@
     saveCart();
     carts[targetIndex]=restored;
     discounts[targetIndex]=Math.min(grossTotalFromSnapshot(restored), Number(r.discount)||0);
-    // Keep the original receipt in history while it is being edited. On checkout,
-    // completeSale() replaces that same receipt using its original number/time.
+    // Remove the original receipt from history while it is being edited, but keep
+    // the full original receipt in pending state so it can return exactly to its
+    // original number, date/time, and position if the edit is cancelled.
     pendingRestoredReceipt={
       receiptNumber:r.number||'Receipt',
       createdAt:r.createdAt||new Date().toISOString(),
       originalIndex:receiptIndex,
+      originalReceipt:JSON.parse(JSON.stringify(r)),
       cartIndex:targetIndex
     };
+    receipts.splice(receiptIndex,1);
     saveJson(PENDING_RESTORE_KEY,pendingRestoredReceipt);
     saveJson(CART_STORAGE_KEY,carts);
     saveJson(DISCOUNT_STORAGE_KEY,discounts);
