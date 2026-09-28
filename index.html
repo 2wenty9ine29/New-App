@@ -14,7 +14,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="apple-touch-icon" href="icon-180.png">
-<title>Price List · V9.5.2</title>
+<title>Price List · V9.5.3</title>
 <style>
   :root {
     color-scheme: light;
@@ -118,7 +118,7 @@
   }
   .manage-copy-wrap { padding: 12px 0 20px; }
   .manage-copy-row { display: flex; gap: 8px; }
-  .manage-copy-btn { width: 100%; border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 999px; padding: 12px 14px; font-size: 14px; font-weight: 700; }
+  .manage-copy-btn { width: 100%; border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 10px; padding: 8px 10px; font-size: 11px; font-weight: 650; }
   .manage-copy-row .manage-copy-btn { width: auto; flex: 1; }
   .manage-copy-btn:active { opacity: .8; transform: scale(.99); }
   #price-import-text { width:100%; min-height:220px; box-sizing:border-box; resize:vertical; border:1px solid var(--line); border-radius:12px; padding:10px; background:var(--paper); color:var(--ink); font:11px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace; }
@@ -205,6 +205,13 @@
     -webkit-appearance: none; appearance: none; font-size: 14.5px; outline: none;
   }
   #sell-search:focus { border-color: var(--gold); box-shadow: 0 0 0 3px var(--gold-soft); }
+  #receipt-search {
+    width: 100%; box-sizing: border-box; padding: 8px 42px 8px 38px; border-radius: 12px;
+    border: 1px solid var(--line); background: var(--surface); color: var(--ink);
+    -webkit-text-fill-color: var(--ink); -webkit-appearance: none; appearance: none;
+    font-size: 13px; outline: none;
+  }
+  #receipt-search:focus { border-color: var(--gold); box-shadow: 0 0 0 3px var(--gold-soft); }
 
   .search-clear {
     position: absolute; right: 41px; top: 50%; transform: translateY(-50%);
@@ -412,11 +419,14 @@
   .receipt-copy-btn { margin-top:7px; margin-left:5px; border:0; background:var(--paper); color:var(--ink); border-radius:999px; padding:6px 12px; font-size:10px; font-weight:600; }
   .receipt-tools-title { margin:2px 0 5px; color:var(--ink-soft); font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; }
   .receipt-tools { display:flex; gap:7px; flex-wrap:wrap; margin-top:4px; }
-  .receipt-tool-btn { border:1px solid var(--line); background:var(--paper); color:var(--ink); border-radius:999px; padding:8px 12px; font-size:11px; font-weight:750; transition:transform .12s ease, filter .12s ease, border-color .12s ease; }
+  .receipt-tool-btn { border:1px solid var(--line); background:var(--paper); color:var(--ink); border-radius:9px; padding:6px 9px; font-size:10px; font-weight:650; transition:transform .12s ease, filter .12s ease, border-color .12s ease; }
   .receipt-tool-btn:active { transform:scale(.97); }
   .receipt-tool-btn.change { color:#2563eb; background:rgba(37,99,235,.09); border-color:rgba(37,99,235,.25); }
   .receipt-tool-btn.debt { color:#a16207; background:rgba(161,98,7,.09); border-color:rgba(161,98,7,.25); }
   .receipt-tool-btn.momo { color:#0f766e; background:rgba(15,118,110,.09); border-color:rgba(15,118,110,.25); }
+  .receipt-settlement-tools { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:7px; margin:6px 0 12px; }
+  .receipt-settlement-tools .receipt-tool-btn { width:100%; display:flex; align-items:center; justify-content:space-between; gap:5px; padding:8px 9px; border-radius:10px; font-size:10px; }
+  .receipt-settlement-tools .receipt-tool-btn strong { font-size:10px; font-weight:800; font-variant-numeric:tabular-nums; }
 
   /* Change/Debt status chips shown directly on a receipt */
   .receipt-status-row { display:flex; gap:6px; flex-wrap:wrap; margin-top:6px; }
@@ -469,6 +479,8 @@
   .settlement-card { width:min(480px,100%); max-height:86dvh; overflow-y:auto; box-sizing:border-box; background:var(--surface); color:var(--ink); border-radius:24px 24px 0 0; padding:18px 18px calc(22px + env(safe-area-inset-bottom)); }
   .settlement-head { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:12px; }
   .settlement-head h2 { margin:0; font-size:18px; font-weight:800; letter-spacing:-.01em; }
+  .settlement-total { margin-top:3px; color:var(--ink-soft); font-size:11px; font-weight:600; }
+  .settlement-total strong { color:var(--gold); font-size:14px; margin-left:4px; }
   .settlement-tabs { display:flex; gap:7px; margin-bottom:12px; }
   .settlement-tab { flex:1; border:1px solid var(--line); background:var(--paper); color:var(--ink); border-radius:999px; padding:8px 11px; font-size:12px; font-weight:750; }
   .settlement-tab.active { background:var(--gold); border-color:var(--gold); color:#fff; }
@@ -937,8 +949,7 @@
         </div>
       </div>
       <div class="receipt-tools-title">Unsettled / Pending totals</div>
-      <div class="receipt-summary-grid" id="receipt-summary-grid"></div>
-      <div class="receipt-tools">
+      <div class="receipt-tools receipt-settlement-tools">
         <button class="receipt-tool-btn change" id="change-owed-btn">Change</button>
         <button class="receipt-tool-btn debt" id="unsettled-debts-btn">Debt</button>
         <button class="receipt-tool-btn momo" id="momo-payments-btn">Momo</button>
@@ -994,7 +1005,7 @@
 
   <div class="settlement-panel" id="settlement-panel" hidden>
     <div class="settlement-card">
-      <div class="settlement-head"><h2 id="settlement-title">Unsettled Debts</h2><button class="receipt-history-close" id="settlement-close" aria-label="Close">×</button></div>
+      <div class="settlement-head"><div><h2 id="settlement-title">Unsettled Debts</h2><div class="settlement-total" id="settlement-total">Total <strong>¢0.00</strong></div></div><button class="receipt-history-close" id="settlement-close" aria-label="Close">×</button></div>
       <div class="settlement-tabs"><button class="settlement-tab" id="settlement-change-tab">Change</button><button class="settlement-tab active" id="settlement-debt-tab">Debt</button><button class="settlement-tab" id="settlement-momo-tab">Momo</button></div>
       <div class="settlement-list" id="settlement-list"></div>
     </div>
@@ -1235,7 +1246,7 @@ window.addEventListener("error", function(e) {
   ];
   defaultItems.forEach(function(i){ i.photo = null; });
 
-  var APP_VERSION = 'v9.5.1';
+  var APP_VERSION = 'v9.5.3';
   var PRICE_MIGRATION_VERSION_KEY = 'price-list-price-migration-version-v1';
   var items = loadItems();
 
@@ -2244,6 +2255,8 @@ window.addEventListener("error", function(e) {
     var list=document.getElementById('settlement-list'); if(!list) return;
     var type=settlementView, isDebt=type==='debt', isMomo=type==='momo', data=settlementArray(type);
     document.getElementById('settlement-title').textContent = isDebt ? 'Unsettled Debts' : isMomo ? 'Momo Payments' : 'Change Owed';
+    var settlementTotalEl=document.getElementById('settlement-total');
+    if(settlementTotalEl) settlementTotalEl.innerHTML='Total <strong>¢'+formatCedis(data.reduce(function(sum,x){ return sum+(Number(x.amount)||0); },0))+'</strong>';
     document.getElementById('settlement-debt-tab').classList.toggle('active',isDebt);
     document.getElementById('settlement-change-tab').classList.toggle('active',type==='change');
     document.getElementById('settlement-momo-tab').classList.toggle('active',isMomo);
@@ -2592,12 +2605,16 @@ function renderHistory(){
     return {debt:debt,change:change,momo:momo,total:debt+change+momo};
   }
   function renderReceiptSummary() {
-    var el=document.getElementById('receipt-summary-grid'); if(!el) return;
     var t=settlementTotals();
-    el.innerHTML='<div class="receipt-summary-card debt"><div class="rsc-label">Debt</div><div class="rsc-value">¢'+formatCedis(t.debt)+'</div></div>'+
-      '<div class="receipt-summary-card change"><div class="rsc-label">Change</div><div class="rsc-value">¢'+formatCedis(t.change)+'</div></div>'+
-      '<div class="receipt-summary-card momo"><div class="rsc-label">MoMo</div><div class="rsc-value">¢'+formatCedis(t.momo)+'</div></div>'+
-      '<div class="receipt-summary-card total"><div class="rsc-label">Total tracked</div><div class="rsc-value">¢'+formatCedis(t.total)+'</div></div>';
+    var buttons=[
+      ['change-owed-btn','change','Change',t.change],
+      ['unsettled-debts-btn','debt','Debt',t.debt],
+      ['momo-payments-btn','momo','Momo',t.momo]
+    ];
+    buttons.forEach(function(b){
+      var el=document.getElementById(b[0]);
+      if(el) el.innerHTML='<span>'+b[2]+'</span><strong>¢'+formatCedis(b[3])+'</strong>';
+    });
   }
   function accountingCheck() {
     var known={}; receipts.forEach(function(r){ if(r.receiptId) known[r.receiptId]=true; });
@@ -2662,8 +2679,10 @@ function renderHistory(){
       if(!q) return true;
       var d=new Date(r.createdAt);
       var when=isNaN(d.getTime())?'':d.toLocaleString([], {month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'});
-      var hay=[r.number,r.receiptId,r.total,when,d.toISOString()].concat((r.items||[]).map(function(i){return i.name;})).join(' ').toLowerCase();
-      return hay.indexOf(q)!==-1;
+      var hay=[r.number,r.receiptId,r.total,when,d.toISOString()].concat((r.items||[]).map(function(i){return [i.name,i.id,i.qty,i.subtotal,i.mode,i.fraction].join(' ');}), [JSON.stringify(r)]).join(' ').toLowerCase();
+      var normalizedHay=hay.replace(/\s+/g,' ').trim();
+      var normalizedQ=q.replace(/\s+/g,' ').trim();
+      return normalizedHay.indexOf(normalizedQ)!==-1;
     });
     if(!filtered.length){ list.innerHTML='<div class="history-empty">No receipts match your search.</div>'; return; }
     list.innerHTML=filtered.map(function(r){
