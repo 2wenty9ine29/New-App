@@ -367,6 +367,7 @@
   .reports-top-row .rt-qty { font-size:10px; color:var(--ink-soft); margin-top:1px; }
   .reports-top-row .rt-revenue { font-size:12px; font-weight:650; color:var(--gold); white-space:nowrap; font-variant-numeric:tabular-nums; }
   .reports-empty { text-align:center; padding:30px 10px; color:var(--ink-soft); font-size:13px; }
+  .reports-custom[hidden] { display:none; }
   .reports-custom { display:grid; gap:8px; padding:10px; margin-bottom:8px; border:1px solid var(--line); border-radius:14px; background:var(--paper); }
   .reports-custom-row { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
   .reports-custom label { display:grid; gap:4px; font-size:10px; color:var(--ink-soft); font-weight:650; }
@@ -1451,7 +1452,11 @@ window.addEventListener("error", function(e) {
     activeCartIndex = index;
     cart = carts[activeCartIndex] || {};
     cartOrder = loadJson('price-list-cart-order-v1-' + activeCartIndex, []);
-  ['report-from','report-to'].forEach(function(id){ var el=document.getElementById(id); if(el) el.addEventListener('change',function(){ customReportRange.from=document.getElementById('report-from').value; customReportRange.to=document.getElementById('report-to').value; reportPeriod='custom'; renderReports(); }); });
+  migrateLegacyCart();
+    normalizeCartOrder();
+    renderCart();
+    updateCartSwitcher();
+  }
   var receiptSearchEl=document.getElementById('receipt-search'); if(receiptSearchEl) receiptSearchEl.addEventListener('input',function(){ receiptSearchQuery=this.value; renderReceiptHistory(); });
   var receiptSearchClear=document.getElementById('receipt-search-clear'); if(receiptSearchClear) receiptSearchClear.addEventListener('click',function(){ receiptSearchQuery=''; if(receiptSearchEl) receiptSearchEl.value=''; renderReceiptHistory(); if(receiptSearchEl) receiptSearchEl.focus(); });
   var receiptDateEl=document.getElementById('receipt-date-filter');
@@ -1460,12 +1465,6 @@ window.addEventListener("error", function(e) {
   if(receiptDateEl) receiptDateEl.addEventListener('change',function(){ receiptDateFilter=this.value||''; renderReceiptHistory(); });
   var receiptDateClear=document.getElementById('receipt-date-clear');
   if(receiptDateClear) receiptDateClear.addEventListener('click',function(){ receiptDateFilter=''; if(receiptDateEl) receiptDateEl.value=''; renderReceiptHistory(); });
-
-  migrateLegacyCart();
-    normalizeCartOrder();
-    renderCart();
-    updateCartSwitcher();
-  }
   function updateCartSwitcher() {
     document.querySelectorAll('.cart-switch').forEach(function(btn){
       btn.classList.toggle('active', Number(btn.dataset.cartSwitch) === activeCartIndex);
@@ -2678,7 +2677,7 @@ function renderHistory(){
     document.querySelectorAll('.reports-tab').forEach(function (t) {
       t.classList.toggle('active', t.dataset.reportPeriod === reportPeriod);
     });
-    var customDates=document.getElementById('reports-custom-dates'); if(customDates) customDates.hidden=reportPeriod!=='custom';
+    var customDates=document.getElementById('reports-custom-dates'); if(customDates) customDates.hidden=reportPeriod!=='custom'; var customWrap=document.getElementById('reports-custom'); if(customWrap) customWrap.hidden=reportPeriod!=='custom';
     var fromEl=document.getElementById('report-from'), toEl=document.getElementById('report-to');
     if(fromEl) fromEl.value=customReportRange.from; if(toEl) toEl.value=customReportRange.to;
     var s = computeReportStats(reportPeriod);
