@@ -1187,12 +1187,23 @@
   ];
   defaultItems.forEach(function(i){ i.photo = null; });
 
+  var APP_VERSION = 'v9.2';
+  var PRICE_MIGRATION_VERSION_KEY = 'price-list-price-migration-version-v1';
   var items = loadItems();
-  ensureLatestItems();
+
+  // v9.2 startup migration is deliberately one-time and add-only: existing
+  // items are never rewritten on launch. This preserves every price/name already
+  // saved on the device while still allowing genuinely new built-in items in.
+  function runPriceMigrations() {
+    if (localStorage.getItem(PRICE_MIGRATION_VERSION_KEY) === APP_VERSION) return;
+    ensureLatestItems(true);
+    syncV6Prices(true);
+    try { localStorage.setItem(PRICE_MIGRATION_VERSION_KEY, APP_VERSION); } catch (e) {}
+  }
 
   // Version 6 price sync: apply the supplied 26-09 price list by product ID.
-  // Existing custom photos are preserved; custom products not in the supplied list remain untouched.
-  function syncV6Prices() {
+  // Existing custom photos are preserved; existing items are left untouched in v9.2.
+  function syncV6Prices(addOnly) {
     var changed = false;
     var latest = [{"id":1,"name":"Angel Cola","bulk":41,"single":4},{"id":2,"name":"Awake 1L (Large)","bulk":null,"single":8},{"id":3,"name":"Awake (Tiny Bottles)","bulk":25,"single":null},{"id":4,"name":"Awake (Small)","bulk":35,"single":3},{"id":5,"name":"Awake (Medium)","bulk":45,"single":4},{"id":6,"name":"Bel Active","bulk":50,"single":6},{"id":7,"name":"Bel Aqua (Small)","bulk":30,"single":null},{"id":8,"name":"Bel Aqua (Medium)","bulk":45,"single":4},{"id":9,"name":"Bel Aqua (1 Litre)","bulk":45,"single":null},{"id":10,"name":"Bel Cola","bulk":45,"single":4},{"id":11,"name":"Beta Malt","bulk":95,"single":null},{"id":12,"name":"Bigoo","bulk":50,"single":4},{"id":13,"name":"Breeze","bulk":47,"single":null},{"id":14,"name":"Can Coke","bulk":165,"single":8},{"id":15,"name":"Can Fanta","bulk":165,"single":8},{"id":16,"name":"Can Malt Ghana (Slim)","bulk":240,"single":14},{"id":17,"name":"Can Malt Nigeria","bulk":190,"single":10},{"id":18,"name":"Ceres (Medium)","bulk":16,"single":null},{"id":19,"name":"Ceres (Large)","bulk":35,"single":null},{"id":20,"name":"ChocoMalt","bulk":75,"single":null},{"id":64,"name":"ChocoMalt (Small)","bulk":52,"single":null},{"id":21,"name":"Coke Bottle 1L (Large)","bulk":null,"single":25},{"id":22,"name":"Coke Bottle (Medium, 450ml)","bulk":90,"single":null},{"id":23,"name":"Coke Bottle (Small)","bulk":65,"single":null},{"id":24,"name":"Communion Wine ( Wine )","bulk":40,"single":null},{"id":25,"name":"Dj Cocktail","bulk":40,"single":null},{"id":26,"name":"Don Simon (Large, 1L)","bulk":30,"single":30},{"id":27,"name":"Don Simon (Medium)","bulk":15,"single":null},{"id":28,"name":"Eden (Medium)","bulk":45,"single":null},{"id":29,"name":"Fanta Bottle","bulk":65,"single":9},{"id":30,"name":"Fruitfun Grapes","bulk":15,"single":null},{"id":31,"name":"Jingo","bulk":40,"single":null},{"id":32,"name":"Kaesar","bulk":50,"single":null},{"id":33,"name":"Kalyppo","bulk":97,"single":5},{"id":34,"name":"Kangen (Small)","bulk":30,"single":null},{"id":35,"name":"Kangen (Big)","bulk":30,"single":null},{"id":36,"name":"Lucozade (Per 6)","bulk":80,"single":null},{"id":37,"name":"Malt Guinness Bottle","bulk":120,"single":null},{"id":38,"name":"Multi Fruit (Big Red)","bulk":75,"single":null},{"id":39,"name":"Multi Fruit (Small)","bulk":null,"single":null},{"id":40,"name":"Multi Fruit Kiki (Per 6)","bulk":20,"single":null},{"id":42,"name":"Perla","bulk":35,"single":null},{"id":43,"name":"PET Malt","bulk":120,"single":11},{"id":44,"name":"Planet","bulk":42,"single":4},{"id":45,"name":"Puma Cola","bulk":42,"single":null},{"id":46,"name":"Rendez Vous (Champagne)","bulk":35,"single":null},{"id":47,"name":"Royal Apple and Drinks","bulk":45,"single":null},{"id":48,"name":"Run (Large)","bulk":70,"single":null},{"id":49,"name":"Squeeze","bulk":50,"single":4},{"id":50,"name":"Storm (Large)","bulk":75,"single":7},{"id":51,"name":"Storm (Small)","bulk":52,"single":5},{"id":52,"name":"Tampico (Medium)","bulk":67,"single":null},{"id":53,"name":"U-Fresh Choco or Soy","bulk":67,"single":null},{"id":54,"name":"U-Fresh Grapes (Medium)","bulk":38,"single":null},{"id":55,"name":"Verna 36 (Small)","bulk":60,"single":null},{"id":56,"name":"Vitamilk (Bottle)","bulk":80,"single":14},{"id":57,"name":"Vitamilk Kallypo Champion (Per 6)","bulk":25,"single":null},{"id":58,"name":"Voltic (Medium)","bulk":35,"single":null},{"id":59,"name":"Voltic (Big)","bulk":35,"single":8},{"id":60,"name":"Wheat Drink (Medium)","bulk":160,"single":null},{"id":61,"name":"5 Star (small)","bulk":47,"single":5},{"id":62,"name":"Blue Jeans (Per 6)","bulk":115,"single":null},{"id":63,"name":"Lucozade Bottle and Can (Per 6)","bulk":115,"single":null},{"id":1789024028868,"name":"Milo (Can per 6)","bulk":80,"single":14},{"id":1789024106241,"name":"Niche (per 6)","bulk":35,"single":6},{"id":1789050609250,"name":"Fanta Bottle 1L (Large)","bulk":null,"single":25},{"id":1789050625457,"name":"Sprite Bottle 1L (Large)","bulk":null,"single":25},{"id":1789052873689,"name":"Run (Small)","bulk":45,"single":null},{"id":1789672465732,"name":"Malt - 5 Star","bulk":55,"single":null},{"id":1789832810515,"name":"Senak Pink (Champagne)","bulk":47,"single":null},{"id":1790013085865,"name":"Frutelli (Large)","bulk":30,"single":null},{"id":65,"name":"Frutelli Large","bulk":30,"single":null},{"id":1790187089255,"name":"Alvaro","bulk":null,"single":10},{"id":1790187245575,"name":"Festival (Champagne)","bulk":35,"single":null}];
     var legacyNiche = items.find(function(i){ return Number(i.id) === 41 && normalizeSearchText(i.name) === 'niche'; });
@@ -1202,9 +1213,14 @@
     latest.forEach(function(u){
       var existing = items.find(function(i){ return Number(i.id) === Number(u.id); });
       if (existing) {
-        if (existing.name !== u.name) { existing.name = u.name; changed = true; }
-        if ((existing.bulk == null ? null : Number(existing.bulk)) !== u.bulk) { existing.bulk = u.bulk; changed = true; }
-        if ((existing.single == null ? null : Number(existing.single)) !== u.single) { existing.single = u.single; changed = true; }
+        // v9.2 must never overwrite an existing saved item during startup.
+        // The timestamp/version written by manual edits protects those values
+        // for later migrations as well.
+        if (!addOnly && !existing.customizedAt) {
+          if (existing.name !== u.name) { existing.name = u.name; changed = true; }
+          if ((existing.bulk == null ? null : Number(existing.bulk)) !== u.bulk) { existing.bulk = u.bulk; changed = true; }
+          if ((existing.single == null ? null : Number(existing.single)) !== u.single) { existing.single = u.single; changed = true; }
+        }
         if (!Object.prototype.hasOwnProperty.call(existing,'photo')) { existing.photo = null; changed = true; }
       } else {
         items.push({id:u.id,name:u.name,bulk:u.bulk,single:u.single,photo:null});
@@ -1213,7 +1229,7 @@
     });
     if (changed) saveItems();
   }
-  syncV6Prices();
+  runPriceMigrations();
   var carts = loadCarts();
   var DISCOUNT_STORAGE_KEY = 'price-list-cart-discounts-v1';
   var discounts = loadJson(DISCOUNT_STORAGE_KEY, [0,0]);
@@ -1277,7 +1293,7 @@
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(items)); } catch (e) {}
   }
   function isFinishedItem(item) { return !!(item && item.finished); }
-  function ensureLatestItems() {
+  function ensureLatestItems(addOnly) {
     var changed = false;
     var updates = [
       {id:45,name:"Puma Cola",bulk:42.00,single:null},
@@ -1293,9 +1309,11 @@
     updates.forEach(function(u){
       var existing = items.find(function(i){ return i.id === u.id; });
       if (existing) {
-        if (existing.name !== u.name) { existing.name = u.name; changed = true; }
-        if (u.bulk !== undefined && Number(existing.bulk) !== Number(u.bulk)) { existing.bulk = u.bulk; changed = true; }
-        if (u.single !== undefined && (existing.single === undefined ? null : existing.single) !== u.single) { existing.single = u.single; changed = true; }
+        if (!addOnly && !existing.customizedAt) {
+          if (existing.name !== u.name) { existing.name = u.name; changed = true; }
+          if (u.bulk !== undefined && Number(existing.bulk) !== Number(u.bulk)) { existing.bulk = u.bulk; changed = true; }
+          if (u.single !== undefined && (existing.single === undefined ? null : existing.single) !== u.single) { existing.single = u.single; changed = true; }
+        }
       } else {
         items.push({id:u.id,name:u.name,bulk:u.bulk,single:u.single,photo:null});
         changed = true;
@@ -1567,7 +1585,6 @@
     showToast('Price list TXT ready');
   }
 
-  var APP_VERSION = 'v9.1';
   var LAST_BACKUP_KEY = 'price-list-last-backup-v1';
   function isAppStorageKey(k) {
     return !!k && (k.indexOf('priceList') === 0 || k.indexOf('price-list-') === 0);
@@ -2509,6 +2526,7 @@ function renderHistory(){
     document.getElementById("screen-sell").classList.toggle("active", tab === "sell");
     document.getElementById("screen-history").classList.toggle("active", tab === "history");
     document.querySelectorAll(".tab-btn").forEach(function (b) { b.classList.toggle("active", b.dataset.tab === tab); });
+    if(tab==='manage') renderManageList();
     if(tab==='history') renderHistory();
   }
 
@@ -2571,7 +2589,23 @@ function renderHistory(){
     var single = parsePriceField("item-single-input");
     if (editingId !== null) {
       var idx = items.findIndex(function (i) { return i.id === editingId; });
-      if (idx !== -1) items[idx] = { id: editingId, name: name, bulk: bulk, single: single, photo: pendingPhoto, finished: document.getElementById("item-finished-input").checked };
+      if (idx !== -1) {
+        var previous = items[idx];
+        items[idx] = {
+          id: editingId,
+          name: name,
+          bulk: bulk,
+          single: single,
+          photo: pendingPhoto,
+          finished: document.getElementById("item-finished-input").checked,
+          customizedAt: Date.now(),
+          customizedVersion: APP_VERSION
+        };
+        // Keep any future item metadata not represented by the edit sheet.
+        Object.keys(previous || {}).forEach(function(key) {
+          if (!(key in items[idx]) && key !== 'name' && key !== 'bulk' && key !== 'single' && key !== 'photo' && key !== 'finished') items[idx][key] = previous[key];
+        });
+      }
     } else {
       items.push({ id: Date.now(), name: name, bulk: bulk, single: single, photo: pendingPhoto, finished: document.getElementById("item-finished-input").checked });
     }
@@ -2830,11 +2864,20 @@ function renderHistory(){
   normalizeCartOrder();
   bindPhotoInput();
   applyTheme();
-  renderManageList();
+  // Render the visible selling UI first. Hidden Manage/History lists wait until
+  // their tab is opened (or the browser is idle), reducing work on launch.
   renderCatalogList();
   renderCart();
- 
-  renderHistory();
+  if (window.requestAnimationFrame) {
+    requestAnimationFrame(function(){
+      if (document.visibilityState === 'visible') {
+        setTimeout(function(){
+          if (!document.getElementById('screen-manage').classList.contains('active')) renderManageList();
+          if (!document.getElementById('screen-history').classList.contains('active')) renderHistory();
+        }, 0);
+      }
+    });
+  }
   renderBackupMeta();
   renderAppVersion();
   document.getElementById("money-received").addEventListener("input", updateChangeCalculator);

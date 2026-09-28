@@ -1,4 +1,4 @@
-const CACHE = "price-list-sales-calculator-v9-1";
+const CACHE = "price-list-sales-calculator-v9-2";
 const APP_SHELL = ["./","./index.html","./manifest.webmanifest","./icon-180.png","./icon-512.png"];
 
 self.addEventListener("install", event => {
