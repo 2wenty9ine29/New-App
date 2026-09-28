@@ -1,5 +1,5 @@
-const CACHE = "price-list-sales-calculator-v9-5-4";
-const APP_SHELL = ["./","./index.html","./manifest.webmanifest","./icon-180.png","./icon-512.png"];
+const CACHE = "price-list-sales-calculator-v9-6";
+const APP_SHELL = ["./","./index.html","./manifest.webmanifest","./icon-180.png","./icon-512.png","./fonts/poppins-latin-400-normal.woff2","./fonts/poppins-latin-500-normal.woff2","./fonts/poppins-latin-600-normal.woff2","./fonts/poppins-latin-700-normal.woff2","./fonts/poppins-latin-800-normal.woff2","./fonts/poppins-latin-900-normal.woff2"];
 
 self.addEventListener("install", event => {
   event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(APP_SHELL)));
@@ -19,17 +19,20 @@ self.addEventListener("fetch", event => {
     event.request.url.endsWith("/");
 
   if (isAppShellDoc) {
-    // Network-first for the app itself: always try to fetch the latest
-    // version first, and only fall back to the cached copy when offline.
-    // A cache-first strategy here was why updates could get stuck behind
-    // an old cached copy indefinitely.
+    // Stale-while-revalidate: open instantly from the cached copy (important
+    // on slow networks) and fetch the latest version quietly in the background.
+    // A new version is used the next time the app is opened.
     event.respondWith(
-      fetch(event.request).then(function (response) {
-        var copy = response.clone();
-        caches.open(CACHE).then(function (cache) { cache.put(event.request, copy); });
-        return response;
-      }).catch(function () {
-        return caches.match(event.request);
+      caches.match(event.request, { ignoreSearch: true }).then(function (cached) {
+        var refresh = fetch(event.request).then(function (response) {
+          if (response && response.ok) {
+            var copy = response.clone();
+            caches.open(CACHE).then(function (cache) { cache.put(event.request, copy); });
+          }
+          return response;
+        }).catch(function () { return cached; });
+        event.waitUntil(refresh.catch(function () {}));
+        return cached || refresh;
       })
     );
     return;

@@ -10,12 +10,13 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#F6F5F0" id="theme-color-meta">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="preload" href="fonts/poppins-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/poppins-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/poppins-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="apple-touch-icon" href="icon-180.png">
-<title>Price List · V9.5.4</title>
+<title>Price List · V9.6</title>
 <style>
+@font-face{font-family:"Poppins";font-style:normal;font-weight:400;font-display:swap;src:url(fonts/poppins-latin-400-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:500;font-display:swap;src:url(fonts/poppins-latin-500-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:600;font-display:swap;src:url(fonts/poppins-latin-600-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:700;font-display:swap;src:url(fonts/poppins-latin-700-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:800;font-display:swap;src:url(fonts/poppins-latin-800-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:900;font-display:swap;src:url(fonts/poppins-latin-900-normal.woff2) format("woff2");}
   :root {
     color-scheme: light;
     --paper: #F6F5F0;
@@ -219,7 +220,9 @@
   .receipt-calendar-btn { flex:0 0 40px; width:40px; height:40px; border:1px solid var(--line); border-radius:12px; background:var(--surface); color:var(--ink-soft); display:flex; align-items:center; justify-content:center; padding:0; }
   .receipt-calendar-btn:active { transform:scale(.96); }
   .receipt-calendar-btn svg { width:18px; height:18px; }
-  #receipt-date-filter { position:absolute; width:1px; height:1px; opacity:0; pointer-events:none; }
+  .receipt-calendar-wrap { position:relative; flex:0 0 40px; width:40px; height:40px; }
+  .receipt-calendar-wrap .receipt-calendar-btn { pointer-events:none; }
+  #receipt-date-filter { position:absolute; inset:0; width:100%; height:100%; opacity:0; font-size:16px; cursor:pointer; border:0; padding:0; margin:0; }
   .receipt-date-clear { font-size:10px; color:var(--gold); margin:4px 20px 0; text-align:right; min-height:14px; }
   .receipt-date-clear button { border:0; background:none; color:inherit; font:inherit; padding:0; }
 
@@ -959,10 +962,10 @@
             <input id="receipt-search" type="text" placeholder="Search receipts" autocomplete="off">
             <button class="search-clear" id="receipt-search-clear" aria-label="Clear receipt search">×</button>
           </div>
-          <button class="receipt-calendar-btn" id="receipt-calendar-btn" aria-label="Filter receipts by date" title="Filter by date">
+          <div class="receipt-calendar-wrap"><button class="receipt-calendar-btn" id="receipt-calendar-btn" tabindex="-1" aria-label="Filter receipts by date" title="Filter by date">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="9" x2="21" y2="9"/></svg>
           </button>
-          <input id="receipt-date-filter" type="date" aria-label="Receipt date">
+          <input id="receipt-date-filter" type="date" aria-label="Filter receipts by date"></div>
         </div>
         <div class="receipt-date-clear" id="receipt-date-clear" hidden><button type="button">Clear date</button></div>
       </div>
@@ -1261,7 +1264,7 @@ window.addEventListener("error", function(e) {
   ];
   defaultItems.forEach(function(i){ i.photo = null; });
 
-  var APP_VERSION = 'v9.5.4';
+  var APP_VERSION = 'v9.6';
   var PRICE_MIGRATION_VERSION_KEY = 'price-list-price-migration-version-v1';
   var items = loadItems();
 
@@ -1461,8 +1464,7 @@ window.addEventListener("error", function(e) {
   var receiptSearchClear=document.getElementById('receipt-search-clear'); if(receiptSearchClear) receiptSearchClear.addEventListener('click',function(){ receiptSearchQuery=''; if(receiptSearchEl) receiptSearchEl.value=''; renderReceiptHistory(); if(receiptSearchEl) receiptSearchEl.focus(); });
   var receiptDateEl=document.getElementById('receipt-date-filter');
   var receiptCalendarBtn=document.getElementById('receipt-calendar-btn');
-  if(receiptCalendarBtn) receiptCalendarBtn.addEventListener('click',function(){ if(receiptDateEl){ if(receiptDateEl.showPicker) receiptDateEl.showPicker(); else receiptDateEl.click(); } });
-  if(receiptDateEl) receiptDateEl.addEventListener('change',function(){ receiptDateFilter=this.value||''; renderReceiptHistory(); });
+  if(receiptDateEl){ var onReceiptDate=function(){ receiptDateFilter=this.value||''; renderReceiptHistory(); }; receiptDateEl.addEventListener('change',onReceiptDate); receiptDateEl.addEventListener('input',onReceiptDate); }
   var receiptDateClear=document.getElementById('receipt-date-clear');
   if(receiptDateClear) receiptDateClear.addEventListener('click',function(){ receiptDateFilter=''; if(receiptDateEl) receiptDateEl.value=''; renderReceiptHistory(); });
   function updateCartSwitcher() {
