@@ -350,6 +350,26 @@
   .reports-top-row .rt-qty { font-size:10px; color:var(--ink-soft); margin-top:1px; }
   .reports-top-row .rt-revenue { font-size:12px; font-weight:650; color:var(--gold); white-space:nowrap; font-variant-numeric:tabular-nums; }
   .reports-empty { text-align:center; padding:30px 10px; color:var(--ink-soft); font-size:13px; }
+  .reports-custom { display:grid; gap:8px; padding:10px; margin-bottom:8px; border:1px solid var(--line); border-radius:14px; background:var(--paper); }
+  .reports-custom-row { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .reports-custom label { display:grid; gap:4px; font-size:10px; color:var(--ink-soft); font-weight:650; }
+  .reports-custom input { width:100%; box-sizing:border-box; border:1px solid var(--line); border-radius:10px; padding:8px 9px; background:var(--surface); color:var(--ink); font:inherit; font-size:12px; }
+  .reports-title-input { width:100%; box-sizing:border-box; border:1px solid var(--line); border-radius:10px; padding:9px; background:var(--surface); color:var(--ink); font:inherit; font-size:12px; }
+  .reports-actions { display:flex; gap:8px; margin:10px 0 2px; }
+  .reports-action-btn { flex:1; border:1px solid var(--line); background:var(--paper); color:var(--ink); border-radius:999px; padding:9px 10px; font-size:11px; font-weight:750; }
+  .reports-action-btn.primary { background:var(--gold); border-color:var(--gold); color:#fff; }
+  .reports-check { margin-top:12px; padding:10px 12px; border:1px solid var(--line); border-radius:14px; background:var(--paper); font-size:11px; }
+  .reports-check.ok { border-color:rgba(30,92,70,.28); }
+  .reports-check.warn { border-color:rgba(161,98,7,.35); }
+  .reports-check strong { display:block; margin-bottom:3px; font-size:12px; }
+  .receipt-summary-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:7px; margin:10px 0 12px; }
+  .receipt-summary-card { border:1px solid var(--line); border-radius:12px; padding:9px 10px; background:var(--paper); }
+  .receipt-summary-card .rsc-label { font-size:9px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.04em; }
+  .receipt-summary-card .rsc-value { margin-top:2px; font-size:15px; font-weight:750; font-variant-numeric:tabular-nums; }
+  .receipt-summary-card.debt .rsc-value { color:var(--gold); }
+  .receipt-summary-card.change .rsc-value { color:#0ea5e9; }
+  .receipt-summary-card.momo .rsc-value { color:var(--green); }
+  .receipt-summary-card.total .rsc-value { color:var(--ink); }
 
   /* Polished receipt action sheet */
   .receipt-action-panel { position:fixed; inset:0; z-index:130; background:rgba(0,0,0,.52); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); display:flex; align-items:center; justify-content:center; padding:20px; }
@@ -909,7 +929,8 @@
         <button class="receipt-tool-btn" id="copy-all-receipts-btn">Copy receipts</button>
         <button class="receipt-tool-btn" id="paste-receipts-btn">Paste receipts</button>
       </div>
-      <div class="receipt-tools-title">Unsettled / Pending</div>
+      <div class="receipt-tools-title">Unsettled / Pending totals</div>
+      <div class="receipt-summary-grid" id="receipt-summary-grid"></div>
       <div class="receipt-tools">
         <button class="receipt-tool-btn change" id="change-owed-btn">Change</button>
         <button class="receipt-tool-btn debt" id="unsettled-debts-btn">Debt</button>
@@ -931,6 +952,18 @@
         <button class="reports-tab" data-report-period="dayBeforeYesterday" id="report-day-before-yesterday">Thursday</button>
         <button class="reports-tab" data-report-period="month">This Month</button>
         <button class="reports-tab" data-report-period="year">This Year</button>
+        <button class="reports-tab" data-report-period="custom">Custom</button>
+      </div>
+      <div class="reports-custom" id="reports-custom">
+        <div class="reports-custom-row" id="reports-custom-dates">
+          <label>From<input type="date" id="report-from"></label>
+          <label>To<input type="date" id="report-to"></label>
+        </div>
+        <label>Report title<input class="reports-title-input" id="report-title" type="text" maxlength=80 placeholder="Sales Report"></label>
+      </div>
+      <div class="reports-actions">
+        <button class="reports-action-btn" id="report-accounting-btn">Check accounts</button>
+        <button class="reports-action-btn primary" id="report-pdf-btn">Download PDF</button>
       </div>
       <div id="reports-body"></div>
     </div>
@@ -1187,7 +1220,7 @@
   ];
   defaultItems.forEach(function(i){ i.photo = null; });
 
-  var APP_VERSION = 'v9.2';
+  var APP_VERSION = 'v9.5';
   var PRICE_MIGRATION_VERSION_KEY = 'price-list-price-migration-version-v1';
   var items = loadItems();
 
@@ -1250,6 +1283,32 @@
   var pendingRestoredReceipt = loadJson(PENDING_RESTORE_KEY, null);
   if (pendingRestoredReceipt && !pendingRestoredReceipt.receiptNumber) pendingRestoredReceipt = null;
 
+  // v9.5: receipts get a permanent identity. Settlements use this hidden ID
+  // instead of the visible receipt number, so adding debts or new receipts can
+  // never make an existing debt/change/Momo record jump to another receipt.
+  function newReceiptId() { return 'r_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,10); }
+  function migrateReceiptIdentity() {
+    var changed = false;
+    var byNumber = {};
+    receipts.forEach(function(r){
+      if (!r.receiptId) { r.receiptId = newReceiptId(); changed = true; }
+      if (r.number) byNumber[String(r.number)] = r.receiptId;
+    });
+    if (pendingRestoredReceipt && pendingRestoredReceipt.receiptId) byNumber[String(pendingRestoredReceipt.receiptNumber||'')] = pendingRestoredReceipt.receiptId;
+    [unsettledDebts, changeOwed, momoPayments].forEach(function(arr){
+      arr.forEach(function(x){
+        if (!x.receiptId && x.receiptNumber && byNumber[String(x.receiptNumber)]) { x.receiptId = byNumber[String(x.receiptNumber)]; changed = true; }
+        if (!x.receiptId) { x.receiptId = newReceiptId(); changed = true; }
+      });
+    });
+    if (pendingRestoredReceipt && !pendingRestoredReceipt.receiptId) {
+      var old = byNumber[String(pendingRestoredReceipt.receiptNumber||'')];
+      if (old) { pendingRestoredReceipt.receiptId = old; saveJson(PENDING_RESTORE_KEY,pendingRestoredReceipt); }
+    }
+    if (changed) { saveJson('price-list-receipts-v1',receipts); saveSettlements(); }
+  }
+  migrateReceiptIdentity();
+
   // Keep the visible receipt numbers orderly by date while the counter itself
   // always moves forward. This means the newest saved receipt has the largest
   // visible number, while deleting/restoring a receipt never reuses a number.
@@ -1264,7 +1323,6 @@
     localStorage.setItem('price-list-receipt-counter-v1', String(receiptCounter));
     saveJson('price-list-receipts-v1', receipts);
   }
-  normalizeReceiptNumbers();
   var darkMode = localStorage.getItem('price-list-dark-mode-v1') === '1';
   var pendingPhoto = null;
   var editingId = null;
@@ -1350,6 +1408,9 @@
     activeCartIndex = index;
     cart = carts[activeCartIndex] || {};
     cartOrder = loadJson('price-list-cart-order-v1-' + activeCartIndex, []);
+  ['report-from','report-to'].forEach(function(id){ var el=document.getElementById(id); if(el) el.addEventListener('change',function(){ customReportRange.from=document.getElementById('report-from').value; customReportRange.to=document.getElementById('report-to').value; reportPeriod='custom'; renderReports(); }); });
+  var reportTitleEl=document.getElementById('report-title'); if(reportTitleEl) reportTitleEl.addEventListener('input',function(){ reportTitle=this.value; });
+
   migrateLegacyCart();
     normalizeCartOrder();
     renderCart();
@@ -1992,7 +2053,7 @@
       receiptNo='Receipt #' + String(receiptCounter).padStart(4,'0');
       createdAt=new Date().toISOString();
     }
-    var receipt={number:receiptNo,total:total,grossTotal:grossTotal,discount:discount,createdAt:createdAt,cartIndex:activeCartIndex,items:entries.map(function(e){
+    var receipt={receiptId:(restoring && restoring.receiptId) || newReceiptId(),number:receiptNo,total:total,grossTotal:grossTotal,discount:discount,createdAt:createdAt,cartIndex:activeCartIndex,items:entries.map(function(e){
       return {id:e.item.id,key:e.key,name:e.item.name,mode:e.mode,fraction:e.fraction,qty:e.qty,subtotal:(priceForMode(e.item,e.mode,e.fraction)||0)*e.qty};
     })};
     if (restoring) {
@@ -2057,15 +2118,14 @@
     saveJson('price-list-change-owed-v1', changeOwed);
     saveJson('price-list-momo-payments-v1', momoPayments);
   }
-  function getReceiptSettlements(receiptNumber) {
-    return {
-      debt: unsettledDebts.find(function(x){ return x.receiptNumber===receiptNumber; }) || null,
-      change: changeOwed.find(function(x){ return x.receiptNumber===receiptNumber; }) || null,
-      momo: momoPayments.find(function(x){ return x.receiptNumber===receiptNumber; }) || null
-    };
+  function getReceiptSettlements(receiptRef) {
+    var receiptId = receiptRef && typeof receiptRef === 'object' ? receiptRef.receiptId : String(receiptRef||'');
+    var receiptNumber = receiptRef && typeof receiptRef === 'object' ? String(receiptRef.number||'') : String(receiptRef||'');
+    function find(arr){ return arr.find(function(x){ return (receiptId && x.receiptId===receiptId) || (!x.receiptId && x.receiptNumber===receiptNumber); }) || null; }
+    return { debt: find(unsettledDebts), change: find(changeOwed), momo: find(momoPayments) };
   }
-  function receiptStatusChipsHtml(receiptNumber) {
-    var s = getReceiptSettlements(receiptNumber);
+  function receiptStatusChipsHtml(receiptRef) {
+    var s = getReceiptSettlements(receiptRef);
     if (!s.change && !s.debt && !s.momo) return '';
     var chips = '<div class="receipt-status-row">';
     var details = '<div class="receipt-status-details">';
@@ -2128,7 +2188,7 @@
     var input=window.prompt(label,''); if(input===null) return;
     var amount=Number(input);
     if(!isFinite(amount) || amount<=0){ showToast('Enter a valid amount'); return; }
-    var record={id:Date.now()+Math.random(),receiptNumber:r.number||'Receipt',receiptCreatedAt:r.createdAt||new Date().toISOString(),amount:Number(amount.toFixed(2)),createdAt:new Date().toISOString(),items:(r.items||[]).map(function(i){return {name:String(i.name||''),qty:Number(i.qty)||0,mode:i.mode||'bulk',fraction:i.fraction==null?1:Number(i.fraction),subtotal:Number(i.subtotal)||0};})};
+    var record={id:Date.now()+Math.random(),receiptId:r.receiptId||'',receiptNumber:r.number||'Receipt',receiptCreatedAt:r.createdAt||new Date().toISOString(),amount:Number(amount.toFixed(2)),createdAt:new Date().toISOString(),items:(r.items||[]).map(function(i){return {name:String(i.name||''),qty:Number(i.qty)||0,mode:i.mode||'bulk',fraction:i.fraction==null?1:Number(i.fraction),subtotal:Number(i.subtotal)||0};})};
     settlementArray(type).unshift(record);
     saveSettlements();
     closeReceiptActionMenu();
@@ -2153,7 +2213,7 @@
     var actionLabel = isDebt ? 'Mark as paid' : isMomo ? 'Clear' : 'Mark as collected';
     list.innerHTML=data.map(function(x,i){
       var d=new Date(x.createdAt), when=isNaN(d.getTime())?'':d.toLocaleString([], {month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
-      var sourceItems=Array.isArray(x.items)&&x.items.length?x.items:((receipts.find(function(r){return String(r.number||'')===String(x.receiptNumber||'');})||{}).items||[]); var itemsHtml=sourceItems.length?'<ul class="settlement-items">'+sourceItems.map(function(it){var tag=it.mode==='bulk'?(it.fraction===0.5?' (Half)':it.fraction===0.25?' (Quarter)':''):''; return '<li>'+escapeHtml(it.name+tag)+' × '+(Number(it.qty)||0)+'</li>';}).join('')+'</ul>':''; return '<div class="settlement-item"><div class="settlement-item-top"><strong>'+escapeHtml(x.receiptNumber)+'</strong><span class="settlement-amount">¢'+formatCedis(x.amount)+'</span></div>'+itemsHtml+'<div class="settlement-meta">Recorded '+escapeHtml(when)+'</div><button class="settlement-action" data-settlement-complete="'+i+'">'+actionLabel+'</button></div>';
+      var sourceItems=Array.isArray(x.items)&&x.items.length?x.items:((receipts.find(function(r){return (x.receiptId && r.receiptId===x.receiptId) || (!x.receiptId && String(r.number||'')===String(x.receiptNumber||''));})||{}).items||[]); var itemsHtml=sourceItems.length?'<ul class="settlement-items">'+sourceItems.map(function(it){var tag=it.mode==='bulk'?(it.fraction===0.5?' (Half)':it.fraction===0.25?' (Quarter)':''):''; return '<li>'+escapeHtml(it.name+tag)+' × '+(Number(it.qty)||0)+'</li>';}).join('')+'</ul>':''; return '<div class="settlement-item"><div class="settlement-item-top"><strong>'+escapeHtml(x.receiptNumber)+'</strong><span class="settlement-amount">¢'+formatCedis(x.amount)+'</span></div>'+itemsHtml+'<div class="settlement-meta">Recorded '+escapeHtml(when)+'</div><button class="settlement-action" data-settlement-complete="'+i+'">'+actionLabel+'</button></div>';
     }).join('');
   }
   function completeSettlement(index) {
@@ -2190,6 +2250,7 @@
     // the full original receipt in pending state so it can return exactly to its
     // original number, date/time, and position if the edit is cancelled.
     pendingRestoredReceipt={
+      receiptId:r.receiptId||newReceiptId(),
       receiptNumber:r.number||'Receipt',
       createdAt:r.createdAt||new Date().toISOString(),
       originalIndex:receiptIndex,
@@ -2262,6 +2323,7 @@
     else if(payload && payload.number && payload.items) list=[payload];
     return list.filter(function(r){ return r && r.number && r.createdAt && Array.isArray(r.items); }).map(function(r){
       return {
+        receiptId:r.receiptId || newReceiptId(),
         number:String(r.number), total:Number(r.total)||0, grossTotal:r.grossTotal==null?Number(r.total)||0:Number(r.grossTotal)||0,
         discount:Number(r.discount)||0, createdAt:String(r.createdAt), cartIndex:Number(r.cartIndex)||0,
         items:r.items.map(function(i){ return {id:i.id==null?null:Number(i.id),key:i.key||'',name:String(i.name||''),mode:i.mode||'bulk',fraction:i.fraction==null?1:Number(i.fraction),qty:Number(i.qty)||0,subtotal:Number(i.subtotal)||0}; })
@@ -2284,7 +2346,8 @@
     var maxNo=receiptCounter;
     receipts.forEach(function(r){ var m=String(r.number||'').match(/(\d+)$/); if(m) maxNo=Math.max(maxNo,Number(m[1])); });
     receiptCounter=maxNo; localStorage.setItem('price-list-receipt-counter-v1',String(receiptCounter));
-    normalizeReceiptNumbers();
+    receipts.sort(function(a,b){ return new Date(b.createdAt).getTime()-new Date(a.createdAt).getTime(); });
+    migrateReceiptIdentity();
     saveJson('price-list-receipts-v1',receipts); renderHistory(); closeReceiptImport(); showToast(incoming.length+' receipt'+(incoming.length===1?'':'s')+' imported');
   }
 
@@ -2408,10 +2471,11 @@ function renderHistory(){
         var mode=i.mode==='bulk'?(i.fraction===0.5?'½ BULK':i.fraction===0.25?'¼ BULK':'Full BULK'):'SINGLE';
         return '<li>'+escapeHtml(i.name)+' — '+mode+' × '+(Number(i.qty)||0)+' — ¢'+formatCedis(i.subtotal)+'</li>';
       }).join('');
-      return '<div class="history-card" data-history-index="'+idx+'" data-receipt-index="'+idx+'"><div class="history-top"><span class="history-receipt">'+escapeHtml(r.number)+'</span><span class="history-total">¢'+formatCedis(r.total)+'</span></div>'+receiptStatusChipsHtml(r.number)+'<div class="history-meta">'+when+'</div><ul class="history-items">'+itemsHtml+'</ul><button class="receipt-history-share" data-share-receipt="'+idx+'">Share receipt</button><button class="receipt-copy-btn" data-copy-receipt="'+idx+'">Copy</button></div>';
+      return '<div class="history-card" data-history-index="'+idx+'" data-receipt-index="'+idx+'"><div class="history-top"><span class="history-receipt">'+escapeHtml(r.number)+'</span><span class="history-total">¢'+formatCedis(r.total)+'</span></div>'+receiptStatusChipsHtml(r)+'<div class="history-meta">'+when+'</div><ul class="history-items">'+itemsHtml+'</ul><button class="receipt-history-share" data-share-receipt="'+idx+'">Share receipt</button><button class="receipt-copy-btn" data-copy-receipt="'+idx+'">Copy</button></div>';
     }).join('');
     updateReceiptCount();
     renderReceiptHistory();
+    renderReceiptSummary();
     updateChangeCalculator();
   }
   function updateReceiptCount(){
@@ -2421,6 +2485,8 @@ function renderHistory(){
     if(btn) btn.setAttribute('aria-label','View '+receipts.length+' available receipts');
   }
   var reportPeriod = 'today';
+  var customReportRange = {from:'', to:''};
+  var reportTitle = '';
   function reportPeriodStart(period) {
     var now = new Date();
     var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -2437,6 +2503,14 @@ function renderHistory(){
     }
     if (period === 'month') return { start: new Date(now.getFullYear(), now.getMonth(), 1), end: new Date(now.getTime() + 1) };
     if (period === 'year') return { start: new Date(now.getFullYear(), 0, 1), end: new Date(now.getTime() + 1) };
+    if (period === 'custom') {
+      if (!customReportRange.from || !customReportRange.to) return null;
+      var from = new Date(customReportRange.from+'T00:00:00');
+      var to = new Date(customReportRange.to+'T00:00:00');
+      if (isNaN(from.getTime()) || isNaN(to.getTime()) || to < from) return null;
+      to.setDate(to.getDate()+1);
+      return {start:from,end:to};
+    }
     return null;
   }
   function updateDayBeforeYesterdayLabel() {
@@ -2471,7 +2545,110 @@ function renderHistory(){
     });
     var topItems = Object.keys(itemTotals).map(function (k) { return itemTotals[k]; })
       .sort(function (a, b) { return b.revenue - a.revenue; }).slice(0, 8);
-    return { saleCount: filtered.length, revenue: revenue, discountTotal: discountTotal, bulkRevenue: bulkRevenue, singleRevenue: singleRevenue, topItems: topItems };
+    return { saleCount: filtered.length, revenue: revenue, discountTotal: discountTotal, bulkRevenue: bulkRevenue, singleRevenue: singleRevenue, topItems: topItems, filtered: filtered, range: range };
+  }
+  function settlementTotals() {
+    function total(arr){ return arr.reduce(function(sum,x){ return sum+(Number(x.amount)||0); },0); }
+    var debt=total(unsettledDebts), change=total(changeOwed), momo=total(momoPayments);
+    return {debt:debt,change:change,momo:momo,total:debt+change+momo};
+  }
+  function renderReceiptSummary() {
+    var el=document.getElementById('receipt-summary-grid'); if(!el) return;
+    var t=settlementTotals();
+    el.innerHTML='<div class="receipt-summary-card debt"><div class="rsc-label">Debt</div><div class="rsc-value">¢'+formatCedis(t.debt)+'</div></div>'+
+      '<div class="receipt-summary-card change"><div class="rsc-label">Change</div><div class="rsc-value">¢'+formatCedis(t.change)+'</div></div>'+
+      '<div class="receipt-summary-card momo"><div class="rsc-label">MoMo</div><div class="rsc-value">¢'+formatCedis(t.momo)+'</div></div>'+
+      '<div class="receipt-summary-card total"><div class="rsc-label">Total tracked</div><div class="rsc-value">¢'+formatCedis(t.total)+'</div></div>';
+  }
+  function accountingCheck() {
+    var known={}; receipts.forEach(function(r){ if(r.receiptId) known[r.receiptId]=true; });
+    if(pendingRestoredReceipt && pendingRestoredReceipt.receiptId) known[pendingRestoredReceipt.receiptId]=true;
+    var all=[].concat(unsettledDebts,changeOwed,momoPayments), unmatched=all.filter(function(x){ return !x.receiptId || !known[x.receiptId]; });
+    return {ok:unmatched.length===0,totalReceipts:receipts.length,debt:unsettledDebts.length,change:changeOwed.length,momo:momoPayments.length,unmatched:unmatched};
+  }
+  function accountingCheckHtml() {
+    var c=accountingCheck();
+    if(c.ok) return '<div class="reports-check ok"><strong>✓ Everything is accounted for</strong>'+c.totalReceipts+' receipts checked · '+c.debt+' debts · '+c.change+' change records · '+c.momo+' MoMo records · 0 unmatched</div>';
+    return '<div class="reports-check warn"><strong>⚠ '+c.unmatched.length+' record'+(c.unmatched.length===1?'':'s')+' need attention</strong>'+c.totalReceipts+' receipts checked · '+c.unmatched.length+' settlement record'+(c.unmatched.length===1?' is':'s are')+' not linked to a known receipt.</div>';
+  }
+  function reportSettlementStats(filteredReceipts) {
+    var ids={}; (filteredReceipts||[]).forEach(function(r){ if(r.receiptId) ids[r.receiptId]=true; });
+    function sum(arr){ return arr.reduce(function(total,x){ return total + (x.receiptId && ids[x.receiptId] ? Number(x.amount)||0 : 0); },0); }
+    return {momo:sum(momoPayments),debt:sum(unsettledDebts),change:sum(changeOwed)};
+  }
+  function reportRangeLabel(period, range) {
+    if (period==='custom' && range) return customReportRange.from+' to '+customReportRange.to;
+    var names={today:'Today',yesterday:'Yesterday',dayBeforeYesterday:'Day before yesterday',month:'This month',year:'This year'};
+    return names[period] || 'Sales report';
+  }
+  function pdfSafeText(value) {
+    return String(value==null?'':value).replace(/[^\x20-\x7E]/g,'?').replace(/\\/g,'\\\\').replace(/\(/g,'\\(').replace(/\)/g,'\\)');
+  }
+  function pdfMoney(n){ return 'GHS '+formatCedis(n); }
+  function pdfAddText(parts, text, x, y, size, bold) {
+    parts.push('BT /F'+(bold?'2':'1')+' '+size+' Tf '+x.toFixed(1)+' '+y.toFixed(1)+' Td ('+pdfSafeText(text)+') Tj ET');
+  }
+  function pdfAddLine(parts,x1,y1,x2,y2){ parts.push(x1.toFixed(1)+' '+y1.toFixed(1)+' m '+x2.toFixed(1)+' '+y2.toFixed(1)+' l S'); }
+  function pdfAddPie(parts,cx,cy,r,values,labels) {
+    var total=values.reduce(function(a,b){return a+(Number(b)||0);},0);
+    if(total<=0){ return; }
+    var palette=[[0.18,0.55,0.42],[0.92,0.64,0.16],[0.22,0.55,0.86],[0.55,0.38,0.72]];
+    var angle=-Math.PI/2;
+    values.forEach(function(v,idx){
+      v=Number(v)||0; if(v<=0)return;
+      var sweep=2*Math.PI*v/total, end=angle+sweep, steps=Math.max(2,Math.ceil(Math.abs(sweep)/(Math.PI/12)));
+      var c=palette[idx%palette.length]; parts.push(c[0]+' '+c[1]+' '+c[2]+' rg');
+      parts.push(cx.toFixed(1)+' '+cy.toFixed(1)+' m');
+      for(var i=0;i<=steps;i++){ var a=angle+(sweep*i/steps); parts.push((cx+r*Math.cos(a)).toFixed(1)+' '+(cy+r*Math.sin(a)).toFixed(1)+' l'); }
+      parts.push('h f'); angle=end;
+    });
+  }
+  function buildReportPdf(title, periodLabel, stats, settlement) {
+    var W=595,H=842, parts=[];
+    parts.push('0.18 0.18 0.18 rg');
+    pdfAddText(parts,title,42,795,22,true);
+    pdfAddText(parts,periodLabel,42,773,10,false);
+    parts.push('0.82 0.82 0.82 RG 1 w'); pdfAddLine(parts,42,760,553,760);
+    pdfAddText(parts,'SUMMARY',42,738,11,true);
+    var summary=[['Revenue',pdfMoney(stats.revenue)],['Sales',String(stats.saleCount)],['Discounts',pdfMoney(stats.discountTotal)],['Average sale',pdfMoney(stats.saleCount?stats.revenue/stats.saleCount:0)]];
+    summary.forEach(function(row,i){ var col=i%2, rr=Math.floor(i/2), x=42+col*255, y=710-rr*42; parts.push('0.96 0.96 0.96 rg '+x+' '+(y-15)+' 235 30 re f'); parts.push('0.18 0.18 0.18 rg'); pdfAddText(parts,row[0],x+10,y,8,false); pdfAddText(parts,row[1],x+10,y-13,13,true); });
+    pdfAddText(parts,'SALES MIX',42,610,11,true);
+    pdfAddPie(parts,150,525,68,[stats.bulkRevenue,stats.singleRevenue],['Bulk','Singles']);
+    pdfAddText(parts,'Bulk',245,555,9,true); pdfAddText(parts,pdfMoney(stats.bulkRevenue),300,555,9,false);
+    pdfAddText(parts,'Singles',245,535,9,true); pdfAddText(parts,pdfMoney(stats.singleRevenue),300,535,9,false);
+    pdfAddText(parts,'SETTLEMENTS IN PERIOD',42,430,11,true);
+    pdfAddPie(parts,150,345,68,[settlement.momo,settlement.debt,settlement.change],['MoMo','Debt','Change']);
+    pdfAddText(parts,'MoMo',245,375,9,true); pdfAddText(parts,pdfMoney(settlement.momo),300,375,9,false);
+    pdfAddText(parts,'Debt',245,355,9,true); pdfAddText(parts,pdfMoney(settlement.debt),300,355,9,false);
+    pdfAddText(parts,'Change',245,335,9,true); pdfAddText(parts,pdfMoney(settlement.change),300,335,9,false);
+    pdfAddText(parts,'TOP ITEMS',42,245,11,true);
+    stats.topItems.forEach(function(it,i){ var y=222-i*20; if(y<58)return; pdfAddText(parts,String(i+1)+'. '+it.name,48,y,9,false); pdfAddText(parts,String(it.qty)+' sold',360,y,8,false); pdfAddText(parts,pdfMoney(it.revenue),455,y,9,true); });
+    var check=accountingCheck();
+    parts.push('0.94 0.94 0.94 rg 42 28 511 24 re f'); parts.push('0.18 0.18 0.18 rg');
+    pdfAddText(parts,check.ok?'Everything is accounted for':'Accounting check: '+check.unmatched.length+' unmatched record(s)',50,40,9,true);
+    var stream=parts.join('\n'), objects=[];
+    objects.push('<< /Type /Catalog /Pages 2 0 R >>');
+    objects.push('<< /Type /Pages /Kids [3 0 R] /Count 1 >>');
+    objects.push('<< /Type /Page /Parent 2 0 R /MediaBox [0 0 '+W+' '+H+'] /Resources << /Font << /F1 5 0 R /F2 6 0 R >> >> /Contents 4 0 R >>');
+    objects.push('<< /Length '+stream.length+' >>\nstream\n'+stream+'\nendstream');
+    objects.push('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>');
+    objects.push('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>');
+    var pdf='%PDF-1.4\n', offsets=[0];
+    objects.forEach(function(obj,i){ offsets[i+1]=pdf.length; pdf+=(i+1)+' 0 obj\n'+obj+'\nendobj\n'; });
+    var xref=pdf.length; pdf+='xref\n0 '+(objects.length+1)+'\n0000000000 65535 f \n';
+    for(var oi=1;oi<=objects.length;oi++) pdf+=String(offsets[oi]).padStart(10,'0')+' 00000 n \n';
+    pdf+='trailer\n<< /Size '+(objects.length+1)+' /Root 1 0 R >>\nstartxref\n'+xref+'\n%%EOF';
+    return new Blob([pdf],{type:'application/pdf'});
+  }
+  function downloadReportPdf() {
+    var stats=computeReportStats(reportPeriod);
+    var range=stats.range;
+    if(reportPeriod==='custom' && !range){ showToast('Choose a valid custom date range'); return; }
+    var title=(reportTitle||'').trim() || ('Sales Report — '+reportRangeLabel(reportPeriod,range));
+    var blob=buildReportPdf(title,reportRangeLabel(reportPeriod,range),stats,reportSettlementStats(stats.filtered));
+    var url=URL.createObjectURL(blob), a=document.createElement('a');
+    a.href=url; a.download=title.replace(/[^a-z0-9]+/gi,'-').replace(/^-|-$/g,'').toLowerCase()+'.pdf'; a.click();
+    setTimeout(function(){URL.revokeObjectURL(url);},1500); showToast('PDF report ready');
   }
   function renderReports() {
     var body = document.getElementById('reports-body'); if (!body) return;
@@ -2479,6 +2656,10 @@ function renderHistory(){
     document.querySelectorAll('.reports-tab').forEach(function (t) {
       t.classList.toggle('active', t.dataset.reportPeriod === reportPeriod);
     });
+    var customDates=document.getElementById('reports-custom-dates'); if(customDates) customDates.hidden=reportPeriod!=='custom';
+    var fromEl=document.getElementById('report-from'), toEl=document.getElementById('report-to'), titleEl=document.getElementById('report-title');
+    if(fromEl) fromEl.value=customReportRange.from; if(toEl) toEl.value=customReportRange.to; if(titleEl) titleEl.value=reportTitle;
+    var checkBtn=document.getElementById('report-accounting-btn'); if(checkBtn) checkBtn.textContent=accountingCheck().ok?'Accounts OK':'Check accounts';
     var s = computeReportStats(reportPeriod);
     if (!s.saleCount) { body.innerHTML = '<div class="reports-empty">No completed sales in this period.</div>'; return; }
     var avg = s.saleCount ? (s.revenue / s.saleCount) : 0;
@@ -2498,10 +2679,12 @@ function renderHistory(){
     html += '<div class="reports-top-list">' + s.topItems.map(function (it) {
       return '<div class="reports-top-row"><div><div class="rt-name">' + escapeHtml(it.name) + '</div><div class="rt-qty">' + it.qty + ' sold</div></div><div class="rt-revenue">\u00A2' + formatCedis(it.revenue) + '</div></div>';
     }).join('') + '</div>';
+    html += accountingCheckHtml();
     body.innerHTML = html;
   }
   function renderReceiptHistory(){
     updateReceiptCount();
+    renderReceiptSummary();
     var list=document.getElementById('receipt-history-list'); if(!list) return;
     if(!receipts.length){ list.innerHTML='<div class="history-empty">No completed sales yet.</div>'; return; }
     list.innerHTML=receipts.map(function(r){
@@ -2510,7 +2693,7 @@ function renderHistory(){
         var mode=i.mode==='bulk'?(i.fraction===0.5?'½ BULK':i.fraction===0.25?'¼ BULK':'Full BULK'):'SINGLE';
         return '<li>'+escapeHtml(i.name)+' — '+mode+' × '+(Number(i.qty)||0)+' — ¢'+formatCedis(i.subtotal)+'</li>';
       }).join('');
-      return '<div class="receipt-history-item expanded" data-receipt-index="'+receipts.indexOf(r)+'"><div class="rh-top"><span class="rh-no">'+escapeHtml(r.number)+'</span><span class="rh-total">¢'+formatCedis(r.total)+'</span></div>'+receiptStatusChipsHtml(r.number)+'<div class="rh-meta">'+when+'</div><ul class="rh-items">'+itemsHtml+'</ul><button class="receipt-history-share" data-share-receipt="'+receipts.indexOf(r)+'">Share as image</button><button class="receipt-copy-btn" data-copy-receipt="'+receipts.indexOf(r)+'">Copy</button></div>';
+      return '<div class="receipt-history-item expanded" data-receipt-index="'+receipts.indexOf(r)+'"><div class="rh-top"><span class="rh-no">'+escapeHtml(r.number)+'</span><span class="rh-total">¢'+formatCedis(r.total)+'</span></div>'+receiptStatusChipsHtml(r)+'<div class="rh-meta">'+when+'</div><ul class="rh-items">'+itemsHtml+'</ul><button class="receipt-history-share" data-share-receipt="'+receipts.indexOf(r)+'">Share as image</button><button class="receipt-copy-btn" data-copy-receipt="'+receipts.indexOf(r)+'">Copy</button></div>';
     }).join('');
   }
   function updateChangeCalculator(){
@@ -2607,7 +2790,7 @@ function renderHistory(){
         });
       }
     } else {
-      items.push({ id: Date.now(), name: name, bulk: bulk, single: single, photo: pendingPhoto, finished: document.getElementById("item-finished-input").checked });
+      items.push({ id: Date.now(), name: name, bulk: bulk, single: single, photo: pendingPhoto, finished: document.getElementById("item-finished-input").checked, customizedAt: Date.now(), customizedVersion: APP_VERSION });
     }
     saveItems();
     renderManageList();
@@ -2757,6 +2940,8 @@ function renderHistory(){
     if (e.target.closest("#reports-close") || e.target === document.getElementById('reports-panel')) { document.getElementById('reports-panel').hidden=true; return; }
     var reportTab = e.target.closest('[data-report-period]');
     if (reportTab) { reportPeriod = reportTab.dataset.reportPeriod; renderReports(); return; }
+    if (e.target.closest('#report-pdf-btn')) { return downloadReportPdf(); }
+    if (e.target.closest('#report-accounting-btn')) { renderReports(); showToast(accountingCheck().ok ? 'Everything is accounted for' : accountingCheck().unmatched.length+' record(s) need attention'); return; }
     if (e.target.closest("#unsettled-debts-btn")) { openSettlements('debt'); return; }
     if (e.target.closest("#change-owed-btn")) { openSettlements('change'); return; }
     if (e.target.closest("#momo-payments-btn")) { openSettlements('momo'); return; }
@@ -2859,6 +3044,9 @@ function renderHistory(){
     var input=document.getElementById('sell-search'); input.value=''; sellSearchQuery='';
     document.getElementById('search-clear').classList.remove('visible'); renderCatalogList(); input.focus();
   });
+
+  ['report-from','report-to'].forEach(function(id){ var el=document.getElementById(id); if(el) el.addEventListener('change',function(){ customReportRange.from=document.getElementById('report-from').value; customReportRange.to=document.getElementById('report-to').value; reportPeriod='custom'; renderReports(); }); });
+  var reportTitleEl=document.getElementById('report-title'); if(reportTitleEl) reportTitleEl.addEventListener('input',function(){ reportTitle=this.value; });
 
   migrateLegacyCart();
   normalizeCartOrder();
