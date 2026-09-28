@@ -14,7 +14,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="apple-touch-icon" href="icon-180.png">
-<title>Price List · V9.0</title>
+<title>Price List · V9.5.2</title>
 <style>
   :root {
     color-scheme: light;
@@ -836,7 +836,7 @@
   </section>
 
   <!-- SELL SCREEN -->
-  <section id="screen-sell" class="screen">
+  <section id="screen-sell" class="screen active">
 
     <div class="search-wrap">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
@@ -929,6 +929,13 @@
         <button class="receipt-tool-btn" id="copy-all-receipts-btn">Copy receipts</button>
         <button class="receipt-tool-btn" id="paste-receipts-btn">Paste receipts</button>
       </div>
+      <div class="receipt-search-wrap" style="margin:10px 0 12px;">
+        <div class="search-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input id="receipt-search" type="text" placeholder="Search receipts" autocomplete="off">
+          <button class="search-clear" id="receipt-search-clear" aria-label="Clear receipt search">×</button>
+        </div>
+      </div>
       <div class="receipt-tools-title">Unsettled / Pending totals</div>
       <div class="receipt-summary-grid" id="receipt-summary-grid"></div>
       <div class="receipt-tools">
@@ -959,11 +966,9 @@
           <label>From<input type="date" id="report-from"></label>
           <label>To<input type="date" id="report-to"></label>
         </div>
-        <label>Report title<input class="reports-title-input" id="report-title" type="text" maxlength=80 placeholder="Sales Report"></label>
       </div>
       <div class="reports-actions">
         <button class="reports-action-btn" id="report-accounting-btn">Check accounts</button>
-        <button class="reports-action-btn primary" id="report-pdf-btn">Download PDF</button>
       </div>
       <div id="reports-body"></div>
     </div>
@@ -1133,6 +1138,16 @@
 </div>
 
 <script>
+window.addEventListener("error", function(e) {
+  try {
+    var sell = document.getElementById("screen-sell");
+    if (sell) { sell.classList.add("active"); sell.style.display = "grid"; }
+    var nav = document.querySelector(".bottom-nav");
+    if (nav) nav.style.display = "";
+  } catch (_) {}
+});
+</script>
+<script>
   if ("serviceWorker" in navigator) {
     window.addEventListener("load", function () {
       navigator.serviceWorker.register("./sw.js").catch(function () {});
@@ -1220,7 +1235,7 @@
   ];
   defaultItems.forEach(function(i){ i.photo = null; });
 
-  var APP_VERSION = 'v9.5';
+  var APP_VERSION = 'v9.5.1';
   var PRICE_MIGRATION_VERSION_KEY = 'price-list-price-migration-version-v1';
   var items = loadItems();
 
@@ -1328,6 +1343,7 @@
   var editingId = null;
   var sellSearchQuery = "";
   var manageSearchQuery = "";
+  var receiptSearchQuery = "";
   var showFinishedItems = false;
   var lastTotal = -1;
   var cartOrder = loadJson('price-list-cart-order-v1-' + activeCartIndex, []);
@@ -1409,7 +1425,8 @@
     cart = carts[activeCartIndex] || {};
     cartOrder = loadJson('price-list-cart-order-v1-' + activeCartIndex, []);
   ['report-from','report-to'].forEach(function(id){ var el=document.getElementById(id); if(el) el.addEventListener('change',function(){ customReportRange.from=document.getElementById('report-from').value; customReportRange.to=document.getElementById('report-to').value; reportPeriod='custom'; renderReports(); }); });
-  var reportTitleEl=document.getElementById('report-title'); if(reportTitleEl) reportTitleEl.addEventListener('input',function(){ reportTitle=this.value; });
+  var receiptSearchEl=document.getElementById('receipt-search'); if(receiptSearchEl) receiptSearchEl.addEventListener('input',function(){ receiptSearchQuery=this.value; renderReceiptHistory(); });
+  var receiptSearchClear=document.getElementById('receipt-search-clear'); if(receiptSearchClear) receiptSearchClear.addEventListener('click',function(){ receiptSearchQuery=''; if(receiptSearchEl) receiptSearchEl.value=''; renderReceiptHistory(); if(receiptSearchEl) receiptSearchEl.focus(); });
 
   migrateLegacyCart();
     normalizeCartOrder();
@@ -1647,8 +1664,29 @@
   }
 
   var LAST_BACKUP_KEY = 'price-list-last-backup-v1';
+  var AUTO_CHECKPOINT_KEY = 'price-list-auto-checkpoint-v1';
+  function createAutomaticCheckpoint(reason) {
+    try {
+      var data = {};
+      for (var i = 0; i < localStorage.length; i++) {
+        var k = localStorage.key(i);
+        if (isAppStorageKey(k) && k !== AUTO_CHECKPOINT_KEY) data[k] = localStorage.getItem(k);
+      }
+      localStorage.setItem(AUTO_CHECKPOINT_KEY, JSON.stringify({version:1, createdAt:new Date().toISOString(), reason:reason||'automatic', data:data}));
+    } catch(e) {}
+  }
+  function restoreAutomaticCheckpoint() {
+    try {
+      var raw=localStorage.getItem(AUTO_CHECKPOINT_KEY);
+      if(!raw) return false;
+      var payload=JSON.parse(raw);
+      if(!payload || !payload.data) return false;
+      Object.keys(payload.data).forEach(function(k){ localStorage.setItem(k,payload.data[k]); });
+      return true;
+    } catch(e) { return false; }
+  }
   function isAppStorageKey(k) {
-    return !!k && (k.indexOf('priceList') === 0 || k.indexOf('price-list-') === 0);
+    return !!k && k !== AUTO_CHECKPOINT_KEY && (k.indexOf('priceList') === 0 || k.indexOf('price-list-') === 0);
   }
   function formatBackupStamp(iso) {
     var d = new Date(iso);
@@ -1683,6 +1721,7 @@
     showToast('Backup file downloaded');
   }
   function importAllData(file) {
+    createAutomaticCheckpoint('before full restore');
     var reader = new FileReader();
     reader.onload = function() {
       var data;
@@ -2331,6 +2370,7 @@
     });
   }
   function importReceiptsFromText() {
+    createAutomaticCheckpoint('before receipt import');
     var text=(document.getElementById('receipt-import-text').value||'').trim();
     if(!text){ showToast('Paste a receipt backup first'); return; }
     var payload;
@@ -2486,7 +2526,6 @@ function renderHistory(){
   }
   var reportPeriod = 'today';
   var customReportRange = {from:'', to:''};
-  var reportTitle = '';
   function reportPeriodStart(period) {
     var now = new Date();
     var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -2581,75 +2620,6 @@ function renderHistory(){
     var names={today:'Today',yesterday:'Yesterday',dayBeforeYesterday:'Day before yesterday',month:'This month',year:'This year'};
     return names[period] || 'Sales report';
   }
-  function pdfSafeText(value) {
-    return String(value==null?'':value).replace(/[^\x20-\x7E]/g,'?').replace(/\\/g,'\\\\').replace(/\(/g,'\\(').replace(/\)/g,'\\)');
-  }
-  function pdfMoney(n){ return 'GHS '+formatCedis(n); }
-  function pdfAddText(parts, text, x, y, size, bold) {
-    parts.push('BT /F'+(bold?'2':'1')+' '+size+' Tf '+x.toFixed(1)+' '+y.toFixed(1)+' Td ('+pdfSafeText(text)+') Tj ET');
-  }
-  function pdfAddLine(parts,x1,y1,x2,y2){ parts.push(x1.toFixed(1)+' '+y1.toFixed(1)+' m '+x2.toFixed(1)+' '+y2.toFixed(1)+' l S'); }
-  function pdfAddPie(parts,cx,cy,r,values,labels) {
-    var total=values.reduce(function(a,b){return a+(Number(b)||0);},0);
-    if(total<=0){ return; }
-    var palette=[[0.18,0.55,0.42],[0.92,0.64,0.16],[0.22,0.55,0.86],[0.55,0.38,0.72]];
-    var angle=-Math.PI/2;
-    values.forEach(function(v,idx){
-      v=Number(v)||0; if(v<=0)return;
-      var sweep=2*Math.PI*v/total, end=angle+sweep, steps=Math.max(2,Math.ceil(Math.abs(sweep)/(Math.PI/12)));
-      var c=palette[idx%palette.length]; parts.push(c[0]+' '+c[1]+' '+c[2]+' rg');
-      parts.push(cx.toFixed(1)+' '+cy.toFixed(1)+' m');
-      for(var i=0;i<=steps;i++){ var a=angle+(sweep*i/steps); parts.push((cx+r*Math.cos(a)).toFixed(1)+' '+(cy+r*Math.sin(a)).toFixed(1)+' l'); }
-      parts.push('h f'); angle=end;
-    });
-  }
-  function buildReportPdf(title, periodLabel, stats, settlement) {
-    var W=595,H=842, parts=[];
-    parts.push('0.18 0.18 0.18 rg');
-    pdfAddText(parts,title,42,795,22,true);
-    pdfAddText(parts,periodLabel,42,773,10,false);
-    parts.push('0.82 0.82 0.82 RG 1 w'); pdfAddLine(parts,42,760,553,760);
-    pdfAddText(parts,'SUMMARY',42,738,11,true);
-    var summary=[['Revenue',pdfMoney(stats.revenue)],['Sales',String(stats.saleCount)],['Discounts',pdfMoney(stats.discountTotal)],['Average sale',pdfMoney(stats.saleCount?stats.revenue/stats.saleCount:0)]];
-    summary.forEach(function(row,i){ var col=i%2, rr=Math.floor(i/2), x=42+col*255, y=710-rr*42; parts.push('0.96 0.96 0.96 rg '+x+' '+(y-15)+' 235 30 re f'); parts.push('0.18 0.18 0.18 rg'); pdfAddText(parts,row[0],x+10,y,8,false); pdfAddText(parts,row[1],x+10,y-13,13,true); });
-    pdfAddText(parts,'SALES MIX',42,610,11,true);
-    pdfAddPie(parts,150,525,68,[stats.bulkRevenue,stats.singleRevenue],['Bulk','Singles']);
-    pdfAddText(parts,'Bulk',245,555,9,true); pdfAddText(parts,pdfMoney(stats.bulkRevenue),300,555,9,false);
-    pdfAddText(parts,'Singles',245,535,9,true); pdfAddText(parts,pdfMoney(stats.singleRevenue),300,535,9,false);
-    pdfAddText(parts,'SETTLEMENTS IN PERIOD',42,430,11,true);
-    pdfAddPie(parts,150,345,68,[settlement.momo,settlement.debt,settlement.change],['MoMo','Debt','Change']);
-    pdfAddText(parts,'MoMo',245,375,9,true); pdfAddText(parts,pdfMoney(settlement.momo),300,375,9,false);
-    pdfAddText(parts,'Debt',245,355,9,true); pdfAddText(parts,pdfMoney(settlement.debt),300,355,9,false);
-    pdfAddText(parts,'Change',245,335,9,true); pdfAddText(parts,pdfMoney(settlement.change),300,335,9,false);
-    pdfAddText(parts,'TOP ITEMS',42,245,11,true);
-    stats.topItems.forEach(function(it,i){ var y=222-i*20; if(y<58)return; pdfAddText(parts,String(i+1)+'. '+it.name,48,y,9,false); pdfAddText(parts,String(it.qty)+' sold',360,y,8,false); pdfAddText(parts,pdfMoney(it.revenue),455,y,9,true); });
-    var check=accountingCheck();
-    parts.push('0.94 0.94 0.94 rg 42 28 511 24 re f'); parts.push('0.18 0.18 0.18 rg');
-    pdfAddText(parts,check.ok?'Everything is accounted for':'Accounting check: '+check.unmatched.length+' unmatched record(s)',50,40,9,true);
-    var stream=parts.join('\n'), objects=[];
-    objects.push('<< /Type /Catalog /Pages 2 0 R >>');
-    objects.push('<< /Type /Pages /Kids [3 0 R] /Count 1 >>');
-    objects.push('<< /Type /Page /Parent 2 0 R /MediaBox [0 0 '+W+' '+H+'] /Resources << /Font << /F1 5 0 R /F2 6 0 R >> >> /Contents 4 0 R >>');
-    objects.push('<< /Length '+stream.length+' >>\nstream\n'+stream+'\nendstream');
-    objects.push('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>');
-    objects.push('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>');
-    var pdf='%PDF-1.4\n', offsets=[0];
-    objects.forEach(function(obj,i){ offsets[i+1]=pdf.length; pdf+=(i+1)+' 0 obj\n'+obj+'\nendobj\n'; });
-    var xref=pdf.length; pdf+='xref\n0 '+(objects.length+1)+'\n0000000000 65535 f \n';
-    for(var oi=1;oi<=objects.length;oi++) pdf+=String(offsets[oi]).padStart(10,'0')+' 00000 n \n';
-    pdf+='trailer\n<< /Size '+(objects.length+1)+' /Root 1 0 R >>\nstartxref\n'+xref+'\n%%EOF';
-    return new Blob([pdf],{type:'application/pdf'});
-  }
-  function downloadReportPdf() {
-    var stats=computeReportStats(reportPeriod);
-    var range=stats.range;
-    if(reportPeriod==='custom' && !range){ showToast('Choose a valid custom date range'); return; }
-    var title=(reportTitle||'').trim() || ('Sales Report — '+reportRangeLabel(reportPeriod,range));
-    var blob=buildReportPdf(title,reportRangeLabel(reportPeriod,range),stats,reportSettlementStats(stats.filtered));
-    var url=URL.createObjectURL(blob), a=document.createElement('a');
-    a.href=url; a.download=title.replace(/[^a-z0-9]+/gi,'-').replace(/^-|-$/g,'').toLowerCase()+'.pdf'; a.click();
-    setTimeout(function(){URL.revokeObjectURL(url);},1500); showToast('PDF report ready');
-  }
   function renderReports() {
     var body = document.getElementById('reports-body'); if (!body) return;
     updateDayBeforeYesterdayLabel();
@@ -2657,8 +2627,8 @@ function renderHistory(){
       t.classList.toggle('active', t.dataset.reportPeriod === reportPeriod);
     });
     var customDates=document.getElementById('reports-custom-dates'); if(customDates) customDates.hidden=reportPeriod!=='custom';
-    var fromEl=document.getElementById('report-from'), toEl=document.getElementById('report-to'), titleEl=document.getElementById('report-title');
-    if(fromEl) fromEl.value=customReportRange.from; if(toEl) toEl.value=customReportRange.to; if(titleEl) titleEl.value=reportTitle;
+    var fromEl=document.getElementById('report-from'), toEl=document.getElementById('report-to');
+    if(fromEl) fromEl.value=customReportRange.from; if(toEl) toEl.value=customReportRange.to;
     var checkBtn=document.getElementById('report-accounting-btn'); if(checkBtn) checkBtn.textContent=accountingCheck().ok?'Accounts OK':'Check accounts';
     var s = computeReportStats(reportPeriod);
     if (!s.saleCount) { body.innerHTML = '<div class="reports-empty">No completed sales in this period.</div>'; return; }
@@ -2687,13 +2657,23 @@ function renderHistory(){
     renderReceiptSummary();
     var list=document.getElementById('receipt-history-list'); if(!list) return;
     if(!receipts.length){ list.innerHTML='<div class="history-empty">No completed sales yet.</div>'; return; }
-    list.innerHTML=receipts.map(function(r){
+    var q=String(receiptSearchQuery||'').trim().toLowerCase();
+    var filtered=receipts.filter(function(r){
+      if(!q) return true;
+      var d=new Date(r.createdAt);
+      var when=isNaN(d.getTime())?'':d.toLocaleString([], {month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'});
+      var hay=[r.number,r.receiptId,r.total,when,d.toISOString()].concat((r.items||[]).map(function(i){return i.name;})).join(' ').toLowerCase();
+      return hay.indexOf(q)!==-1;
+    });
+    if(!filtered.length){ list.innerHTML='<div class="history-empty">No receipts match your search.</div>'; return; }
+    list.innerHTML=filtered.map(function(r){
+      var idx=receipts.indexOf(r);
       var d=new Date(r.createdAt); var when=isNaN(d.getTime())?'':d.toLocaleString([], {month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'});
       var itemsHtml=(r.items||[]).map(function(i){
         var mode=i.mode==='bulk'?(i.fraction===0.5?'½ BULK':i.fraction===0.25?'¼ BULK':'Full BULK'):'SINGLE';
         return '<li>'+escapeHtml(i.name)+' — '+mode+' × '+(Number(i.qty)||0)+' — ¢'+formatCedis(i.subtotal)+'</li>';
       }).join('');
-      return '<div class="receipt-history-item expanded" data-receipt-index="'+receipts.indexOf(r)+'"><div class="rh-top"><span class="rh-no">'+escapeHtml(r.number)+'</span><span class="rh-total">¢'+formatCedis(r.total)+'</span></div>'+receiptStatusChipsHtml(r)+'<div class="rh-meta">'+when+'</div><ul class="rh-items">'+itemsHtml+'</ul><button class="receipt-history-share" data-share-receipt="'+receipts.indexOf(r)+'">Share as image</button><button class="receipt-copy-btn" data-copy-receipt="'+receipts.indexOf(r)+'">Copy</button></div>';
+      return '<div class="receipt-history-item expanded" data-receipt-index="'+idx+'"><div class="rh-top"><span class="rh-no">'+escapeHtml(r.number)+'</span><span class="rh-total">¢'+formatCedis(r.total)+'</span></div>'+receiptStatusChipsHtml(r)+'<div class="rh-meta">'+when+'</div><ul class="rh-items">'+itemsHtml+'</ul><button class="receipt-history-share" data-share-receipt="'+idx+'">Share as image</button><button class="receipt-copy-btn" data-copy-receipt="'+idx+'">Copy</button></div>';
     }).join('');
   }
   function updateChangeCalculator(){
@@ -2940,7 +2920,6 @@ function renderHistory(){
     if (e.target.closest("#reports-close") || e.target === document.getElementById('reports-panel')) { document.getElementById('reports-panel').hidden=true; return; }
     var reportTab = e.target.closest('[data-report-period]');
     if (reportTab) { reportPeriod = reportTab.dataset.reportPeriod; renderReports(); return; }
-    if (e.target.closest('#report-pdf-btn')) { return downloadReportPdf(); }
     if (e.target.closest('#report-accounting-btn')) { renderReports(); showToast(accountingCheck().ok ? 'Everything is accounted for' : accountingCheck().unmatched.length+' record(s) need attention'); return; }
     if (e.target.closest("#unsettled-debts-btn")) { openSettlements('debt'); return; }
     if (e.target.closest("#change-owed-btn")) { openSettlements('change'); return; }
@@ -3046,7 +3025,6 @@ function renderHistory(){
   });
 
   ['report-from','report-to'].forEach(function(id){ var el=document.getElementById(id); if(el) el.addEventListener('change',function(){ customReportRange.from=document.getElementById('report-from').value; customReportRange.to=document.getElementById('report-to').value; reportPeriod='custom'; renderReports(); }); });
-  var reportTitleEl=document.getElementById('report-title'); if(reportTitleEl) reportTitleEl.addEventListener('input',function(){ reportTitle=this.value; });
 
   migrateLegacyCart();
   normalizeCartOrder();
