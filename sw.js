@@ -1,8 +1,16 @@
-const CACHE = "price-list-sales-calculator-v9-69";
+const CACHE = "price-list-sales-calculator-v9-70";
 const APP_SHELL = ["./","./index.html","./manifest.webmanifest","./icon-180.png","./icon-512.png","./fonts/poppins-latin-400-normal.woff2","./fonts/poppins-latin-500-normal.woff2","./fonts/poppins-latin-600-normal.woff2","./fonts/poppins-latin-700-normal.woff2"];
 
 self.addEventListener("install", event => {
-  event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(APP_SHELL)));
+  // Always fetch fresh copies (bypass the browser's HTTP cache) so a new
+  // version can never install an old page. Fonts are best-effort so one
+  // missing font can't stop an update from installing.
+  event.waitUntil(caches.open(CACHE).then(cache => Promise.all(APP_SHELL.map(url =>
+    fetch(new Request(url, { cache: "reload" })).then(res => {
+      if (!res.ok) throw new Error(url + " " + res.status);
+      return cache.put(url, res);
+    }).catch(err => { if (url.indexOf("/fonts/") === -1) throw err; })
+  ))));
   self.skipWaiting();
 });
 

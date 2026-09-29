@@ -15,7 +15,7 @@
 <link rel="preload" href="fonts/poppins-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/poppins-latin-800-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="apple-touch-icon" href="icon-180.png">
-<title>Price List · V9.69</title>
+<title>Price List · V9.70</title>
 <style>
 @font-face{font-family:"Poppins";font-style:normal;font-weight:400;font-display:swap;src:url(fonts/poppins-latin-400-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:500;font-display:swap;src:url(fonts/poppins-latin-500-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:600;font-display:swap;src:url(fonts/poppins-latin-600-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:700;font-display:swap;src:url(fonts/poppins-latin-700-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:700;font-display:swap;src:url(fonts/poppins-latin-800-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:700;font-display:swap;src:url(fonts/poppins-latin-900-normal.woff2) format("woff2");}
   :root {
@@ -859,6 +859,51 @@
   .change-result{font-weight:800}
   .change-line strong{font-weight:700}
   .change-line input{font-weight:600}
+  /* v9.70 — History cards full width, quick-cash chips, amount entry sheet, backup reminder */
+  .history-list{padding:0}
+  .status-chip .chip-amt{font-variant-numeric:tabular-nums}
+  .receipt-quick-cash{display:flex;gap:6px;margin:8px 0 4px;align-items:stretch}
+  .quick-cash-btn{flex:1 1 0;min-width:0;border:1px solid var(--line);background:var(--gold-soft);color:var(--ink);border-radius:999px;padding:9px 0;font-size:12.5px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.1;-webkit-tap-highlight-color:transparent}
+  .quick-cash-btn:active{transform:scale(.93);background:var(--gold);border-color:var(--gold);color:#fff}
+  .quick-cash-btn.clear{flex:0 0 auto;padding:9px 11px;background:var(--paper);color:var(--ink-soft);font-size:11px;font-weight:600}
+
+  .entry-overlay{position:fixed;inset:0;z-index:160;background:rgba(0,0,0,.52);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);display:flex;align-items:flex-start;justify-content:center;padding:calc(56px + env(safe-area-inset-top)) 20px 20px;overflow:hidden}
+  .entry-card{width:min(400px,100%);box-sizing:border-box;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:24px;padding:18px 18px 16px;box-shadow:0 22px 60px rgba(0,0,0,.28)}
+  .entry-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .entry-type{display:inline-flex;align-items:center;border:1px solid transparent;border-radius:999px;padding:5px 13px;font-size:12px;font-weight:700;letter-spacing:.02em}
+  .entry-type.momo{color:var(--green);background:rgba(30,92,70,.12);border-color:rgba(30,92,70,.3)}
+  .entry-type.change{color:#0ea5e9;background:rgba(14,165,233,.12);border-color:rgba(14,165,233,.3)}
+  .entry-type.debt{color:var(--gold);background:var(--gold-soft);border-color:rgba(184,132,26,.3)}
+  .entry-close{flex:0 0 auto;width:32px;height:32px;border:0;border-radius:50%;background:var(--paper);color:var(--ink);font-size:20px;line-height:1;display:flex;align-items:center;justify-content:center}
+  .entry-close:active{transform:scale(.94)}
+  .entry-total{margin:14px 0 2px;padding:14px 12px;border-radius:18px;background:var(--paper);border:1px solid var(--line);text-align:center}
+  .entry-total small{display:block;font-size:11px;font-weight:600;color:var(--ink-soft);letter-spacing:.05em;text-transform:uppercase}
+  .entry-total strong{display:block;margin-top:4px;font-size:34px;font-weight:800;color:var(--gold);font-variant-numeric:tabular-nums;letter-spacing:-.01em;line-height:1.1}
+  .entry-label{display:block;margin:14px 0 6px;font-size:12px;font-weight:700;color:var(--ink-soft)}
+  .entry-input{width:100%;box-sizing:border-box;padding:13px 14px;border:1.5px solid var(--line);border-radius:14px;background:var(--paper);color:var(--ink);font-size:22px;font-weight:700;text-align:center;outline:none;font-variant-numeric:tabular-nums}
+  .entry-input:focus{border-color:var(--gold)}
+  .entry-input{-moz-appearance:textfield;appearance:textfield}
+  .entry-input::-webkit-outer-spin-button,.entry-input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+  .entry-error{margin-top:7px;text-align:center;font-size:12px;font-weight:600;color:var(--brick)}
+  .entry-actions{display:flex;gap:10px;margin-top:14px}
+  .entry-actions button{flex:1;border-radius:999px;padding:13px;font-size:14px;font-weight:700}
+  .entry-actions button:active{transform:scale(.98)}
+  .entry-save{border:0;background:var(--gold);color:#fff;box-shadow:0 8px 20px rgba(0,0,0,.16)}
+  .entry-cancel{border:1px solid var(--line);background:var(--paper);color:var(--ink)}
+
+  .backup-overlay{position:fixed;inset:0;z-index:170;background:rgba(0,0,0,.55);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);display:flex;align-items:center;justify-content:center;padding:24px}
+  .backup-card{width:min(340px,100%);box-sizing:border-box;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:26px;padding:26px 22px 20px;text-align:center;box-shadow:0 24px 64px rgba(0,0,0,.32);animation:backupPop .28s ease-out}
+  @keyframes backupPop{from{opacity:0;transform:translateY(12px) scale(.96)}to{opacity:1;transform:none}}
+  .backup-icon{width:64px;height:64px;margin:0 auto 14px;border-radius:20px;background:var(--gold-soft);color:var(--gold);display:flex;align-items:center;justify-content:center}
+  .backup-icon svg{width:32px;height:32px;display:block}
+  .backup-card h3{margin:0;font-size:20px;font-weight:800;letter-spacing:-.01em}
+  .backup-card p{margin:8px 0 0;font-size:13px;line-height:1.45;color:var(--ink-soft);font-weight:500}
+  .backup-last{margin-top:14px;padding:8px 12px;border-radius:12px;background:var(--paper);border:1px solid var(--line);font-size:11px;font-weight:600;color:var(--ink-soft)}
+  .backup-actions{display:flex;gap:10px;margin-top:16px}
+  .backup-actions button{border-radius:999px;padding:13px;font-size:14px;font-weight:700}
+  .backup-actions button:active{transform:scale(.98)}
+  .backup-go{flex:1.5;border:0;background:var(--gold);color:#fff;box-shadow:0 8px 20px rgba(0,0,0,.16)}
+  .backup-skip{flex:1;border:1px solid var(--line);background:var(--paper);color:var(--ink)}
 </style>
 </head>
 <body>
@@ -989,6 +1034,14 @@
         <h2>Change calculator</h2>
         <div class="change-line"><span>Current total</span><strong id="change-total">¢0.00</strong></div>
         <div class="change-line"><span>Money received</span><input id="money-received" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00"></div>
+        <div class="receipt-quick-cash" id="quick-cash" aria-label="Quick add money received">
+          <button type="button" class="quick-cash-btn" data-cash-add="20">¢20</button>
+          <button type="button" class="quick-cash-btn" data-cash-add="50">¢50</button>
+          <button type="button" class="quick-cash-btn" data-cash-add="100">¢100</button>
+          <button type="button" class="quick-cash-btn" data-cash-add="200">¢200</button>
+          <button type="button" class="quick-cash-btn" data-cash-add="400">¢400</button>
+          <button type="button" class="quick-cash-btn clear" id="quick-cash-clear" aria-label="Clear money received">Clear</button>
+        </div>
         <div class="change-line"><span>Change to give</span><strong class="change-result" id="change-due">¢0.00</strong></div>
       </div>
     </div>
@@ -1150,6 +1203,27 @@
       </div>
     </div>
   </div>
+  <div class="entry-overlay" id="entry-overlay" hidden>
+    <div class="entry-card" role="dialog" aria-modal="true" aria-labelledby="entry-type">
+      <div class="entry-head"><span class="entry-type" id="entry-type">Momo</span><button type="button" class="entry-close" id="entry-close" aria-label="Close">×</button></div>
+      <div class="entry-total"><small id="entry-receipt">Receipt total</small><strong id="entry-total">¢0.00</strong></div>
+      <label class="entry-label" id="entry-label" for="entry-input">Amount (¢)</label>
+      <input class="entry-input" id="entry-input" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00" autocomplete="off">
+      <div class="entry-error" id="entry-error" hidden>Enter a valid amount</div>
+      <div class="entry-actions"><button type="button" class="entry-cancel" id="entry-cancel">Cancel</button><button type="button" class="entry-save" id="entry-save">Save</button></div>
+    </div>
+  </div>
+
+  <div class="backup-overlay" id="backup-reminder" hidden>
+    <div class="backup-card" role="dialog" aria-modal="true" aria-labelledby="backup-reminder-title">
+      <div class="backup-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><polyline points="7 10 12 15 17 10"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg></div>
+      <h3 id="backup-reminder-title">Time to back up</h3>
+      <p id="backup-reminder-text">Save a copy of your price list, receipts and debts.</p>
+      <div class="backup-last" id="backup-reminder-last"></div>
+      <div class="backup-actions"><button type="button" class="backup-skip" id="backup-reminder-close">Close</button><button type="button" class="backup-go" id="backup-reminder-go">Backup</button></div>
+    </div>
+  </div>
+
   <div class="toast" id="toast"></div>
 
   <!-- TAB BAR -->
@@ -1227,6 +1301,12 @@ window.addEventListener("error", function(e) {
 </script>
 <script>
   if ("serviceWorker" in navigator) {
+    // When a new version takes over right after launch, reload once so the
+    // update shows immediately instead of on the next open.
+    navigator.serviceWorker.addEventListener("controllerchange", function () {
+      if (window.__swReloaded || performance.now() > 15000) return;
+      window.__swReloaded = true; location.reload();
+    });
     window.addEventListener("load", function () {
       navigator.serviceWorker.register("./sw.js").catch(function () {});
     });
@@ -1313,7 +1393,7 @@ window.addEventListener("error", function(e) {
   ];
   defaultItems.forEach(function(i){ i.photo = null; });
 
-  var APP_VERSION = 'v9.69';
+  var APP_VERSION = 'v9.70';
   var PRICE_MIGRATION_VERSION_KEY = 'price-list-price-migration-version-v1';
   var items = loadItems();
 
@@ -2246,21 +2326,25 @@ window.addEventListener("error", function(e) {
     function find(arr){ return arr.find(function(x){ return (receiptId && x.receiptId===receiptId) || (!x.receiptId && x.receiptNumber===receiptNumber); }) || null; }
     return { debt: find(unsettledDebts), change: find(changeOwed), momo: find(momoPayments) };
   }
+  function chipAmount(amount) {
+    var n = Number(amount) || 0;
+    return '¢' + formatCedis(n).replace(/\.00$/, '');
+  }
   function receiptStatusChipsHtml(receiptRef) {
     var s = getReceiptSettlements(receiptRef);
     if (!s.change && !s.debt && !s.momo) return '';
     var chips = '<div class="receipt-status-row">';
     var details = '<div class="receipt-status-details">';
     if (s.change) {
-      chips += '<button type="button" class="status-chip change" data-status-chip="change" data-status-id="'+escapeHtml(String(s.change.id))+'">Change</button>';
+      chips += '<button type="button" class="status-chip change" data-status-chip="change" data-status-id="'+escapeHtml(String(s.change.id))+'">Change:<span class="chip-amt">'+chipAmount(s.change.amount)+'</span></button>';
       details += '<div class="status-detail-row change"><span class="status-detail-label">Change owed</span><span class="status-detail-amount">¢'+formatCedis(s.change.amount)+'</span><button type="button" class="status-detail-settle" data-settle-chip="change" data-status-id="'+escapeHtml(String(s.change.id))+'">Settle</button></div>';
     }
     if (s.debt) {
-      chips += '<button type="button" class="status-chip debt" data-status-chip="debt" data-status-id="'+escapeHtml(String(s.debt.id))+'">Debt</button>';
+      chips += '<button type="button" class="status-chip debt" data-status-chip="debt" data-status-id="'+escapeHtml(String(s.debt.id))+'">Debt:<span class="chip-amt">'+chipAmount(s.debt.amount)+'</span></button>';
       details += '<div class="status-detail-row debt"><span class="status-detail-label">Debt owed</span><span class="status-detail-amount">¢'+formatCedis(s.debt.amount)+'</span><button type="button" class="status-detail-settle" data-settle-chip="debt" data-status-id="'+escapeHtml(String(s.debt.id))+'">Settle</button></div>';
     }
     if (s.momo) {
-      chips += '<button type="button" class="status-chip momo" data-status-chip="momo" data-status-id="'+escapeHtml(String(s.momo.id))+'">Momo</button>';
+      chips += '<button type="button" class="status-chip momo" data-status-chip="momo" data-status-id="'+escapeHtml(String(s.momo.id))+'">Momo:<span class="chip-amt">'+chipAmount(s.momo.amount)+'</span></button>';
       details += '<div class="status-detail-row momo"><span class="status-detail-label">Paid via Momo</span><span class="status-detail-amount">¢'+formatCedis(s.momo.amount)+'</span><button type="button" class="status-detail-settle" data-settle-chip="momo" data-status-id="'+escapeHtml(String(s.momo.id))+'">Clear</button></div>';
     }
     chips += '</div>';
@@ -2304,15 +2388,37 @@ window.addEventListener("error", function(e) {
     document.getElementById('receipt-action-panel').hidden=false;
   }
   function closeReceiptActionMenu() { receiptActionIndex=null; document.getElementById('receipt-action-panel').hidden=true; }
+  // v9.70 — Momo / Debt / Change amount entry: a sheet with the receipt total
+  // shown big on top (replaces the plain browser prompt).
+  var entryState = null;
   function addSettlement(type) {
-    var idx=receiptActionIndex, r=receipts[idx]; if(!r) return;
-    var label=type==='debt'?'Debt amount (¢)':type==='momo'?'Momo amount (¢)':'Change owed (¢)';
-    var input=window.prompt(label,''); if(input===null) return;
-    var amount=Number(input);
-    if(!isFinite(amount) || amount<=0){ showToast('Enter a valid amount'); return; }
+    var r=receipts[receiptActionIndex]; if(!r) return;
+    entryState={type:type, receipt:r};
+    var name = type==='debt'?'Debt':type==='momo'?'Momo':'Change';
+    var pill=document.getElementById('entry-type');
+    pill.textContent='Add '+name; pill.className='entry-type '+type;
+    document.getElementById('entry-receipt').textContent=(r.number||'Receipt')+' total';
+    document.getElementById('entry-total').textContent='¢'+formatCedis(Number(r.total)||0);
+    document.getElementById('entry-label').textContent=(type==='debt'?'Debt amount (¢)':type==='momo'?'Momo amount (¢)':'Change owed (¢)');
+    var input=document.getElementById('entry-input'); input.value='';
+    document.getElementById('entry-error').hidden=true;
+    document.getElementById('entry-overlay').hidden=false;
+    input.focus();
+  }
+  function closeSettlementEntry() {
+    entryState=null;
+    document.getElementById('entry-overlay').hidden=true;
+    document.getElementById('entry-input').blur();
+  }
+  function saveSettlementEntry() {
+    if(!entryState) return;
+    var type=entryState.type, r=entryState.receipt;
+    var amount=Number(document.getElementById('entry-input').value);
+    if(!isFinite(amount) || amount<=0){ document.getElementById('entry-error').hidden=false; document.getElementById('entry-input').focus(); return; }
     var record={id:Date.now()+Math.random(),receiptId:r.receiptId||'',receiptNumber:r.number||'Receipt',receiptCreatedAt:r.createdAt||new Date().toISOString(),amount:Number(amount.toFixed(2)),createdAt:new Date().toISOString(),items:(r.items||[]).map(function(i){return {name:String(i.name||''),qty:Number(i.qty)||0,mode:i.mode||'bulk',fraction:i.fraction==null?1:Number(i.fraction),subtotal:Number(i.subtotal)||0};})};
     settlementArray(type).unshift(record);
     saveSettlements();
+    closeSettlementEntry();
     closeReceiptActionMenu();
     showToast(type==='debt'?'Debt added':type==='momo'?'Momo payment recorded':'Change added');
     renderSettlementList();
@@ -3212,6 +3318,82 @@ function renderHistory(){
       }
     });
   }
+  // v9.70 — entry sheet wiring
+  document.getElementById('entry-save').addEventListener('click', saveSettlementEntry);
+  document.getElementById('entry-cancel').addEventListener('click', closeSettlementEntry);
+  document.getElementById('entry-close').addEventListener('click', closeSettlementEntry);
+  document.getElementById('entry-overlay').addEventListener('click', function(e){ if (e.target === this) closeSettlementEntry(); });
+  document.getElementById('entry-input').addEventListener('input', function(){ document.getElementById('entry-error').hidden = true; });
+  document.getElementById('entry-input').addEventListener('keydown', function(e){ if (e.key === 'Enter') { e.preventDefault(); saveSettlementEntry(); } });
+
+  // v9.70 — quick cash chips add to "Money received" (tap several to add them up)
+  document.getElementById('quick-cash').addEventListener('click', function(e){
+    var btn = e.target.closest('[data-cash-add]');
+    var input = document.getElementById('money-received');
+    if (btn) {
+      var next = Math.round(((Number(input.value) || 0) + Number(btn.dataset.cashAdd)) * 100) / 100;
+      input.value = String(next);
+      updateChangeCalculator();
+      return;
+    }
+    if (e.target.closest('#quick-cash-clear')) { input.value = ''; updateChangeCalculator(); }
+  });
+
+  // v9.70 — backup reminder at 8:30 AM and 6:30 PM (shows whenever the app is open at or
+  // shortly after those times; it can't wake a closed app).
+  var BACKUP_REMINDER_KEY = 'pl-backup-reminder-last-v1';
+  var BACKUP_REMINDER_SLOTS = [{h:8,m:30},{h:18,m:30}];
+  var BACKUP_REMINDER_GRACE_MS = 4 * 60 * 60 * 1000;
+  var backupReminderSlot = null;
+  function latestBackupSlot(now) {
+    var best = null;
+    for (var off = 0; off >= -1; off--) {
+      BACKUP_REMINDER_SLOTS.forEach(function(sl){
+        var d = new Date(now.getFullYear(), now.getMonth(), now.getDate() + off, sl.h, sl.m, 0, 0);
+        if (d.getTime() <= now.getTime() && (!best || d.getTime() > best.getTime())) best = d;
+      });
+    }
+    return best;
+  }
+  function backupReminderDue() {
+    var now = new Date(), slot = latestBackupSlot(now);
+    if (!slot || now.getTime() - slot.getTime() > BACKUP_REMINDER_GRACE_MS) return null;
+    var handled = 0, lastBackup = 0;
+    try { handled = Number(localStorage.getItem(BACKUP_REMINDER_KEY)) || 0; } catch (e) {}
+    try { lastBackup = Date.parse(localStorage.getItem(LAST_BACKUP_KEY) || '') || 0; } catch (e) {}
+    if (handled >= slot.getTime() || lastBackup >= slot.getTime()) return null;
+    return slot;
+  }
+  function checkBackupReminder() {
+    if (document.visibilityState !== 'visible') return;
+    var overlay = document.getElementById('backup-reminder');
+    if (!overlay || !overlay.hidden) return;
+    var slot = backupReminderDue(); if (!slot) return;
+    backupReminderSlot = slot;
+    var morning = new Date().getHours() < 12;
+    document.getElementById('backup-reminder-title').textContent = morning ? 'Good morning — backup time' : 'Time to back up';
+    document.getElementById('backup-reminder-text').textContent = morning
+      ? 'Save a fresh copy of your price list, receipts and debts before the day gets busy.'
+      : 'Save a copy of today\u2019s receipts, prices and debts so nothing gets lost.';
+    var raw = null; try { raw = localStorage.getItem(LAST_BACKUP_KEY); } catch (e) {}
+    document.getElementById('backup-reminder-last').textContent = raw ? ('Last backup: ' + formatBackupStamp(raw)) : 'No backup saved yet on this device.';
+    overlay.hidden = false;
+  }
+  function closeBackupReminder() {
+    if (backupReminderSlot) { try { localStorage.setItem(BACKUP_REMINDER_KEY, String(backupReminderSlot.getTime())); } catch (e) {} }
+    backupReminderSlot = null;
+    document.getElementById('backup-reminder').hidden = true;
+  }
+  document.getElementById('backup-reminder-close').addEventListener('click', closeBackupReminder);
+  document.getElementById('backup-reminder-go').addEventListener('click', function(){
+    try { exportAllData(); } finally { closeBackupReminder(); }
+  });
+  setInterval(checkBackupReminder, 15000);
+  document.addEventListener('visibilitychange', checkBackupReminder);
+  window.addEventListener('focus', checkBackupReminder);
+  window.addEventListener('pageshow', checkBackupReminder);
+  setTimeout(checkBackupReminder, 1500);
+
   renderBackupMeta();
   renderAppVersion();
   document.getElementById("money-received").addEventListener("input", updateChangeCalculator);
