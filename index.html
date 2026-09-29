@@ -15,7 +15,7 @@
 <link rel="preload" href="fonts/poppins-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/poppins-latin-800-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="apple-touch-icon" href="icon-180.png">
-<title>Price List · V9.71</title>
+<title>Price List · V9.72</title>
 <style>
 @font-face{font-family:"Poppins";font-style:normal;font-weight:400;font-display:swap;src:url(fonts/poppins-latin-400-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:500;font-display:swap;src:url(fonts/poppins-latin-500-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:600;font-display:swap;src:url(fonts/poppins-latin-600-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:700;font-display:swap;src:url(fonts/poppins-latin-700-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:700;font-display:swap;src:url(fonts/poppins-latin-800-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:700;font-display:swap;src:url(fonts/poppins-latin-900-normal.woff2) format("woff2");}
   :root {
@@ -867,6 +867,63 @@
   .quick-cash-btn:active{transform:scale(.93);background:var(--gold);border-color:var(--gold);color:#fff}
   .quick-cash-btn.clear{flex:0 0 auto;padding:9px 11px;background:var(--paper);color:var(--ink-soft);font-size:11px;font-weight:600}
 
+
+  /* v9.72 — cash tray (stacked notes that cascade out), notes pen, withdraw icon */
+  .history-header-actions{flex-direction:row;align-items:center;gap:10px}
+  .history-header-links{display:flex;flex-direction:column;gap:6px;align-items:flex-end}
+  .notes-pen-btn{position:relative;width:36px;height:36px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--gold);display:inline-flex;align-items:center;justify-content:center;padding:0;-webkit-tap-highlight-color:transparent}
+  .notes-pen-btn svg{width:18px;height:18px}
+  .notes-pen-btn:active{background:var(--gold-soft);transform:scale(.94)}
+  .notes-dot{position:absolute;top:5px;right:5px;width:7px;height:7px;border-radius:50%;background:var(--gold)}
+  .notes-dot[hidden]{display:none}
+  .notes-panel{position:fixed;inset:0;z-index:115;background:rgba(0,0,0,.45);display:flex;align-items:flex-end;justify-content:center}
+  .notes-panel[hidden]{display:none}
+  .notes-card{width:min(480px,100%);box-sizing:border-box;background:var(--surface);color:var(--ink);border-radius:24px 24px 0 0;padding:18px 18px calc(20px + env(safe-area-inset-bottom))}
+  .notes-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+  .notes-head h2{margin:0;font-size:18px;font-weight:700;letter-spacing:-.01em}
+  .notes-sub{font-size:10px;color:var(--ink-soft);margin-top:2px}
+  .notes-text{display:block;width:100%;box-sizing:border-box;height:min(46dvh,340px);resize:none;border:1px solid var(--line);border-radius:14px;padding:10px 12px;background:var(--paper);color:var(--ink);font:inherit;font-size:15px;line-height:28px;background-image:repeating-linear-gradient(to bottom,transparent 0,transparent 27px,var(--line) 27px,var(--line) 28px);background-attachment:local}
+  .notes-text:focus{outline:none;border-color:var(--gold)}
+  .notes-actions{display:flex;gap:8px;margin-top:10px}
+  .notes-actions .receipt-tool-btn{flex:1}
+
+  .cash-tray{display:block;margin:8px 0 4px}
+  .cash-bar{display:flex;align-items:center;justify-content:space-between;height:40px}
+  .cash-notes-wrap{display:grid;grid-template-rows:0fr;transition:grid-template-rows .38s ease}
+  .cash-tray.open .cash-notes-wrap{grid-template-rows:1fr}
+  .cash-notes-clip{overflow:hidden;min-height:0}
+  .cash-stack{flex:0 0 auto;display:inline-flex;align-items:center;gap:6px;height:40px;padding:0 12px 0 8px;border:1px solid var(--line);border-radius:12px;background:var(--gold-soft);color:var(--ink);font-size:12px;font-weight:700;-webkit-tap-highlight-color:transparent;position:relative;z-index:2;transition:transform .15s ease}
+  .cash-stack svg{width:28px;height:24px;color:var(--gold)}
+  .cash-stack svg rect{fill:var(--surface)}
+  .cash-stack:active{transform:scale(.95)}
+  .cash-stack[aria-expanded="true"]{background:var(--gold);border-color:var(--gold);color:#fff}
+  .cash-stack[aria-expanded="true"] svg{color:#fff}
+  .cash-stack[aria-expanded="true"] svg rect{fill:rgba(255,255,255,.18)}
+  .cash-notes{display:flex;gap:6px;padding:9px 2px 5px}
+  .cash-note{--n1:#e3efdc;--n2:#c4dcb8;--ni:#2f5f2a;flex:1 1 0;min-width:0;height:40px;position:relative;border:1px solid rgba(0,0,0,.14);border-radius:6px;padding:0;color:var(--ni);background:linear-gradient(135deg,var(--n1),var(--n2));box-shadow:0 2px 5px rgba(0,0,0,.14);font-variant-numeric:tabular-nums;-webkit-tap-highlight-color:transparent;overflow:hidden;
+    opacity:0;visibility:hidden;pointer-events:none;transform:translate(calc(-1 * var(--i) * (100% + 6px)),-34px) scale(.5) rotate(-6deg);
+    transition:transform .28s cubic-bezier(.5,0,.75,0) calc(var(--r) * 28ms),opacity .2s ease calc(var(--r) * 28ms),visibility 0s linear calc(.3s + var(--r) * 28ms)}
+  .cash-note::before{content:"";position:absolute;inset:3px;border:1px solid currentColor;border-radius:4px;opacity:.28}
+  .cash-note::after{content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent 35%,rgba(255,255,255,.45) 50%,transparent 65%);pointer-events:none}
+  .cash-note b{position:relative;z-index:1;font-size:16px;font-weight:800;letter-spacing:-.02em}
+  .cash-tray.open .cash-note{opacity:1;visibility:visible;pointer-events:auto;transform:none;
+    transition:transform .42s cubic-bezier(.2,.9,.3,1.25) calc(var(--i) * 55ms),opacity .2s ease calc(var(--i) * 55ms),visibility 0s}
+  .cash-note:active{transform:scale(.92) !important;filter:brightness(.94)}
+  .cash-note.n50{--n1:#f8e3d0;--n2:#eebf98;--ni:#86440f}
+  .cash-note.n100{--n1:#dbe8f7;--n2:#b3cdea;--ni:#1f4a78}
+  .cash-note.n200{--n1:#eadff3;--n2:#d0b9e3;--ni:#52306f}
+  .cash-note.n400{--n1:#f6dcdf;--n2:#e6b2b9;--ni:#7d2534}
+  body.dark .cash-note{border-color:rgba(255,255,255,.14);--n1:#2f4a2c;--n2:#26401f;--ni:#bfe6b4}
+  body.dark .cash-note::after{background:linear-gradient(115deg,transparent 35%,rgba(255,255,255,.10) 50%,transparent 65%)}
+  body.dark .cash-note.n50{--n1:#5a3a1f;--n2:#4a2f18;--ni:#f5c99a}
+  body.dark .cash-note.n100{--n1:#243f5f;--n2:#1c3350;--ni:#a9cdf2}
+  body.dark .cash-note.n200{--n1:#41305a;--n2:#33254a;--ni:#d5bdf0}
+  body.dark .cash-note.n400{--n1:#5a2833;--n2:#4a1f29;--ni:#f2b4be}
+  .cash-clear{flex:0 0 auto;height:32px;padding:0 10px;border:0;background:none;color:var(--ink-soft);font-size:11px;font-weight:600;opacity:0;visibility:hidden;transition:opacity .2s ease .2s,visibility 0s linear .4s;-webkit-tap-highlight-color:transparent}
+  .cash-tray.open .cash-clear{opacity:1;visibility:visible;transition:opacity .2s ease .3s,visibility 0s}
+  .cash-clear:active{color:var(--brick)}
+  @media (prefers-reduced-motion:reduce){.cash-note,.cash-tray.open .cash-note{transition:opacity .15s ease,visibility 0s}}
+
   .entry-overlay{position:fixed;inset:0;z-index:160;background:rgba(0,0,0,.52);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);display:flex;align-items:flex-start;justify-content:center;padding:calc(56px + env(safe-area-inset-top)) 20px 20px;overflow:hidden}
   .entry-card{width:min(400px,100%);box-sizing:border-box;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:24px;padding:18px 18px 16px;box-shadow:0 22px 60px rgba(0,0,0,.28)}
   .entry-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
@@ -1059,8 +1116,11 @@
       <div class="history-header">
         <div><h1>History</h1><p>Last 3 receipts</p></div>
         <div class="history-header-actions">
+          <button class="notes-pen-btn" id="notes-pen-btn" aria-label="Open quick notes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg><i class="notes-dot" id="notes-dot" hidden></i></button>
+          <div class="history-header-links">
           <button class="history-receipt-btn" id="receipt-history-btn" aria-label="View available receipts">▤ Receipts <span id="receipt-count">0</span></button>
           <button class="history-receipt-btn" id="history-reports-btn" aria-label="View sales reports">▦ Reports</button>
+          </div>
         </div>
       </div>
     </header>
@@ -1075,13 +1135,21 @@
         <h2>Change calculator</h2>
         <div class="change-line"><span>Current total</span><strong id="change-total">¢0.00</strong></div>
         <div class="change-line"><span>Money received</span><input id="money-received" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00"></div>
-        <div class="receipt-quick-cash" id="quick-cash" aria-label="Quick add money received">
-          <button type="button" class="quick-cash-btn" data-cash-add="20">¢20</button>
-          <button type="button" class="quick-cash-btn" data-cash-add="50">¢50</button>
-          <button type="button" class="quick-cash-btn" data-cash-add="100">¢100</button>
-          <button type="button" class="quick-cash-btn" data-cash-add="200">¢200</button>
-          <button type="button" class="quick-cash-btn" data-cash-add="400">¢400</button>
-          <button type="button" class="quick-cash-btn clear" id="quick-cash-clear" aria-label="Clear money received">Clear</button>
+        <div class="cash-tray" id="quick-cash" aria-label="Quick add money received">
+          <div class="cash-bar">
+          <button type="button" class="cash-stack" id="cash-stack" aria-expanded="false" aria-label="Show cash notes">
+            <svg viewBox="0 0 30 26" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" aria-hidden="true"><rect x="7" y="7" width="17" height="11" rx="2" transform="rotate(-16 15 22)"/><rect x="7" y="7" width="17" height="11" rx="2" transform="rotate(14 15 22)"/><rect x="6.5" y="8" width="17" height="11" rx="2" class="top"/><path d="M11 13.5h8" stroke-linecap="round"/></svg>
+            <span>Cash</span>
+          </button>
+          <button type="button" class="cash-clear" id="quick-cash-clear" aria-label="Clear money received" tabindex="-1">Clear</button>
+          </div>
+          <div class="cash-notes-wrap"><div class="cash-notes-clip"><div class="cash-notes">
+            <button type="button" class="cash-note n20" style="--i:0;--r:4" data-cash-add="20" tabindex="-1"><b>20</b></button>
+            <button type="button" class="cash-note n50" style="--i:1;--r:3" data-cash-add="50" tabindex="-1"><b>50</b></button>
+            <button type="button" class="cash-note n100" style="--i:2;--r:2" data-cash-add="100" tabindex="-1"><b>100</b></button>
+            <button type="button" class="cash-note n200" style="--i:3;--r:1" data-cash-add="200" tabindex="-1"><b>200</b></button>
+            <button type="button" class="cash-note n400" style="--i:4;--r:0" data-cash-add="400" tabindex="-1"><b>400</b></button>
+          </div></div></div>
         </div>
         <div class="change-line"><span>Change to give</span><strong class="change-result" id="change-due">¢0.00</strong></div>
       </div>
@@ -1119,6 +1187,20 @@
         <button class="receipt-tool-btn momo" id="momo-payments-btn">Momo</button>
       </div>
       <div class="receipt-history-list" id="receipt-history-list"></div>
+    </div>
+  </div>
+
+  <div class="notes-panel" id="notes-panel" hidden>
+    <div class="notes-card">
+      <div class="notes-head">
+        <div><h2>Quick notes</h2><div class="notes-sub" id="notes-status">Saved on this device</div></div>
+        <button class="receipt-history-close" id="notes-close" aria-label="Close notes">×</button>
+      </div>
+      <textarea id="notes-text" class="notes-text" placeholder="Write anything that pops to mind…" spellcheck="true" autocapitalize="sentences"></textarea>
+      <div class="notes-actions">
+        <button type="button" class="receipt-tool-btn" id="notes-copy">Copy</button>
+        <button type="button" class="receipt-tool-btn" id="notes-clear">Clear</button>
+      </div>
     </div>
   </div>
 
@@ -1170,7 +1252,7 @@
       <div class="settlement-tabs"><button class="settlement-tab" id="settlement-change-tab">Change</button><button class="settlement-tab active" id="settlement-debt-tab">Debt</button><button class="settlement-tab" id="settlement-momo-tab">Momo</button></div>
       <div class="settlement-list" id="settlement-list"></div>
       <div class="momo-withdraw-wrap" id="momo-withdraw-wrap" hidden>
-        <a class="momo-withdraw-btn" id="momo-withdraw-btn" href="tel:*170%23"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><polyline points="7 10 12 15 17 10"/><path d="M5 21h14"/></svg><span>Withdraw</span><small>*170#</small></a>
+        <a class="momo-withdraw-btn" id="momo-withdraw-btn" href="tel:*170%23"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 12V3"/><polyline points="8.5 6.5 12 3 15.5 6.5"/><rect x="3" y="12" width="18" height="9" rx="2"/><path d="M7 16.5h.01M17 16.5h.01"/><path d="M10 16.5h4"/></svg><span>Withdraw</span><small>*170#</small></a>
       </div>
     </div>
   </div>
@@ -1446,7 +1528,7 @@ window.addEventListener("error", function(e) {
   ];
   defaultItems.forEach(function(i){ i.photo = null; });
 
-  var APP_VERSION = 'v9.71';
+  var APP_VERSION = 'v9.72';
   var PRICE_MIGRATION_VERSION_KEY = 'price-list-price-migration-version-v1';
   var items = loadItems();
 
@@ -3601,6 +3683,14 @@ function renderHistory(){
 
   // v9.70 — quick cash chips add to "Money received" (tap several to add them up)
   document.getElementById('quick-cash').addEventListener('click', function(e){
+    var tray = document.getElementById('quick-cash');
+    if (e.target.closest('#cash-stack')) {
+      var open = !tray.classList.contains('open');
+      tray.classList.toggle('open', open);
+      document.getElementById('cash-stack').setAttribute('aria-expanded', open ? 'true' : 'false');
+      tray.querySelectorAll('.cash-note, .cash-clear').forEach(function(b){ b.tabIndex = open ? 0 : -1; });
+      return;
+    }
     var btn = e.target.closest('[data-cash-add]');
     var input = document.getElementById('money-received');
     if (btn) {
@@ -3611,6 +3701,39 @@ function renderHistory(){
     }
     if (e.target.closest('#quick-cash-clear')) { input.value = ''; updateChangeCalculator(); }
   });
+
+
+  // v9.72 — quick notes (pen button in History). Saved automatically; included in backups.
+  var NOTES_KEY = 'price-list-notes-v1';
+  (function initNotes(){
+    var panel = document.getElementById('notes-panel'), ta = document.getElementById('notes-text');
+    var status = document.getElementById('notes-status'), dot = document.getElementById('notes-dot');
+    if (!panel || !ta) return;
+    var timer = null;
+    function load(){ try { return localStorage.getItem(NOTES_KEY) || ''; } catch (e) { return ''; } }
+    function refreshDot(){ dot.hidden = !load().trim(); }
+    function save(){
+      try { localStorage.setItem(NOTES_KEY, ta.value); status.textContent = 'Saved on this device'; }
+      catch (e) { status.textContent = "Couldn't save — storage is full"; }
+      refreshDot();
+    }
+    function openNotes(){ ta.value = load(); status.textContent = 'Saved on this device'; panel.hidden = false; }
+    function closeNotes(){ clearTimeout(timer); save(); panel.hidden = true; ta.blur(); }
+    refreshDot();
+    document.getElementById('notes-pen-btn').addEventListener('click', openNotes);
+    document.getElementById('notes-close').addEventListener('click', closeNotes);
+    panel.addEventListener('click', function(e){ if (e.target === panel) closeNotes(); });
+    ta.addEventListener('input', function(){ status.textContent = 'Saving…'; clearTimeout(timer); timer = setTimeout(save, 350); });
+    document.addEventListener('visibilitychange', function(){ if (document.hidden && !panel.hidden) { clearTimeout(timer); save(); } });
+    document.getElementById('notes-copy').addEventListener('click', function(){
+      if (!ta.value.trim()) { showToast('Nothing to copy yet'); return; }
+      copyTextWithFallback(ta.value, 'Notes copied', 'notes.txt');
+    });
+    document.getElementById('notes-clear').addEventListener('click', function(){
+      if (!ta.value.trim()) return;
+      sheetConfirm('Clear all notes?', 'This wipes everything written in Quick notes.', 'Clear', true, function(){ ta.value = ''; save(); showToast('Notes cleared'); });
+    });
+  })();
 
   // v9.70 — backup reminder at 8:30 AM and 6:30 PM (shows whenever the app is open at or
   // shortly after those times; it can't wake a closed app).
