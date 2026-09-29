@@ -1,11 +1,13 @@
 {
-  "name": "Price List",
-  "short_name": "Price List",
+  "id": "./",
+  "name": "Music Money",
+  "short_name": "Music Money",
+  "description": "Track music subscription payments, coverage and reminders.",
   "start_url": "./",
+  "scope": "./",
   "display": "standalone",
-  "background_color": "#080808",
-  "theme_color": "#080808",
-  "description": "Price list and sales calculator \u00b7 Version 9.67.67",
+  "background_color": "#f5f5f7",
+  "theme_color": "#f5f5f7",
   "icons": [
     {
       "src": "icon-180.png",
