@@ -15,7 +15,7 @@
 <link rel="preload" href="fonts/poppins-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/poppins-latin-800-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="apple-touch-icon" href="icon-180.png">
-<title>Price List · V9.70</title>
+<title>Price List · V9.71</title>
 <style>
 @font-face{font-family:"Poppins";font-style:normal;font-weight:400;font-display:swap;src:url(fonts/poppins-latin-400-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:500;font-display:swap;src:url(fonts/poppins-latin-500-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:600;font-display:swap;src:url(fonts/poppins-latin-600-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:700;font-display:swap;src:url(fonts/poppins-latin-700-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:700;font-display:swap;src:url(fonts/poppins-latin-800-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:700;font-display:swap;src:url(fonts/poppins-latin-900-normal.woff2) format("woff2");}
   :root {
@@ -904,6 +904,46 @@
   .backup-actions button:active{transform:scale(.98)}
   .backup-go{flex:1.5;border:0;background:var(--gold);color:#fff;box-shadow:0 8px 20px rgba(0,0,0,.16)}
   .backup-skip{flex:1;border:1px solid var(--line);background:var(--paper);color:var(--ink)}
+
+  /* v9.71 — styled confirm/restore sheet, undo restore, momo withdraw */
+  .sheet-overlay{position:fixed;inset:0;z-index:180;background:rgba(0,0,0,.55);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);display:flex;align-items:center;justify-content:center;padding:18px}
+  .sheet-overlay[hidden]{display:none}
+  .sheet-card{width:min(360px,100%);max-height:88dvh;overflow-y:auto;box-sizing:border-box;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:26px;padding:22px 18px 16px;box-shadow:0 24px 64px rgba(0,0,0,.32);animation:backupPop .28s ease-out}
+  .sheet-icon{width:54px;height:54px;margin:0 auto 10px;border-radius:18px;background:var(--gold-soft);color:var(--gold);display:flex;align-items:center;justify-content:center}
+  .sheet-icon svg{width:28px;height:28px}
+  .sheet-card.danger .sheet-icon{background:rgba(185,50,40,.12);color:#b93228}
+  .sheet-card h3{margin:0;text-align:center;font-size:19px;font-weight:800;letter-spacing:-.01em}
+  .sheet-msg{margin:8px 0 0;text-align:center;font-size:13px;line-height:1.45;color:var(--ink-soft);font-weight:500}
+  .sheet-actions{display:flex;gap:10px;margin-top:16px}
+  .sheet-actions button{flex:1;border-radius:999px;padding:13px;font-size:14px;font-weight:700}
+  .sheet-actions button:active{transform:scale(.98)}
+  .sheet-cancel{border:1px solid var(--line);background:var(--paper);color:var(--ink)}
+  .sheet-ok{flex:1.4!important;border:0;background:var(--gold);color:#fff;box-shadow:0 8px 20px rgba(0,0,0,.16)}
+  .sheet-card.danger .sheet-ok{background:#b93228}
+  .sheet-ok:disabled{opacity:.4;box-shadow:none}
+  .rs-compare{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
+  .rs-col{border:1px solid var(--line);background:var(--paper);border-radius:14px;padding:9px 10px;font-size:11px;font-weight:600;line-height:1.55}
+  .rs-h{font-size:9px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-soft);font-weight:700}
+  .rs-date{font-size:12px;font-weight:800;margin-bottom:2px}
+  .rs-warn{margin-top:10px;padding:9px 11px;border-radius:12px;background:rgba(185,50,40,.11);border:1px solid rgba(185,50,40,.35);color:#b93228;font-size:11.5px;font-weight:600;line-height:1.45}
+  .rs-warn[hidden]{display:none}
+  .rs-sec{margin:14px 0 6px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-soft)}
+  .rs-check{display:flex;align-items:center;gap:10px;padding:9px 11px;margin-bottom:6px;border:1px solid var(--line);border-radius:12px;background:var(--paper);font-size:13px;font-weight:700}
+  .rs-check input{width:19px;height:19px;accent-color:var(--gold);flex-shrink:0}
+  .rs-check span{flex:1}
+  .rs-check small{font-size:10px;font-weight:600;color:var(--ink-soft)}
+  .rs-seg{display:flex;gap:6px}
+  .rs-seg button{flex:1;border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:999px;padding:9px;font-size:12px;font-weight:700}
+  .rs-seg button.active{background:var(--gold);border-color:var(--gold);color:#fff}
+  .rs-hint{margin:8px 2px 0;font-size:11px;line-height:1.45;color:var(--ink-soft);font-weight:500}
+  .manage-undo-btn{margin-top:8px;border-color:rgba(185,50,40,.35)!important;color:#b93228!important}
+  .manage-undo-btn[hidden]{display:none}
+  .momo-withdraw-wrap{margin-top:14px}
+  .momo-withdraw-wrap[hidden]{display:none}
+  .momo-withdraw-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;box-sizing:border-box;padding:14px 16px;border-radius:999px;background:var(--green);color:#fff;text-decoration:none;font-size:15px;font-weight:800;box-shadow:0 8px 20px rgba(30,92,70,.28);-webkit-tap-highlight-color:transparent}
+  .momo-withdraw-btn:active{transform:scale(.98)}
+  .momo-withdraw-btn svg{width:20px;height:20px;flex-shrink:0}
+  .momo-withdraw-btn small{font-size:11px;font-weight:600;opacity:.85}
 </style>
 </head>
 <body>
@@ -948,6 +988,7 @@
           <button class="manage-copy-btn" id="backup-export-btn">Backup all data</button>
           <button class="manage-copy-btn" id="backup-restore-btn">Restore all data</button>
         </div>
+        <button class="manage-copy-btn manage-undo-btn" id="backup-undo-btn" type="button" hidden>Undo last restore</button>
         <input type="file" id="backup-restore-input" accept="application/json,.json" hidden>
         <p class="photo-hint" id="backup-last-date" style="margin-top:8px;"></p>
         <p class="manage-version-label" id="app-version-label"></p>
@@ -1128,6 +1169,9 @@
       <div class="settlement-head"><div><h2 id="settlement-title">Unsettled Debts</h2><div class="settlement-total" id="settlement-total">Total <strong>¢0.00</strong></div></div><button class="receipt-history-close" id="settlement-close" aria-label="Close">×</button></div>
       <div class="settlement-tabs"><button class="settlement-tab" id="settlement-change-tab">Change</button><button class="settlement-tab active" id="settlement-debt-tab">Debt</button><button class="settlement-tab" id="settlement-momo-tab">Momo</button></div>
       <div class="settlement-list" id="settlement-list"></div>
+      <div class="momo-withdraw-wrap" id="momo-withdraw-wrap" hidden>
+        <a class="momo-withdraw-btn" id="momo-withdraw-btn" href="tel:*170%23"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><polyline points="7 10 12 15 17 10"/><path d="M5 21h14"/></svg><span>Withdraw</span><small>*170#</small></a>
+      </div>
     </div>
   </div>
 
@@ -1211,6 +1255,15 @@
       <input class="entry-input" id="entry-input" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00" autocomplete="off">
       <div class="entry-error" id="entry-error" hidden>Enter a valid amount</div>
       <div class="entry-actions"><button type="button" class="entry-cancel" id="entry-cancel">Cancel</button><button type="button" class="entry-save" id="entry-save">Save</button></div>
+    </div>
+  </div>
+
+  <div class="sheet-overlay" id="sheet-overlay" hidden>
+    <div class="sheet-card" id="sheet-card" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
+      <div class="sheet-icon" id="sheet-icon"></div>
+      <h3 id="sheet-title"></h3>
+      <div id="sheet-body"></div>
+      <div class="sheet-actions"><button type="button" class="sheet-cancel" id="sheet-cancel">Cancel</button><button type="button" class="sheet-ok" id="sheet-ok">OK</button></div>
     </div>
   </div>
 
@@ -1393,7 +1446,7 @@ window.addEventListener("error", function(e) {
   ];
   defaultItems.forEach(function(i){ i.photo = null; });
 
-  var APP_VERSION = 'v9.70';
+  var APP_VERSION = 'v9.71';
   var PRICE_MIGRATION_VERSION_KEY = 'price-list-price-migration-version-v1';
   var items = loadItems();
 
@@ -1785,7 +1838,9 @@ window.addEventListener("error", function(e) {
           '<div class="price-col"><span class="price-label">Bulk</span><span class="price-val' + (bulkVal === "—" ? " dash" : "") + '">' + bulkVal + '</span></div>' +
           '<div class="price-col"><span class="price-label">Single</span><span class="price-val' + (singleVal === "—" ? " dash" : "") + '">' + singleVal + '</span></div>' +
         '</div>' +
-        '<button class="icon-btn remove-btn" data-remove="' + item.id + '" aria-label="Remove ' + escapeHtml(item.name) + '">' +
+        (showFinishedItems
+          ? '<button class="icon-btn remove-btn" data-unfinish="' + item.id + '" aria-label="Remove ' + escapeHtml(item.name) + ' from Finished">'
+          : '<button class="icon-btn remove-btn" data-remove="' + item.id + '" aria-label="Remove ' + escapeHtml(item.name) + '">') +
         '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +
         '</button></li>';
     }).join("");
@@ -1836,7 +1891,8 @@ window.addEventListener("error", function(e) {
         if (isAppStorageKey(k) && k !== AUTO_CHECKPOINT_KEY) data[k] = localStorage.getItem(k);
       }
       localStorage.setItem(AUTO_CHECKPOINT_KEY, JSON.stringify({version:1, createdAt:new Date().toISOString(), reason:reason||'automatic', data:data}));
-    } catch(e) {}
+      return true;
+    } catch(e) { return false; }
   }
   function restoreAutomaticCheckpoint() {
     try {
@@ -1861,6 +1917,21 @@ window.addEventListener("error", function(e) {
     var el = document.getElementById('backup-last-date'); if (!el) return;
     var raw = localStorage.getItem(LAST_BACKUP_KEY);
     el.textContent = raw ? ('Last backup: ' + formatBackupStamp(raw)) : 'No backup saved yet on this device.';
+    renderUndoRestore();
+  }
+  function getRestoreCheckpoint() {
+    try {
+      var raw = localStorage.getItem(AUTO_CHECKPOINT_KEY); if (!raw) return null;
+      var cp = JSON.parse(raw);
+      if (cp && cp.data && String(cp.reason || '').indexOf('before restore') === 0) return cp;
+    } catch (e) {}
+    return null;
+  }
+  function renderUndoRestore() {
+    var b = document.getElementById('backup-undo-btn'); if (!b) return;
+    var cp = getRestoreCheckpoint();
+    b.hidden = !cp;
+    if (cp) b.textContent = 'Undo last restore (' + shortStamp(cp.createdAt) + ')';
   }
   function renderAppVersion() {
     var el = document.getElementById('app-version-label'); if (!el) return;
@@ -1883,32 +1954,214 @@ window.addEventListener("error", function(e) {
     renderBackupMeta();
     showToast('Backup file downloaded');
   }
-  function importAllData(file) {
-    createAutomaticCheckpoint('before full restore');
-    var reader = new FileReader();
-    reader.onload = function() {
-      var data;
-      try {
-        var payload = JSON.parse(reader.result);
-        data = (payload && typeof payload === 'object' && payload.data) ? payload.data : payload;
-        if (!data || typeof data !== 'object') throw new Error('empty');
-      } catch (e) {
-        alert("Could not read that file — make sure it's an unedited backup exported from this app.");
-        return;
-      }
-      var keys = Object.keys(data).filter(isAppStorageKey);
-      if (!keys.length) { alert("That file doesn't look like a backup from this app."); return; }
-      if (!confirm('This replaces the price list, carts, receipts, and debts/change currently on this device with the backup file. This cannot be undone. Continue?')) return;
+  function shortStamp(iso) {
+    var d = new Date(iso);
+    if (isNaN(d.getTime())) return 'Unknown date';
+    return d.toLocaleDateString(undefined, { day: 'numeric', month: 'short' }) + ', ' +
+      d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+  }
+  function parseJsonSafe(str, fallback) { try { var v = JSON.parse(str); return v == null ? fallback : v; } catch (e) { return fallback; } }
+  function plural(n, w) { return n + ' ' + w + (n === 1 ? '' : 's'); }
+
+  // ----- styled confirm sheet (replaces the plain browser popups) -----
+  var SHEET_ICONS = {
+    restore: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>',
+    warn: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>'
+  };
+  var sheetHandlers = { ok: null, cancel: null };
+  function openSheet(o) {
+    var overlay = document.getElementById('sheet-overlay');
+    document.getElementById('sheet-card').classList.toggle('danger', !!o.danger);
+    document.getElementById('sheet-icon').innerHTML = SHEET_ICONS[o.icon || (o.danger ? 'warn' : 'restore')];
+    document.getElementById('sheet-title').textContent = o.title || '';
+    document.getElementById('sheet-body').innerHTML = o.html || '';
+    var ok = document.getElementById('sheet-ok'), cancel = document.getElementById('sheet-cancel');
+    ok.textContent = o.ok || 'OK'; ok.disabled = false;
+    cancel.textContent = o.cancel || 'Cancel';
+    cancel.style.display = o.hideCancel ? 'none' : '';
+    sheetHandlers.ok = o.onOk || null;
+    sheetHandlers.cancel = o.onCancel || null;
+    overlay.hidden = false;
+  }
+  function closeSheet2() { document.getElementById('sheet-overlay').hidden = true; sheetHandlers.ok = sheetHandlers.cancel = null; }
+  function sheetMessage(title, msg, danger) {
+    openSheet({ title: title, html: '<p class="sheet-msg">' + escapeHtml(msg) + '</p>', ok: 'OK', hideCancel: true, danger: !!danger });
+  }
+  function sheetConfirm(title, msg, okLabel, danger, onOk) {
+    openSheet({ title: title, html: '<p class="sheet-msg">' + escapeHtml(msg) + '</p>', ok: okLabel, danger: danger, onOk: onOk });
+  }
+
+  // ----- restore -----
+  var RESTORE_GROUPS = {
+    items: ['priceListItems_v3'],
+    receipts: ['price-list-receipts-v1', 'price-list-receipt-counter-v1'],
+    debts: ['price-list-unsettled-debts-v1', 'price-list-change-owed-v1', 'price-list-momo-payments-v1']
+  };
+  function dataStats(get) {
+    var items = parseJsonSafe(get('priceListItems_v3'), []);
+    var rec = parseJsonSafe(get('price-list-receipts-v1'), []);
+    var debts = ['price-list-unsettled-debts-v1', 'price-list-change-owed-v1', 'price-list-momo-payments-v1']
+      .reduce(function (n, k) { var a = parseJsonSafe(get(k), []); return n + (Array.isArray(a) ? a.length : 0); }, 0);
+    var newest = 0;
+    (Array.isArray(rec) ? rec : []).forEach(function (r) { var t = Date.parse(r && r.createdAt); if (t > newest) newest = t; });
+    return { items: Array.isArray(items) ? items.length : 0, receipts: Array.isArray(rec) ? rec : [], receiptCount: Array.isArray(rec) ? rec.length : 0, debts: debts, newest: newest };
+  }
+  function receiptKeyOf(r) { return String(r && r.number || '') + '|' + String(r && r.createdAt || ''); }
+  function mergeById(cur, inc) {
+    var seen = {}; cur.forEach(function (x) { if (x && x.id != null) seen[String(x.id)] = true; });
+    var out = cur.slice(), added = 0;
+    inc.forEach(function (x) { if (x && x.id != null && !seen[String(x.id)]) { seen[String(x.id)] = true; out.push(x); added++; } });
+    return { list: out, added: added };
+  }
+  function applyRestore(data, sel) {
+    var fullReplace = sel.items && sel.receipts && sel.debts && sel.mode === 'replace';
+    if (fullReplace) {
       for (var i = localStorage.length - 1; i >= 0; i--) {
         var k = localStorage.key(i);
         if (isAppStorageKey(k)) localStorage.removeItem(k);
       }
-      keys.forEach(function(k){ localStorage.setItem(k, data[k]); });
-      showToast('Backup restored — reloading…');
-      setTimeout(function(){ location.reload(); }, 700);
+      Object.keys(data).filter(isAppStorageKey).forEach(function (k) { localStorage.setItem(k, data[k]); });
+      return;
+    }
+    if (sel.items && data['priceListItems_v3'] != null) localStorage.setItem('priceListItems_v3', data['priceListItems_v3']);
+    if (sel.receipts) {
+      if (sel.mode === 'replace') {
+        RESTORE_GROUPS.receipts.forEach(function (k) { if (data[k] != null) localStorage.setItem(k, data[k]); });
+      } else {
+        var cur = parseJsonSafe(localStorage.getItem('price-list-receipts-v1'), []);
+        var incoming = normalizeImportedReceipts(parseJsonSafe(data['price-list-receipts-v1'], []));
+        var haveId = {}, haveKey = {};
+        cur.forEach(function (r) { if (r.receiptId) haveId[r.receiptId] = true; haveKey[receiptKeyOf(r)] = true; });
+        var add = incoming.filter(function (r) {
+          if ((r.receiptId && haveId[r.receiptId]) || haveKey[receiptKeyOf(r)]) return false;
+          haveKey[receiptKeyOf(r)] = true; return true;
+        });
+        var merged = cur.concat(add);
+        merged.sort(function (a, b) { return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(); });
+        merged = merged.slice(0, 500);
+        var maxNo = Math.max(Number(localStorage.getItem('price-list-receipt-counter-v1')) || 0, Number(data['price-list-receipt-counter-v1']) || 0);
+        merged.forEach(function (r) { var m = String(r.number || '').match(/(\d+)$/); if (m) maxNo = Math.max(maxNo, Number(m[1])); });
+        localStorage.setItem('price-list-receipts-v1', JSON.stringify(merged));
+        localStorage.setItem('price-list-receipt-counter-v1', String(maxNo));
+      }
+    }
+    if (sel.debts) {
+      RESTORE_GROUPS.debts.forEach(function (k) {
+        if (data[k] == null) return;
+        if (sel.mode === 'replace') { localStorage.setItem(k, data[k]); return; }
+        var cur = parseJsonSafe(localStorage.getItem(k), []), inc = parseJsonSafe(data[k], []);
+        localStorage.setItem(k, JSON.stringify(mergeById(Array.isArray(cur) ? cur : [], Array.isArray(inc) ? inc : []).list));
+      });
+    }
+  }
+  function importAllData(file) {
+    var reader = new FileReader();
+    reader.onload = function () {
+      var data, exportedAt = '';
+      try {
+        var payload = JSON.parse(reader.result);
+        data = (payload && typeof payload === 'object' && payload.data) ? payload.data : payload;
+        exportedAt = (payload && payload.exportedAt) || '';
+        if (!data || typeof data !== 'object') throw new Error('empty');
+      } catch (e) {
+        sheetMessage("Can't read that file", "Make sure it's an unedited backup exported from this app.", true);
+        return;
+      }
+      var keys = Object.keys(data).filter(isAppStorageKey);
+      if (!keys.length) { sheetMessage('Not a backup', "That file doesn't look like a backup from this app.", true); return; }
+      showRestoreSheet(data, exportedAt);
     };
-    reader.onerror = function(){ alert('Could not read that file.'); };
+    reader.onerror = function () { sheetMessage("Can't read that file", 'Try choosing the file again.', true); };
     reader.readAsText(file);
+  }
+  function showRestoreSheet(data, exportedAt) {
+    var bk = dataStats(function (k) { return data[k]; });
+    var ph = dataStats(function (k) { return localStorage.getItem(k); });
+    var bkKeys = {}; bk.receipts.forEach(function (r) { bkKeys[receiptKeyOf(r)] = 1; });
+    var phoneOnly = ph.receipts.filter(function (r) { return !bkKeys[receiptKeyOf(r)]; });
+    var phKeys = {}; ph.receipts.forEach(function (r) { phKeys[receiptKeyOf(r)] = 1; });
+    var backupOnly = bk.receipts.filter(function (r) { return !phKeys[receiptKeyOf(r)]; }).length;
+    var expTs = Date.parse(exportedAt) || 0;
+    var older = !!(expTs && ph.newest && ph.newest > expTs);
+    var mode = phoneOnly.length ? 'merge' : 'replace';
+
+    var html =
+      '<div class="rs-compare">' +
+        '<div class="rs-col"><div class="rs-h">Backup</div><div class="rs-date">' + escapeHtml(expTs ? shortStamp(exportedAt) : 'Unknown date') + '</div>' +
+          plural(bk.items, 'item') + '<br>' + plural(bk.receiptCount, 'receipt') + '<br>' + bk.debts + ' debts/change/Momo</div>' +
+        '<div class="rs-col"><div class="rs-h">This phone</div><div class="rs-date">' + escapeHtml(shortStamp(new Date().toISOString())) + '</div>' +
+          plural(ph.items, 'item') + '<br>' + plural(ph.receiptCount, 'receipt') + '<br>' + ph.debts + ' debts/change/Momo</div>' +
+      '</div>' +
+      '<div class="rs-warn" id="rs-warn" hidden></div>' +
+      '<div class="rs-sec">What to restore</div>' +
+      '<label class="rs-check"><input type="checkbox" id="rs-items" checked><span>Price list</span><small>' + plural(bk.items, 'item') + '</small></label>' +
+      '<label class="rs-check"><input type="checkbox" id="rs-receipts" checked><span>Receipts</span><small>' + plural(bk.receiptCount, 'receipt') + '</small></label>' +
+      '<label class="rs-check"><input type="checkbox" id="rs-debts" checked><span>Debts, change &amp; Momo</span><small>' + bk.debts + '</small></label>' +
+      '<div id="rs-mode-wrap"><div class="rs-sec">Receipts and debts</div>' +
+        '<div class="rs-seg"><button type="button" data-rs-mode="merge">Merge</button><button type="button" data-rs-mode="replace">Replace</button></div>' +
+        '<p class="rs-hint" id="rs-hint"></p></div>';
+
+    openSheet({ title: 'Restore backup?', html: html, ok: 'Restore', onOk: function () {
+      var sel = { items: document.getElementById('rs-items').checked, receipts: document.getElementById('rs-receipts').checked, debts: document.getElementById('rs-debts').checked, mode: mode };
+      if (!sel.items && !sel.receipts && !sel.debts) return;
+      var run = function (saved) {
+        try { applyRestore(data, sel); }
+        catch (e) { if (saved) restoreAutomaticCheckpoint(); sheetMessage('Restore failed', 'Nothing was changed. The phone may be low on storage.', true); return; }
+        closeSheet2();
+        showToast('Backup restored — reloading…');
+        setTimeout(function () { location.reload(); }, 700);
+      };
+      var checkpointOk = createAutomaticCheckpoint('before restore');
+      if (!checkpointOk) {
+        openSheet({ danger: true, title: 'No undo available', html: '<p class="sheet-msg">The phone has no room to save a safety copy, so this restore could not be undone. Restore anyway?</p>', ok: 'Restore anyway', onOk: function () { run(false); } });
+        return;
+      }
+      run(true);
+    } });
+
+    function refresh() {
+      var sel = { items: document.getElementById('rs-items').checked, receipts: document.getElementById('rs-receipts').checked, debts: document.getElementById('rs-debts').checked };
+      var any = sel.items || sel.receipts || sel.debts;
+      var needsMode = sel.receipts || sel.debts;
+      document.getElementById('rs-mode-wrap').hidden = !needsMode;
+      document.querySelectorAll('[data-rs-mode]').forEach(function (b) { b.classList.toggle('active', b.getAttribute('data-rs-mode') === mode); });
+      var hint = document.getElementById('rs-hint');
+      hint.textContent = mode === 'merge'
+        ? 'Keeps everything on this phone and adds ' + plural(backupOnly, 'receipt') + ' that only exist in the backup. Nothing is removed.'
+        : 'Swaps what is on this phone for what is in the backup.';
+      var lose = mode === 'replace' && sel.receipts && phoneOnly.length;
+      var warn = [];
+      if (older && (sel.receipts || sel.items || sel.debts)) warn.push('This backup (' + shortStamp(exportedAt) + ') is older than the newest sale on this phone (' + shortStamp(new Date(ph.newest).toISOString()) + ').');
+      if (lose) warn.push(plural(phoneOnly.length, 'receipt') + ' on this phone ' + (phoneOnly.length === 1 ? 'is' : 'are') + ' not in the backup and would be lost. Choose Merge to keep ' + (phoneOnly.length === 1 ? 'it' : 'them') + '.');
+      var w = document.getElementById('rs-warn');
+      w.hidden = !warn.length; w.textContent = warn.join(' ');
+      var danger = !!warn.length && mode === 'replace' && needsMode;
+      document.getElementById('sheet-card').classList.toggle('danger', danger);
+      document.getElementById('sheet-icon').innerHTML = SHEET_ICONS[danger ? 'warn' : 'restore'];
+      var ok = document.getElementById('sheet-ok'); ok.disabled = !any;
+      ok.textContent = danger ? 'Replace anyway' : 'Restore';
+    }
+    ['rs-items', 'rs-receipts', 'rs-debts'].forEach(function (id) { document.getElementById(id).addEventListener('change', refresh); });
+    document.querySelectorAll('[data-rs-mode]').forEach(function (b) { b.addEventListener('click', function () { mode = b.getAttribute('data-rs-mode'); refresh(); }); });
+    refresh();
+  }
+  function undoLastRestore() {
+    var cp = getRestoreCheckpoint(); if (!cp) { renderUndoRestore(); return; }
+    openSheet({
+      danger: true, title: 'Undo last restore?',
+      html: '<p class="sheet-msg">This puts back everything exactly as it was on ' + escapeHtml(shortStamp(cp.createdAt)) + ', just before you restored. Sales or changes made since then will be lost.</p>',
+      ok: 'Undo restore',
+      onOk: function () {
+        try {
+          for (var i = localStorage.length - 1; i >= 0; i--) { var k = localStorage.key(i); if (isAppStorageKey(k)) localStorage.removeItem(k); }
+          Object.keys(cp.data).forEach(function (k) { localStorage.setItem(k, cp.data[k]); });
+          localStorage.removeItem(AUTO_CHECKPOINT_KEY);
+        } catch (e) { sheetMessage('Undo failed', 'Something went wrong putting the old data back.', true); return; }
+        closeSheet2();
+        showToast('Restore undone — reloading…');
+        setTimeout(function () { location.reload(); }, 700);
+      }
+    });
   }
 
   function openPriceImport() {
@@ -2151,6 +2404,19 @@ window.addEventListener("error", function(e) {
     updateChangeCalculator();
   }
 
+  // v9.71 — the X in the Finished list only takes the item OFF the Finished list
+  // (back to selling); it never deletes the item.
+  function unfinishItem(id) {
+    var it = items.find(function (i) { return i.id === id; });
+    if (!it) return;
+    it.finished = false;
+    it.customizedAt = Date.now(); it.customizedVersion = APP_VERSION;
+    saveItems();
+    renderManageList();
+    renderCatalogList();
+    renderCart();
+    showToast(it.name + ' removed from Finished');
+  }
   function removeItem(id) {
     items = items.filter(function (i) { return i.id !== id; });
     Object.keys(cart).forEach(function(key) { if (parseCartKey(key).id === id) delete cart[key]; });
@@ -2438,6 +2704,7 @@ window.addEventListener("error", function(e) {
     document.getElementById('settlement-debt-tab').classList.toggle('active',isDebt);
     document.getElementById('settlement-change-tab').classList.toggle('active',type==='change');
     document.getElementById('settlement-momo-tab').classList.toggle('active',isMomo);
+    var wdWrap=document.getElementById('momo-withdraw-wrap'); if(wdWrap) wdWrap.hidden=!isMomo;
     var emptyLabel = isDebt ? 'unsettled debts' : isMomo ? 'momo payments recorded' : 'change waiting to be collected';
     if(!data.length){ list.innerHTML='<div class="settlement-empty">No '+emptyLabel+'.</div>'; return; }
     var actionLabel = isDebt ? 'Mark as paid' : isMomo ? 'Clear' : 'Mark as collected';
@@ -3146,6 +3413,8 @@ function renderHistory(){
   document.addEventListener('touchcancel', function(){ receiptTapState=null; receiptSuppressClicks=0; },{passive:true});
 
   document.addEventListener("click", function (e) {
+    var unfinishBtn = e.target.closest("[data-unfinish]");
+    if (unfinishBtn) return unfinishItem(Number(unfinishBtn.dataset.unfinish));
     var removeBtn = e.target.closest("[data-remove]");
     if (removeBtn) return removeItem(Number(removeBtn.dataset.remove));
 
@@ -3277,6 +3546,10 @@ function renderHistory(){
   document.getElementById('backup-restore-btn').addEventListener('click', function(){
     document.getElementById('backup-restore-input').click();
   });
+  document.getElementById('backup-undo-btn').addEventListener('click', undoLastRestore);
+  document.getElementById('sheet-ok').addEventListener('click', function(){ var f = sheetHandlers.ok; if (f) f(); else closeSheet2(); });
+  document.getElementById('sheet-cancel').addEventListener('click', function(){ var f = sheetHandlers.cancel; closeSheet2(); if (f) f(); });
+  document.getElementById('sheet-overlay').addEventListener('click', function(e){ if (e.target === this) closeSheet2(); });
   document.getElementById('backup-restore-input').addEventListener('change', function(e){
     var file = e.target.files && e.target.files[0];
     if (file) importAllData(file);
