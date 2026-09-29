@@ -14,7 +14,7 @@
 <link rel="preload" href="fonts/poppins-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/poppins-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="apple-touch-icon" href="icon-180.png">
-<title>Price List · V9.67.67</title>
+<title>Price List · V9.68</title>
 <style>
 @font-face{font-family:"Poppins";font-style:normal;font-weight:400;font-display:swap;src:url(fonts/poppins-latin-400-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:500;font-display:swap;src:url(fonts/poppins-latin-500-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:600;font-display:swap;src:url(fonts/poppins-latin-600-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:700;font-display:swap;src:url(fonts/poppins-latin-700-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:800;font-display:swap;src:url(fonts/poppins-latin-800-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:900;font-display:swap;src:url(fonts/poppins-latin-900-normal.woff2) format("woff2");}
   :root {
@@ -810,6 +810,18 @@
   .settlement-items { margin:7px 0 8px; padding-left:17px; color:var(--ink-soft); font-size:10px; line-height:1.35; }
   .settlement-items li { margin:2px 0; }
   [hidden] { display: none !important; }
+
+  /* v9.68 — panels never scroll sideways (fixes shaky left/right drag in Recent receipts) */
+  .receipt-history-panel,.reports-panel,.receipt-panel,.receipt-action-panel{overflow:hidden;overscroll-behavior:contain;touch-action:pan-y}
+  .receipt-history-card,.reports-card,.settlement-card,.cart-overview-card,.receipt-card,.receipt-action-card{overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;overscroll-behavior-x:none;touch-action:pan-y;-webkit-overflow-scrolling:touch;max-width:100%}
+  .receipt-history-card *{min-width:0;max-width:100%}
+  .receipt-history-card .receipt-search-row{padding:0}
+  .receipt-history-card .receipt-date-clear{margin:4px 0 0}
+  .receipt-history-card .receipt-tools{flex-wrap:wrap}
+  .receipt-history-list,.receipt-history-item{width:100%}
+  .receipt-history-item .rh-no,.receipt-history-item .rh-meta,.receipt-history-item .rh-items li{overflow-wrap:anywhere;word-break:break-word}
+  .receipt-history-item .rh-items{padding-left:16px;margin-right:0}
+  #receipt-search{width:100%;max-width:100%}
 </style>
 </head>
 <body>
@@ -1264,7 +1276,7 @@ window.addEventListener("error", function(e) {
   ];
   defaultItems.forEach(function(i){ i.photo = null; });
 
-  var APP_VERSION = 'v9.67.67';
+  var APP_VERSION = 'v9.68';
   var PRICE_MIGRATION_VERSION_KEY = 'price-list-price-migration-version-v1';
   var items = loadItems();
 
@@ -2865,6 +2877,41 @@ function renderHistory(){
     removeItem(editingId);
     closeSheet();
   }
+  // v9.68 — item photos are shrunk to small thumbnails before saving so the
+  // saved data stays tiny and the app opens fast.
+  function shrinkPhoto(dataUrl, done) {
+    try {
+      var img = new Image();
+      img.onload = function () {
+        try {
+          var max = 256, w = img.width, h = img.height;
+          if (!w || !h) { done(dataUrl); return; }
+          var scale = Math.min(1, max / Math.max(w, h));
+          var c = document.createElement('canvas');
+          c.width = Math.max(1, Math.round(w * scale)); c.height = Math.max(1, Math.round(h * scale));
+          var ctx = c.getContext('2d');
+          ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, c.width, c.height);
+          ctx.drawImage(img, 0, 0, c.width, c.height);
+          var out = c.toDataURL('image/jpeg', 0.78);
+          done(out && out.length < dataUrl.length ? out : dataUrl);
+        } catch (e) { done(dataUrl); }
+      };
+      img.onerror = function () { done(dataUrl); };
+      img.src = dataUrl;
+    } catch (e) { done(dataUrl); }
+  }
+  // One-time, background shrink of photos saved by older versions (never blocks launch).
+  function shrinkExistingPhotos() {
+    var big = items.filter(function (i) { return i && typeof i.photo === 'string' && i.photo.length > 40000; });
+    if (!big.length) return;
+    var pending = big.length, changed = false;
+    big.forEach(function (it) {
+      shrinkPhoto(it.photo, function (small) {
+        if (small && small.length < it.photo.length) { it.photo = small; changed = true; }
+        if (--pending === 0 && changed) { saveItems(); try { renderCatalogList(); renderManageList(); } catch (e) {} }
+      });
+    });
+  }
   function bindPhotoInput() {
     var input = document.getElementById("photo-input");
     input.addEventListener("change", function (e) {
@@ -2872,8 +2919,10 @@ function renderHistory(){
       if (!file) return;
       var reader = new FileReader();
       reader.onload = function () {
-        pendingPhoto = reader.result;
-        document.getElementById("photo-picker").innerHTML = '<img src="' + pendingPhoto + '" alt="">';
+        shrinkPhoto(reader.result, function (small) {
+          pendingPhoto = small;
+          document.getElementById("photo-picker").innerHTML = '<img src="' + pendingPhoto + '" alt="">';
+        });
       };
       reader.readAsDataURL(file);
     });
@@ -3131,6 +3180,7 @@ function renderHistory(){
   document.getElementById("money-received").addEventListener("input", updateChangeCalculator);
   updateCartSwitcher();
   switchTab("sell");
+  (window.requestIdleCallback || function (f) { setTimeout(f, 2500); })(function () { setTimeout(shrinkExistingPhotos, 1500); });
 </script>
 </body>
 </html>

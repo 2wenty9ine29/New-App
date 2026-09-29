@@ -1,4 +1,4 @@
-const CACHE = "price-list-sales-calculator-v9-67-67";
+const CACHE = "price-list-sales-calculator-v9-68";
 const APP_SHELL = ["./","./index.html","./manifest.webmanifest","./icon-180.png","./icon-512.png","./fonts/poppins-latin-400-normal.woff2","./fonts/poppins-latin-500-normal.woff2","./fonts/poppins-latin-600-normal.woff2","./fonts/poppins-latin-700-normal.woff2"];
 
 self.addEventListener("install", event => {
@@ -19,11 +19,18 @@ self.addEventListener("fetch", event => {
     event.request.url.endsWith("/");
 
   if (isAppShellDoc) {
-    // Stale-while-revalidate: open instantly from the cached copy (important
-    // on slow networks) and fetch the latest version quietly in the background.
-    // A new version is used the next time the app is opened.
+    // Open instantly from the cached copy. Only re-download the page in the
+    // background if the saved copy is older than 6 hours, so launches on slow
+    // networks aren't competing with a full page download every time.
+    // New versions still arrive quickly: a new sw.js installs a fresh copy.
     event.respondWith(
       caches.match(event.request, { ignoreSearch: true }).then(function (cached) {
+        var stale = true;
+        if (cached) {
+          var d = Date.parse(cached.headers.get("date") || "");
+          stale = !d || (Date.now() - d) > 6 * 60 * 60 * 1000;
+        }
+        if (cached && !stale) return cached;
         var refresh = fetch(event.request).then(function (response) {
           if (response && response.ok) {
             var copy = response.clone();
@@ -38,6 +45,16 @@ self.addEventListener("fetch", event => {
     return;
   }
 
-  // Icons/manifest change rarely, so cache-first is fine for those.
-  event.respondWith(caches.match(event.request).then(cached => cached || fetch(event.request)));
+  // Fonts, icons and manifest change rarely: cache-first, and remember any
+  // font (e.g. Poppins 800/900) the first time it is used.
+  event.respondWith(caches.match(event.request).then(function (cached) {
+    if (cached) return cached;
+    return fetch(event.request).then(function (response) {
+      if (response && response.ok && event.request.url.indexOf("/fonts/") !== -1) {
+        var copy = response.clone();
+        caches.open(CACHE).then(function (cache) { cache.put(event.request, copy); });
+      }
+      return response;
+    });
+  }));
 });
