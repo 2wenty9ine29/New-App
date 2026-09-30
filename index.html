@@ -15,7 +15,7 @@
 <link rel="preload" href="fonts/poppins-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/poppins-latin-800-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="apple-touch-icon" href="icon-180.png">
-<title>Price List · V9.72</title>
+<title>Price List · V9.73</title>
 <style>
 @font-face{font-family:"Poppins";font-style:normal;font-weight:400;font-display:swap;src:url(fonts/poppins-latin-400-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:500;font-display:swap;src:url(fonts/poppins-latin-500-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:600;font-display:swap;src:url(fonts/poppins-latin-600-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:700;font-display:swap;src:url(fonts/poppins-latin-700-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:700;font-display:swap;src:url(fonts/poppins-latin-800-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:700;font-display:swap;src:url(fonts/poppins-latin-900-normal.woff2) format("woff2");}
   :root {
@@ -708,8 +708,10 @@
   }
   .cart-row.swipe-delete-ready .swipe-delete-bg { opacity: 1; }
   .cart-row > *:not(.swipe-delete-bg) { position: relative; z-index: 1; }
-  .undo-toast { pointer-events: auto; display:flex; align-items:center; gap:10px; }
-  .undo-toast button { border:0; background:transparent; color:var(--gold-bright); font-weight:700; padding:2px 0; }
+  .undo-toast { pointer-events:auto; display:flex; align-items:center; gap:10px; min-width:min(320px,calc(100vw - 32px)); max-width:calc(100vw - 32px); padding:11px 12px 11px 14px; border:1px solid var(--line); border-radius:16px; background:var(--surface); color:var(--ink); box-shadow:0 12px 30px rgba(0,0,0,.16), 0 2px 8px rgba(0,0,0,.08); font-size:12px; font-weight:600; animation:undoToastIn .22s ease-out; }
+  .undo-toast button { margin-left:auto; border:1px solid var(--gold); background:var(--gold); color:#fff; border-radius:10px; font-size:11px; font-weight:700; padding:7px 11px; min-width:54px; }
+  .undo-toast button:active { transform:scale(.96); opacity:.88; }
+  @keyframes undoToastIn { from { opacity:0; transform:translateY(10px) scale(.98); } to { opacity:1; transform:translateY(0) scale(1); } }
   @keyframes cartIn {
     from { opacity: 0; transform: translateY(5px); }
     to { opacity: 1; transform: translateY(0); }
@@ -868,7 +870,7 @@
   .quick-cash-btn.clear{flex:0 0 auto;padding:9px 11px;background:var(--paper);color:var(--ink-soft);font-size:11px;font-weight:600}
 
 
-  /* v9.72 — cash tray (stacked notes that cascade out), notes pen, withdraw icon */
+  /* v9.73 — focused UX fixes: restored-receipt clearing, change visibility, notes surface, undo toast */
   .history-header-actions{flex-direction:row;align-items:center;gap:10px}
   .history-header-links{display:flex;flex-direction:column;gap:6px;align-items:flex-end}
   .notes-pen-btn{position:relative;width:36px;height:36px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--gold);display:inline-flex;align-items:center;justify-content:center;padding:0;-webkit-tap-highlight-color:transparent}
@@ -882,7 +884,7 @@
   .notes-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
   .notes-head h2{margin:0;font-size:18px;font-weight:700;letter-spacing:-.01em}
   .notes-sub{font-size:10px;color:var(--ink-soft);margin-top:2px}
-  .notes-text{display:block;width:100%;box-sizing:border-box;height:min(46dvh,340px);resize:none;border:1px solid var(--line);border-radius:14px;padding:10px 12px;background:var(--paper);color:var(--ink);font:inherit;font-size:15px;line-height:28px;background-image:repeating-linear-gradient(to bottom,transparent 0,transparent 27px,var(--line) 27px,var(--line) 28px);background-attachment:local}
+  .notes-text{display:block;width:100%;box-sizing:border-box;height:min(46dvh,340px);resize:none;border:1px solid var(--line);border-radius:16px;padding:14px;background:var(--paper);color:var(--ink);font:inherit;font-size:15px;line-height:1.65;box-shadow:inset 0 1px 0 rgba(255,255,255,.35)}
   .notes-text:focus{outline:none;border-color:var(--gold)}
   .notes-actions{display:flex;gap:8px;margin-top:10px}
   .notes-actions .receipt-tool-btn{flex:1}
@@ -1135,6 +1137,7 @@
         <h2>Change calculator</h2>
         <div class="change-line"><span>Current total</span><strong id="change-total">¢0.00</strong></div>
         <div class="change-line"><span>Money received</span><input id="money-received" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00"></div>
+        <div class="change-line"><span>Change to give</span><strong class="change-result" id="change-due">¢0.00</strong></div>
         <div class="cash-tray" id="quick-cash" aria-label="Quick add money received">
           <div class="cash-bar">
           <button type="button" class="cash-stack" id="cash-stack" aria-expanded="false" aria-label="Show cash notes">
@@ -1151,7 +1154,6 @@
             <button type="button" class="cash-note n400" style="--i:4;--r:0" data-cash-add="400" tabindex="-1"><b>400</b></button>
           </div></div></div>
         </div>
-        <div class="change-line"><span>Change to give</span><strong class="change-result" id="change-due">¢0.00</strong></div>
       </div>
     </div>
   </section>
@@ -1528,7 +1530,7 @@ window.addEventListener("error", function(e) {
   ];
   defaultItems.forEach(function(i){ i.photo = null; });
 
-  var APP_VERSION = 'v9.72';
+  var APP_VERSION = 'v9.73';
   var PRICE_MIGRATION_VERSION_KEY = 'price-list-price-migration-version-v1';
   var items = loadItems();
 
@@ -1772,21 +1774,22 @@ window.addEventListener("error", function(e) {
     try { if (navigator.vibrate) navigator.vibrate(10); } catch (e) {}
   }
   function showToast(message) {
-    var t=document.getElementById('toast'); t.textContent=message; t.classList.add('show');
+    var t=document.getElementById('toast'); t.classList.remove('undo-toast'); t.textContent=message; t.classList.add('show');
     clearTimeout(showToast.timer); showToast.timer=setTimeout(function(){t.classList.remove('show');},1800);
   }
   function showUndo(message, undoFn) {
     var t=document.getElementById('toast');
     clearTimeout(showUndo.timer);
+    t.classList.add('undo-toast');
     t.innerHTML=(message ? '<span>'+escapeHtml(message)+'</span>' : '')+'<button id="undo-btn" type="button">undo</button>';
     t.classList.add('show');
     undoState={fn:undoFn, revision:cartRevision};
     var btn=document.getElementById('undo-btn');
     if(btn) btn.addEventListener('click', function(){
       if(undoState && undoState.revision===cartRevision) undoState.fn();
-      undoState=null; t.classList.remove('show');
+      undoState=null; t.classList.remove('show','undo-toast');
     }, {once:true});
-    showUndo.timer=setTimeout(function(){ undoState=null; t.classList.remove('show'); }, 2000);
+    showUndo.timer=setTimeout(function(){ undoState=null; t.classList.remove('show','undo-toast'); }, 2400);
   }
   function escapeHtml(str) {
     return String(str).replace(/[&<>"']/g, function (m) {
@@ -2544,23 +2547,30 @@ window.addEventListener("error", function(e) {
     var snapshot=cartSnapshot();
     var previousOrder=cartOrder.slice();
     var previousDiscount=Number(discounts[activeCartIndex])||0;
-    if (pendingRestoredReceipt && pendingRestoredReceipt.cartIndex === activeCartIndex) {
-      // Restored receipts are temporarily removed from history while being edited.
-      // If the edit is cancelled/cleared, put the exact original receipt back.
-      var cancelledOriginal = pendingRestoredReceipt.originalReceipt;
-      if (cancelledOriginal && cancelledOriginal.number) {
-        var restoreAt = Math.max(0, Math.min(Number(pendingRestoredReceipt.originalIndex)||0, receipts.length));
-        receipts.splice(restoreAt, 0, cancelledOriginal);
-        receipts=receipts.slice(0,500);
-        saveJson('price-list-receipts-v1',receipts);
-      }
+    // If this cart came from a restored receipt, clearing means the user is
+    // intentionally discarding that restored sale. Keep the restoration memory
+    // in the Undo snapshot only, so Undo can truly reverse Clear without making
+    // the receipt reappear during an ordinary Clear.
+    var previousPendingRestore = (pendingRestoredReceipt && pendingRestoredReceipt.cartIndex === activeCartIndex)
+      ? JSON.parse(JSON.stringify(pendingRestoredReceipt)) : null;
+    if (previousPendingRestore) {
       pendingRestoredReceipt = null;
       saveJson(PENDING_RESTORE_KEY, null);
     }
     cart = {}; cartOrder=[]; discounts[activeCartIndex]=0; bumpCartRevision(); saveJson('price-list-cart-order-v1-' + activeCartIndex, cartOrder); saveCart(); renderCart();
-    showUndo('', function(){
-      cart=JSON.parse(JSON.stringify(snapshot)); discounts[activeCartIndex]=previousDiscount; cartOrder=previousOrder.filter(function(k){ return Object.prototype.hasOwnProperty.call(cart,k); });
-      normalizeCartOrder(); bumpCartRevision(); saveCart(); renderCart();
+    showUndo('Cart cleared', function(){
+      cart=JSON.parse(JSON.stringify(snapshot));
+      discounts[activeCartIndex]=previousDiscount;
+      cartOrder=previousOrder.filter(function(k){ return Object.prototype.hasOwnProperty.call(cart,k); });
+      normalizeCartOrder();
+      // Undo restores the exact pre-clear restoration state, but never inserts a
+      // second copy into History. The original receipt was already removed when
+      // Restore to Cart was used.
+      if (previousPendingRestore) {
+        pendingRestoredReceipt=JSON.parse(JSON.stringify(previousPendingRestore));
+        saveJson(PENDING_RESTORE_KEY,pendingRestoredReceipt);
+      }
+      bumpCartRevision(); saveCart(); renderCart();
     });
   }
   function grossTotalFromSnapshot(snapshot) {
