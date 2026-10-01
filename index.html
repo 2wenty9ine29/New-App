@@ -15,7 +15,7 @@
 <link rel="preload" href="fonts/poppins-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/poppins-latin-800-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="apple-touch-icon" href="icon-180.png">
-<title>Price List · V9.76</title>
+<title>Price List · V9.7.6.5</title>
 <style>
 @font-face{font-family:"Poppins";font-style:normal;font-weight:400;font-display:swap;src:url(fonts/poppins-latin-400-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:500;font-display:swap;src:url(fonts/poppins-latin-500-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:600;font-display:swap;src:url(fonts/poppins-latin-600-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:700;font-display:swap;src:url(fonts/poppins-latin-700-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:700;font-display:swap;src:url(fonts/poppins-latin-800-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:700;font-display:swap;src:url(fonts/poppins-latin-900-normal.woff2) format("woff2");}
   :root {
@@ -401,26 +401,33 @@
   .receipt-summary-card.momo .rsc-value { color:var(--green); }
   .receipt-summary-card.total .rsc-value { color:var(--ink); }
 
-  /* v9.76 — portrait Mobile Money + deliberate swipe-to-delete refinements */
+  /* v9.7.6.5 — cart presentation + MoMo display polish + deliberate swipe-to-delete */
   .receipt-show-details-wrap{margin-top:4px;padding-top:4px;border-top:1px solid var(--line)}
   .receipt-show-details-btn{width:100%;border:0;background:transparent;color:var(--ink-soft);padding:10px 6px 2px;font-size:12px;font-weight:700;letter-spacing:.01em;text-align:center}
   .receipt-show-details-btn:active{transform:scale(.98);color:var(--ink)}
   .momo-display-overlay{position:fixed;inset:0;z-index:240;background:rgba(0,0,0,.64);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:14px;box-sizing:border-box}
   .momo-display-overlay[hidden]{display:none}
-  .momo-display-card{position:relative;width:min(1120px,100%);height:min(720px,calc(100dvh - 20px));min-height:min(330px,calc(100dvh - 20px));box-sizing:border-box;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:30px;padding:30px 34px 34px;box-shadow:0 30px 90px rgba(0,0,0,.38);overflow:hidden;display:flex;flex-direction:column;animation:momoDisplayIn .24s ease-out}
+  .momo-display-card{position:relative;width:min(1120px,100%);height:min(720px,calc(100dvh - 20px));min-height:min(330px,calc(100dvh - 20px));box-sizing:border-box;background:#fff;color:#1C1B18;border:1px solid var(--line);border-radius:30px;padding:30px 34px 34px;box-shadow:0 30px 90px rgba(0,0,0,.38);overflow:hidden;display:flex;flex-direction:column;animation:momoDisplayIn .24s ease-out;transition:background-color .18s ease,color .18s ease,border-color .18s ease}
+  .momo-display-card.dark-mode{background:#050505;color:#fff;border-color:#202020}
   @keyframes momoDisplayIn{from{opacity:0;transform:scale(.965) translateY(8px)}to{opacity:1;transform:none}}
-  .momo-display-close{position:absolute;top:18px;right:18px;width:48px;height:48px;border:0;border-radius:50%;background:var(--paper);color:var(--ink);font-size:29px;line-height:1;display:flex;align-items:center;justify-content:center;z-index:2}
-  .momo-display-close:active{transform:scale(.93)}
-  .momo-display-kicker{margin-top:2px;font-size:13px;font-weight:800;letter-spacing:.16em;color:var(--ink-soft);text-transform:uppercase}
+  .momo-display-close,.momo-display-theme{position:absolute;top:18px;width:48px;height:48px;border:0;border-radius:50%;background:#F6F5F0;color:#1C1B18;line-height:1;display:flex;align-items:center;justify-content:center;z-index:2;box-shadow:0 1px 0 rgba(0,0,0,.02)}
+  .momo-display-close{right:18px;font-size:29px}
+  .momo-display-theme{right:76px;font-size:21px}
+  .momo-display-close:active,.momo-display-theme:active{transform:scale(.93)}
+  .momo-display-card.dark-mode .momo-display-close,.momo-display-card.dark-mode .momo-display-theme{background:#202020;color:#fff}
+  .momo-display-kicker{margin-top:2px;font-size:13px;font-weight:800;letter-spacing:.16em;color:#5B5A54;text-transform:uppercase}
+  .momo-display-card.dark-mode .momo-display-kicker{color:#B7B7B7}
   .momo-display-main{margin:auto 0;display:flex;flex-direction:column;align-items:flex-end;text-align:right;padding:10px 2px 0}
   .momo-display-number{display:flex;align-items:baseline;justify-content:flex-end;gap:.18em;font-size:clamp(48px,10vw,92px);font-weight:800;line-height:.98;letter-spacing:-.055em;font-variant-numeric:tabular-nums;white-space:nowrap}
   .momo-display-number span{display:block}
-  .momo-display-name{margin-top:14px;font-size:clamp(24px,3.6vw,38px);font-weight:600;line-height:1.08;letter-spacing:-.02em;color:var(--ink)}
-  .momo-display-message{margin-top:12px;font-size:clamp(13px,1.7vw,18px);font-weight:500;color:var(--ink-soft);line-height:1.35}
+  .momo-display-name{margin-top:14px;font-size:clamp(27px,3.9vw,40px);font-weight:600;line-height:1.08;letter-spacing:-.02em;color:inherit}
+  .momo-display-message{margin-top:12px;font-size:clamp(13px,1.7vw,18px);font-weight:600;color:#1E7658;line-height:1.35}
+  .momo-display-card.dark-mode .momo-display-message{color:#55B890}
   .momo-display-footer{display:flex;justify-content:flex-end;align-items:center;margin-top:auto}
-  .momo-display-share{border:0;border-radius:999px;background:var(--paper);color:var(--ink);padding:13px 22px;font-size:13px;font-weight:800;box-shadow:0 5px 18px rgba(0,0,0,.08)}
+  .momo-display-share{border:0;border-radius:999px;background:#F6F5F0;color:#1C1B18;padding:14px 24px;font-size:clamp(19px,2vw,21px);font-weight:800;box-shadow:0 5px 18px rgba(0,0,0,.08)}
+  .momo-display-card.dark-mode .momo-display-share{background:#202020;color:#fff;box-shadow:0 5px 18px rgba(0,0,0,.28)}
   .momo-display-share:active{transform:scale(.97)}
-  @media (max-width:600px){.momo-display-overlay{padding:9px}.momo-display-card{width:100%;height:calc(100dvh - 18px);min-height:0;padding:25px 22px 24px;border-radius:26px}.momo-display-close{top:13px;right:13px;width:48px;height:48px;font-size:31px}.momo-display-kicker{font-size:12px}.momo-display-main{width:100%;padding-top:18px}.momo-display-number{flex-direction:column;align-items:flex-end;gap:0;font-size:clamp(64px,18vw,82px);line-height:.9;letter-spacing:-.065em}.momo-display-name{margin-top:16px;font-size:clamp(27px,7.8vw,33px);font-weight:600}.momo-display-message{margin-top:11px;font-size:16px;align-self:flex-end}.momo-display-footer{margin-top:20px}.momo-display-share{padding:14px 22px;font-size:14px}}
+  @media (max-width:600px){.momo-display-overlay{padding:9px}.momo-display-card{width:100%;height:calc(100dvh - 18px);min-height:0;padding:25px 22px 24px;border-radius:26px}.momo-display-close,.momo-display-theme{top:13px;width:48px;height:48px}.momo-display-close{right:13px;font-size:31px}.momo-display-theme{right:68px;font-size:20px}.momo-display-kicker{font-size:12px}.momo-display-main{width:100%;padding-top:18px}.momo-display-number{flex-direction:column;align-items:flex-end;gap:0;font-size:clamp(78px,21vw,104px);line-height:.88;letter-spacing:-.068em}.momo-display-name{margin-top:17px;font-size:clamp(30px,8.2vw,38px);font-weight:600}.momo-display-message{margin-top:11px;font-size:17px;align-self:flex-end}.momo-display-footer{margin-top:20px}.momo-display-share{padding:15px 23px;font-size:21px}}
 
   /* Polished receipt action sheet */
   .receipt-action-panel { position:fixed; inset:0; z-index:130; background:rgba(0,0,0,.52); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); display:flex; align-items:center; justify-content:center; padding:20px; }
@@ -724,29 +731,50 @@
   .cart-row {
     animation: cartIn .2s ease both;
     position: relative;
+    display:block;
     touch-action: pan-y;
     overflow: hidden;
-    background: var(--paper);
+    background: transparent;
+    padding: 6px 10px;
+    margin:0;
+    border-radius:0;
+    gap:0;
   }
   .cart-row-content {
     position: relative; z-index: 1; width:100%; box-sizing:border-box;
-    display:flex; align-items:center; min-height:68px;
-    background:var(--surface); border-radius:10px;
+    display:flex; align-items:center; gap:16px; min-height:78px;
+    background:var(--paper); border-radius:18px; padding:0 8px;
     transition:transform .2s ease, box-shadow .2s ease;
     will-change:transform;
   }
   .cart-row-content.swiping { transition:none; }
+  .cart-row .avatar.sm { width:58px; height:58px; font-size:18px; flex:0 0 58px; }
+  .cart-row .row-name { font-size:21px; line-height:1.08; font-weight:700; }
+  .cart-row .row-name-size { font-size:13px; margin-top:4px; }
+  .cart-row .sale-mode { margin-top:6px; font-size:13px; letter-spacing:.045em; gap:4px; }
+  .cart-row .row-price { font-size:22px; font-weight:700; margin-left:auto; }
+  .cart-row .minus-btn { width:36px; height:36px; margin-left:2px; background:transparent; color:var(--ink-soft); }
+  .cart-row .minus-btn svg { width:22px; height:22px; }
   .swipe-delete-bg {
-    position:absolute; inset:0; width:100%; height:100%; border-radius:12px; box-sizing:border-box;
-    display:flex; flex-direction:column; align-items:flex-end; justify-content:center; gap:3px;
-    padding-right:22px;
-    background:rgba(190,55,48,.12); color:var(--brick);
-    font-size:10px; font-weight:700; pointer-events:none; opacity:0; z-index:0;
+    position:absolute; left:10px; right:10px; top:6px; bottom:6px; width:auto; height:auto; border-radius:18px; box-sizing:border-box;
+    display:flex; flex-direction:row; align-items:center; justify-content:flex-end; gap:8px;
+    padding-right:24px;
+    background:#C44A3E; color:#fff;
+    font-size:13px; font-weight:800; pointer-events:none; opacity:0; z-index:0;
     transition:opacity .12s ease, background .12s ease;
   }
-  .swipe-delete-bg svg { width:20px; height:20px; }
-  .cart-row.swipe-delete-ready .swipe-delete-bg { background:rgba(190,55,48,.18); }
-  .cart-row.swipe-delete-ready .cart-row-content { box-shadow:-8px 0 22px rgba(190,55,48,.10); }
+  .swipe-delete-bg svg { width:22px; height:22px; }
+  .cart-row.swipe-delete-ready .swipe-delete-bg { background:#B93F35; }
+  .cart-row.swipe-delete-ready .cart-row-content { box-shadow:-10px 0 24px rgba(185,63,53,.16); }
+  @media (max-width:390px){
+    .cart-row{padding:5px 7px}
+    .cart-row-content{gap:12px;min-height:72px;padding:0 6px}
+    .cart-row .avatar.sm{width:52px;height:52px;flex-basis:52px;font-size:17px}
+    .cart-row .row-name{font-size:19px}
+    .cart-row .sale-mode{font-size:12px}
+    .cart-row .row-price{font-size:20px}
+    .swipe-delete-bg{left:7px;right:7px;top:5px;bottom:5px;padding-right:20px}
+  }
   .undo-toast { pointer-events:auto; display:flex; align-items:center; gap:10px; min-width:min(320px,calc(100vw - 32px)); max-width:calc(100vw - 32px); padding:11px 12px 11px 14px; border:1px solid var(--line); border-radius:16px; background:var(--surface); color:var(--ink); box-shadow:0 12px 30px rgba(0,0,0,.16), 0 2px 8px rgba(0,0,0,.08); font-size:12px; font-weight:600; animation:undoToastIn .22s ease-out; }
   .undo-toast button { margin-left:auto; border:1px solid var(--gold); background:var(--gold); color:#fff; border-radius:10px; font-size:11px; font-weight:700; padding:7px 11px; min-width:54px; }
   .undo-toast button:active { transform:scale(.96); opacity:.88; }
@@ -1290,7 +1318,7 @@
 
   <div class="momo-display-overlay" id="momo-display-overlay" hidden>
     <div class="momo-display-card" role="dialog" aria-modal="true" aria-labelledby="momo-display-kicker">
-      <button class="momo-display-close" id="momo-display-close" aria-label="Close MoMo details">×</button>
+      <button class="momo-display-theme" id="momo-display-theme" aria-label="Toggle MoMo display colors" title="Toggle display colors">☾</button><button class="momo-display-close" id="momo-display-close" aria-label="Close MoMo details">×</button>
       <div class="momo-display-kicker" id="momo-display-kicker">MOBILE MONEY</div>
       <div class="momo-display-main">
         <div class="momo-display-number" id="momo-display-number"><span>054 854</span><span>8435</span></div>
@@ -1583,7 +1611,7 @@ window.addEventListener("error", function(e) {
   ];
   defaultItems.forEach(function(i){ i.photo = null; });
 
-  var APP_VERSION = 'v9.76';
+  var APP_VERSION = 'v9.7.6.5';
   var PRICE_MIGRATION_VERSION_KEY = 'price-list-price-migration-version-v1';
   var items = loadItems();
 
@@ -2808,11 +2836,28 @@ window.addEventListener("error", function(e) {
   var MOMO_DISPLAY_NAME = 'Baaye Stephen';
   var MOMO_DISPLAY_NUMBER = '054 854 8435';
   var MOMO_DISPLAY_MESSAGE = 'Please add charges';
+  function syncMomoDisplayTheme(){
+    var card=document.querySelector('.momo-display-card');
+    var btn=document.getElementById('momo-display-theme');
+    if(!card || !btn) return;
+    var dark=card.classList.contains('dark-mode');
+    btn.textContent=dark?'☀':'☾';
+    btn.setAttribute('aria-label',dark?'Use light MoMo display':'Use dark MoMo display');
+  }
+  function toggleMomoDisplayTheme(){
+    var card=document.querySelector('.momo-display-card'); if(!card) return;
+    card.classList.toggle('dark-mode');
+    try{ localStorage.setItem('price-list-momo-display-dark',card.classList.contains('dark-mode')?'1':'0'); }catch(e){}
+    syncMomoDisplayTheme();
+  }
   function openMomoDisplay(){
     var overlay=document.getElementById('momo-display-overlay'); if(!overlay) return;
     document.getElementById('momo-display-name').textContent=MOMO_DISPLAY_NAME;
     document.getElementById('momo-display-number').innerHTML='<span>'+escapeHtml(MOMO_DISPLAY_NUMBER.slice(0,7))+'</span><span>'+escapeHtml(MOMO_DISPLAY_NUMBER.slice(8))+'</span>';
     document.getElementById('momo-display-message').textContent=MOMO_DISPLAY_MESSAGE;
+    var card=document.querySelector('.momo-display-card');
+    if(card){ try{ card.classList.toggle('dark-mode',localStorage.getItem('price-list-momo-display-dark')==='1'); }catch(e){} }
+    syncMomoDisplayTheme();
     overlay.hidden=false;
   }
   function closeMomoDisplay(){
@@ -3528,9 +3573,9 @@ function renderHistory(){
   }
 
   var swipeState = null;
-  var SWIPE_DELETE_REVEAL = 92;
-  var SWIPE_DELETE_COMMIT = 132;
-  var SWIPE_DELETE_MAX = 150;
+  var SWIPE_DELETE_REVEAL = 145;
+  var SWIPE_DELETE_COMMIT = 185;
+  var SWIPE_DELETE_MAX = 220;
   document.addEventListener('touchstart', function(e){
     var row=e.target.closest && e.target.closest('.cart-row');
     if(!row) return;
@@ -3548,7 +3593,7 @@ function renderHistory(){
     if(dx<0){
       var distance=Math.min(SWIPE_DELETE_MAX, Math.abs(dx));
       var shift=-distance;
-      var reveal=Math.min(1, Math.max(0,(distance-18)/(SWIPE_DELETE_REVEAL-18)));
+      var reveal=Math.min(1, Math.max(0,(distance-16)/(SWIPE_DELETE_REVEAL-16)));
       swipeState.content.classList.add('swiping');
       swipeState.content.style.transform='translateX('+shift+'px)';
       if(swipeState.bg) swipeState.bg.style.opacity=String(.12 + reveal*.88);
@@ -3676,6 +3721,7 @@ function renderHistory(){
     if (e.target.closest("#settlement-momo-tab")) { settlementView='momo'; renderSettlementList(); return; }
     var settlementDone=e.target.closest('[data-settlement-complete]');
     if (settlementDone) { return completeSettlement(Number(settlementDone.dataset.settlementComplete)); }
+    if (e.target.closest("#momo-display-theme")) { toggleMomoDisplayTheme(); return; }
     if (e.target.closest("#momo-display-close") || e.target === document.getElementById('momo-display-overlay')) { closeMomoDisplay(); return; }
     if (e.target.closest("#momo-display-share")) { return shareMomoDisplay(); }
     if (e.target.closest("#receipt-action-cancel") || e.target === document.getElementById('receipt-action-panel')) { closeReceiptActionMenu(); return; }
