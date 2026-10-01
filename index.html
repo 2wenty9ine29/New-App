@@ -15,7 +15,7 @@
 <link rel="preload" href="fonts/poppins-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/poppins-latin-800-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="apple-touch-icon" href="icon-180.png">
-<title>Price List · V9.73</title>
+<title>Price List · V9.74</title>
 <style>
 @font-face{font-family:"Poppins";font-style:normal;font-weight:400;font-display:swap;src:url(fonts/poppins-latin-400-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:500;font-display:swap;src:url(fonts/poppins-latin-500-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:600;font-display:swap;src:url(fonts/poppins-latin-600-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:700;font-display:swap;src:url(fonts/poppins-latin-700-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:700;font-display:swap;src:url(fonts/poppins-latin-800-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:700;font-display:swap;src:url(fonts/poppins-latin-900-normal.woff2) format("woff2");}
   :root {
@@ -392,6 +392,26 @@
   .receipt-summary-card.change .rsc-value { color:#0ea5e9; }
   .receipt-summary-card.momo .rsc-value { color:var(--green); }
   .receipt-summary-card.total .rsc-value { color:var(--ink); }
+
+  /* v9.74 — receipt details / large Mobile Money display */
+  .receipt-show-details-wrap{margin-top:4px;padding-top:4px;border-top:1px solid var(--line)}
+  .receipt-show-details-btn{width:100%;border:0;background:transparent;color:var(--ink-soft);padding:10px 6px 2px;font-size:12px;font-weight:700;letter-spacing:.01em;text-align:center}
+  .receipt-show-details-btn:active{transform:scale(.98);color:var(--ink)}
+  .momo-display-overlay{position:fixed;inset:0;z-index:240;background:rgba(0,0,0,.64);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:14px;box-sizing:border-box}
+  .momo-display-overlay[hidden]{display:none}
+  .momo-display-card{position:relative;width:min(1120px,100%);height:min(720px,calc(100dvh - 20px));min-height:min(330px,calc(100dvh - 20px));box-sizing:border-box;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:30px;padding:30px 34px 34px;box-shadow:0 30px 90px rgba(0,0,0,.38);overflow:hidden;display:flex;flex-direction:column;animation:momoDisplayIn .24s ease-out}
+  @keyframes momoDisplayIn{from{opacity:0;transform:scale(.965) translateY(8px)}to{opacity:1;transform:none}}
+  .momo-display-close{position:absolute;top:18px;right:18px;width:44px;height:44px;border:0;border-radius:50%;background:var(--paper);color:var(--ink);font-size:29px;line-height:1;display:flex;align-items:center;justify-content:center;z-index:2}
+  .momo-display-close:active{transform:scale(.93)}
+  .momo-display-kicker{margin-top:2px;font-size:13px;font-weight:800;letter-spacing:.16em;color:var(--ink-soft);text-transform:uppercase}
+  .momo-display-main{margin:auto 0;display:flex;flex-direction:column;align-items:flex-end;text-align:right;padding:10px 2px 0}
+  .momo-display-number{font-size:clamp(48px,10vw,92px);font-weight:800;line-height:.98;letter-spacing:-.045em;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .momo-display-name{margin-top:14px;font-size:clamp(20px,3.3vw,34px);font-weight:600;line-height:1.08;letter-spacing:-.02em;color:var(--ink)}
+  .momo-display-message{margin-top:12px;font-size:clamp(13px,1.7vw,18px);font-weight:500;color:var(--ink-soft);line-height:1.35}
+  .momo-display-footer{display:flex;justify-content:flex-end;align-items:center;margin-top:auto}
+  .momo-display-share{border:0;border-radius:999px;background:var(--paper);color:var(--ink);padding:12px 19px;font-size:13px;font-weight:800;box-shadow:0 5px 18px rgba(0,0,0,.08)}
+  .momo-display-share:active{transform:scale(.97)}
+  @media (max-width:600px){.momo-display-card{padding:25px 22px 24px;border-radius:26px}.momo-display-close{top:13px;right:13px;width:40px;height:40px}.momo-display-kicker{font-size:11px}.momo-display-main{padding-top:20px}.momo-display-number{white-space:normal;word-break:break-word;max-width:100%}.momo-display-footer{margin-top:20px}}
 
   /* Polished receipt action sheet */
   .receipt-action-panel { position:fixed; inset:0; z-index:130; background:rgba(0,0,0,.52); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); display:flex; align-items:center; justify-content:center; padding:20px; }
@@ -870,7 +890,7 @@
   .quick-cash-btn.clear{flex:0 0 auto;padding:9px 11px;background:var(--paper);color:var(--ink-soft);font-size:11px;font-weight:600}
 
 
-  /* v9.73 — focused UX fixes: restored-receipt clearing, change visibility, notes surface, undo toast */
+  /* v9.74 — receipt details display + settlement history replacement-on-receipt view */
   .history-header-actions{flex-direction:row;align-items:center;gap:10px}
   .history-header-links{display:flex;flex-direction:column;gap:6px;align-items:flex-end}
   .notes-pen-btn{position:relative;width:36px;height:36px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--gold);display:inline-flex;align-items:center;justify-content:center;padding:0;-webkit-tap-highlight-color:transparent}
@@ -1244,7 +1264,21 @@
         <button class="receipt-action-btn change" id="receipt-add-change-btn"><span class="action-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h13"/><polyline points="14 4 17 8 14 12"/><path d="M20 16H7"/><polyline points="10 12 7 16 10 20"/></svg></span><span>Add Change</span></button>
         <button class="receipt-action-btn momo" id="receipt-add-momo-btn"><span class="action-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="3"/><line x1="6" y1="9" x2="6" y2="9.01"/><line x1="18" y1="15" x2="18" y2="15.01"/></svg></span><span>Add Momo</span></button>
         <button class="receipt-action-btn restore" id="receipt-restore-btn"><span class="action-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><polyline points="3 3 3 6.5 6.5 6.5"/></svg></span><span>Restore to Cart</span></button>
+        <div class="receipt-show-details-wrap"><button type="button" class="receipt-show-details-btn" id="receipt-show-details-btn">Show details</button></div>
       </div>
+    </div>
+  </div>
+
+  <div class="momo-display-overlay" id="momo-display-overlay" hidden>
+    <div class="momo-display-card" role="dialog" aria-modal="true" aria-labelledby="momo-display-kicker">
+      <button class="momo-display-close" id="momo-display-close" aria-label="Close details">×</button>
+      <div class="momo-display-kicker" id="momo-display-kicker">MOBILE MONEY</div>
+      <div class="momo-display-main">
+        <div class="momo-display-number" id="momo-display-number">054 854 8435</div>
+        <div class="momo-display-name" id="momo-display-name">Baaye Stephen</div>
+        <div class="momo-display-message" id="momo-display-message">Please add charges</div>
+      </div>
+      <div class="momo-display-footer"><button type="button" class="momo-display-share" id="momo-display-share">Tap to share</button></div>
     </div>
   </div>
 
@@ -1530,7 +1564,7 @@ window.addEventListener("error", function(e) {
   ];
   defaultItems.forEach(function(i){ i.photo = null; });
 
-  var APP_VERSION = 'v9.73';
+  var APP_VERSION = 'v9.74';
   var PRICE_MIGRATION_VERSION_KEY = 'price-list-price-migration-version-v1';
   var items = loadItems();
 
@@ -2681,8 +2715,18 @@ window.addEventListener("error", function(e) {
   function getReceiptSettlements(receiptRef) {
     var receiptId = receiptRef && typeof receiptRef === 'object' ? receiptRef.receiptId : String(receiptRef||'');
     var receiptNumber = receiptRef && typeof receiptRef === 'object' ? String(receiptRef.number||'') : String(receiptRef||'');
-    function find(arr){ return arr.find(function(x){ return (receiptId && x.receiptId===receiptId) || (!x.receiptId && x.receiptNumber===receiptNumber); }) || null; }
-    return { debt: find(unsettledDebts), change: find(changeOwed), momo: find(momoPayments) };
+    // A receipt shows only the newest entry for each settlement type. Older entries
+    // remain in the Debts / Change / Momo history, so adding a replacement never
+    // destroys the previous record or reduces the total history count.
+    function findLatest(arr){
+      var matches=arr.filter(function(x){ return (receiptId && x.receiptId===receiptId) || (!x.receiptId && x.receiptNumber===receiptNumber); });
+      if(!matches.length) return null;
+      return matches.reduce(function(latest,x){
+        var lt=Date.parse(latest.createdAt||'')||0, xt=Date.parse(x.createdAt||'')||0;
+        return xt>=lt ? x : latest;
+      });
+    }
+    return { debt: findLatest(unsettledDebts), change: findLatest(changeOwed), momo: findLatest(momoPayments) };
   }
   function chipAmount(amount) {
     var n = Number(amount) || 0;
@@ -2739,6 +2783,29 @@ window.addEventListener("error", function(e) {
     closeStatusPopup();
     showToast(type==='debt' ? 'Debt marked as paid' : type==='momo' ? 'Momo entry cleared' : 'Change marked as collected');
   }
+  // v9.74 — receipt details payment card. These are display-only details and do not
+  // participate in receipt totals, settlements, reports, or backup data.
+  var MOMO_DISPLAY_NAME = 'Baaye Stephen';
+  var MOMO_DISPLAY_NUMBER = '054 854 8435';
+  var MOMO_DISPLAY_MESSAGE = 'Please add charges';
+  function openMomoDisplay(){
+    var overlay=document.getElementById('momo-display-overlay'); if(!overlay) return;
+    document.getElementById('momo-display-name').textContent=MOMO_DISPLAY_NAME;
+    document.getElementById('momo-display-number').textContent=MOMO_DISPLAY_NUMBER;
+    document.getElementById('momo-display-message').textContent=MOMO_DISPLAY_MESSAGE;
+    overlay.hidden=false;
+  }
+  function closeMomoDisplay(){
+    var overlay=document.getElementById('momo-display-overlay'); if(overlay) overlay.hidden=true;
+  }
+  async function shareMomoDisplay(){
+    var text='Mobile Money\n'+MOMO_DISPLAY_NUMBER+'\n'+MOMO_DISPLAY_NAME+'\n'+MOMO_DISPLAY_MESSAGE;
+    try{
+      if(navigator.share){ await navigator.share({title:'Mobile Money',text:text}); return; }
+    }catch(e){ if(e && e.name==='AbortError') return; }
+    copyTextWithFallback(text,'Mobile Money details copied','momo-details.txt');
+  }
+
   function openReceiptActionMenu(receiptIndex) {
     var r=receipts[receiptIndex]; if(!r) return;
     receiptActionIndex=receiptIndex;
@@ -3565,7 +3632,10 @@ function renderHistory(){
     if (e.target.closest("#settlement-momo-tab")) { settlementView='momo'; renderSettlementList(); return; }
     var settlementDone=e.target.closest('[data-settlement-complete]');
     if (settlementDone) { return completeSettlement(Number(settlementDone.dataset.settlementComplete)); }
+    if (e.target.closest("#momo-display-close") || e.target === document.getElementById('momo-display-overlay')) { closeMomoDisplay(); return; }
+    if (e.target.closest("#momo-display-share")) { return shareMomoDisplay(); }
     if (e.target.closest("#receipt-action-cancel") || e.target === document.getElementById('receipt-action-panel')) { closeReceiptActionMenu(); return; }
+    if (e.target.closest("#receipt-show-details-btn")) { return openMomoDisplay(); }
     if (e.target.closest("#receipt-add-debt-btn")) { return addSettlement('debt'); }
     if (e.target.closest("#receipt-add-change-btn")) { return addSettlement('change'); }
     if (e.target.closest("#receipt-add-momo-btn")) { return addSettlement('momo'); }
