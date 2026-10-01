@@ -15,7 +15,7 @@
 <link rel="preload" href="fonts/poppins-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/poppins-latin-800-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="apple-touch-icon" href="icon-180.png">
-<title>Price List · V9.7.6.5</title>
+<title>Price List · V9.7.7</title>
 <style>
 @font-face{font-family:"Poppins";font-style:normal;font-weight:400;font-display:swap;src:url(fonts/poppins-latin-400-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:500;font-display:swap;src:url(fonts/poppins-latin-500-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:600;font-display:swap;src:url(fonts/poppins-latin-600-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:700;font-display:swap;src:url(fonts/poppins-latin-700-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:700;font-display:swap;src:url(fonts/poppins-latin-800-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:700;font-display:swap;src:url(fonts/poppins-latin-900-normal.woff2) format("woff2");}
   :root {
@@ -401,7 +401,7 @@
   .receipt-summary-card.momo .rsc-value { color:var(--green); }
   .receipt-summary-card.total .rsc-value { color:var(--ink); }
 
-  /* v9.7.6.5 — cart presentation + MoMo display polish + deliberate swipe-to-delete */
+  /* v9.7.7 — cart presentation + MoMo display polish + deliberate swipe-to-delete */
   .receipt-show-details-wrap{margin-top:4px;padding-top:4px;border-top:1px solid var(--line)}
   .receipt-show-details-btn{width:100%;border:0;background:transparent;color:var(--ink-soft);padding:10px 6px 2px;font-size:12px;font-weight:700;letter-spacing:.01em;text-align:center}
   .receipt-show-details-btn:active{transform:scale(.98);color:var(--ink)}
@@ -1070,6 +1070,28 @@
   .momo-withdraw-btn:active{transform:scale(.98)}
   .momo-withdraw-btn svg{width:20px;height:20px;flex-shrink:0}
   .momo-withdraw-btn small{font-size:11px;font-weight:600;opacity:.85}
+
+  /* v9.77 — restore original cart typography/dimensions; keep the v9.76.5 cardless layout */
+  .cart-row{padding:0;margin:0;border-radius:10px;overflow:hidden;}
+  .cart-row-content{gap:10px;min-height:54px;padding:10px 6px;box-sizing:border-box;background:transparent;border-radius:10px;}
+  .cart-row .avatar.sm{width:34px;height:34px;flex:0 0 34px;font-size:13px;}
+  .cart-row .row-name{font-size:14.5px;line-height:1.2;font-weight:600;}
+  .cart-row .row-name-size{font-size:11px;margin-top:2px;}
+  .cart-row .sale-mode{margin-top:2px;font-size:9px;letter-spacing:.04em;gap:4px;}
+  .cart-row .row-price{font-size:15px;font-weight:600;margin-left:auto;}
+  .cart-row .minus-btn{width:30px;height:30px;margin-left:0;}
+  .cart-row .minus-btn svg{width:18px;height:18px;}
+  .swipe-delete-bg{left:0;right:0;top:0;bottom:0;border-radius:10px;padding-right:14px;}
+  @media (max-width:390px){
+    .cart-row{padding:0;}
+    .cart-row-content{gap:10px;min-height:54px;padding:10px 6px;}
+    .cart-row .avatar.sm{width:34px;height:34px;flex-basis:34px;font-size:13px;}
+    .cart-row .row-name{font-size:14.5px;}
+    .cart-row .sale-mode{font-size:9px;}
+    .cart-row .row-price{font-size:15px;}
+    .swipe-delete-bg{left:0;right:0;top:0;bottom:0;padding-right:14px;}
+  }
+
 </style>
 </head>
 <body>
@@ -1611,7 +1633,7 @@ window.addEventListener("error", function(e) {
   ];
   defaultItems.forEach(function(i){ i.photo = null; });
 
-  var APP_VERSION = 'v9.7.6.5';
+  var APP_VERSION = 'v9.7.7';
   var PRICE_MIGRATION_VERSION_KEY = 'price-list-price-migration-version-v1';
   var items = loadItems();
 
