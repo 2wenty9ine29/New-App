@@ -15,7 +15,7 @@
 <link rel="preload" href="fonts/poppins-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/poppins-latin-800-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="apple-touch-icon" href="icon-180.png">
-<title>Price List · V9.74</title>
+<title>Price List · V9.75</title>
 <style>
 @font-face{font-family:"Poppins";font-style:normal;font-weight:400;font-display:swap;src:url(fonts/poppins-latin-400-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:500;font-display:swap;src:url(fonts/poppins-latin-500-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:600;font-display:swap;src:url(fonts/poppins-latin-600-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:700;font-display:swap;src:url(fonts/poppins-latin-700-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:700;font-display:swap;src:url(fonts/poppins-latin-800-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:700;font-display:swap;src:url(fonts/poppins-latin-900-normal.woff2) format("woff2");}
   :root {
@@ -365,6 +365,14 @@
   .reports-section-title { font-size:11px; font-weight:600; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.03em; margin:14px 2px 6px; }
   .reports-split { display:flex; gap:8px; }
   .reports-split .reports-stat { flex:1; }
+  .reports-settlement-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:7px; }
+  .reports-settlement-card { border:1px solid var(--line); border-radius:13px; padding:9px 10px; background:var(--paper); min-width:0; }
+  .reports-settlement-card .rsc-label { font-size:9px; color:var(--ink-soft); font-weight:700; text-transform:uppercase; letter-spacing:.03em; }
+  .reports-settlement-card .rsc-value { margin-top:3px; font-size:14px; font-weight:700; font-variant-numeric:tabular-nums; white-space:nowrap; }
+  .reports-settlement-card.momo .rsc-value { color:var(--green); }
+  .reports-settlement-card.debt .rsc-value { color:var(--gold); }
+  .reports-settlement-card.change .rsc-value { color:#0ea5e9; }
+  @media (max-width:390px){ .reports-settlement-grid{gap:5px}.reports-settlement-card{padding:8px}.reports-settlement-card .rsc-value{font-size:12px} }
   .reports-top-list { display:grid; gap:6px; }
   .reports-top-row { display:flex; align-items:center; justify-content:space-between; gap:10px; border:1px solid var(--line); border-radius:12px; padding:8px 10px; background:var(--paper); }
   .reports-top-row .rt-name { font-size:12px; font-weight:600; color:var(--ink); }
@@ -393,7 +401,7 @@
   .receipt-summary-card.momo .rsc-value { color:var(--green); }
   .receipt-summary-card.total .rsc-value { color:var(--ink); }
 
-  /* v9.74 — receipt details / large Mobile Money display */
+  /* v9.75 — receipt details / large Mobile Money display refinements */
   .receipt-show-details-wrap{margin-top:4px;padding-top:4px;border-top:1px solid var(--line)}
   .receipt-show-details-btn{width:100%;border:0;background:transparent;color:var(--ink-soft);padding:10px 6px 2px;font-size:12px;font-weight:700;letter-spacing:.01em;text-align:center}
   .receipt-show-details-btn:active{transform:scale(.98);color:var(--ink)}
@@ -401,17 +409,17 @@
   .momo-display-overlay[hidden]{display:none}
   .momo-display-card{position:relative;width:min(1120px,100%);height:min(720px,calc(100dvh - 20px));min-height:min(330px,calc(100dvh - 20px));box-sizing:border-box;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:30px;padding:30px 34px 34px;box-shadow:0 30px 90px rgba(0,0,0,.38);overflow:hidden;display:flex;flex-direction:column;animation:momoDisplayIn .24s ease-out}
   @keyframes momoDisplayIn{from{opacity:0;transform:scale(.965) translateY(8px)}to{opacity:1;transform:none}}
-  .momo-display-close{position:absolute;top:18px;right:18px;width:44px;height:44px;border:0;border-radius:50%;background:var(--paper);color:var(--ink);font-size:29px;line-height:1;display:flex;align-items:center;justify-content:center;z-index:2}
+  .momo-display-close{position:absolute;top:18px;right:18px;width:48px;height:48px;border:0;border-radius:50%;background:var(--paper);color:var(--ink);font-size:29px;line-height:1;display:flex;align-items:center;justify-content:center;z-index:2}
   .momo-display-close:active{transform:scale(.93)}
   .momo-display-kicker{margin-top:2px;font-size:13px;font-weight:800;letter-spacing:.16em;color:var(--ink-soft);text-transform:uppercase}
   .momo-display-main{margin:auto 0;display:flex;flex-direction:column;align-items:flex-end;text-align:right;padding:10px 2px 0}
   .momo-display-number{font-size:clamp(48px,10vw,92px);font-weight:800;line-height:.98;letter-spacing:-.045em;font-variant-numeric:tabular-nums;white-space:nowrap}
-  .momo-display-name{margin-top:14px;font-size:clamp(20px,3.3vw,34px);font-weight:600;line-height:1.08;letter-spacing:-.02em;color:var(--ink)}
+  .momo-display-name{margin-top:14px;font-size:clamp(22px,3.3vw,36px);font-weight:600;line-height:1.08;letter-spacing:-.02em;color:var(--ink)}
   .momo-display-message{margin-top:12px;font-size:clamp(13px,1.7vw,18px);font-weight:500;color:var(--ink-soft);line-height:1.35}
   .momo-display-footer{display:flex;justify-content:flex-end;align-items:center;margin-top:auto}
-  .momo-display-share{border:0;border-radius:999px;background:var(--paper);color:var(--ink);padding:12px 19px;font-size:13px;font-weight:800;box-shadow:0 5px 18px rgba(0,0,0,.08)}
+  .momo-display-share{border:0;border-radius:999px;background:var(--paper);color:var(--ink);padding:13px 22px;font-size:13px;font-weight:800;box-shadow:0 5px 18px rgba(0,0,0,.08)}
   .momo-display-share:active{transform:scale(.97)}
-  @media (max-width:600px){.momo-display-card{padding:25px 22px 24px;border-radius:26px}.momo-display-close{top:13px;right:13px;width:40px;height:40px}.momo-display-kicker{font-size:11px}.momo-display-main{padding-top:20px}.momo-display-number{white-space:normal;word-break:break-word;max-width:100%}.momo-display-footer{margin-top:20px}}
+  @media (max-width:600px){.momo-display-overlay{padding:9px}.momo-display-card{width:100%;height:calc(100dvh - 18px);min-height:0;padding:25px 22px 24px;border-radius:26px}.momo-display-close{top:13px;right:13px;width:44px;height:44px;font-size:28px}.momo-display-kicker{font-size:11px}.momo-display-main{width:100%;padding-top:18px}.momo-display-number{font-size:clamp(40px,11.5vw,70px);white-space:nowrap;letter-spacing:-.055em}.momo-display-name{margin-top:12px;font-size:clamp(21px,6vw,27px)}.momo-display-message{margin-top:10px;font-size:15px;align-self:flex-end}.momo-display-footer{margin-top:20px}.momo-display-share{padding:13px 20px;font-size:13px}}
 
   /* Polished receipt action sheet */
   .receipt-action-panel { position:fixed; inset:0; z-index:130; background:rgba(0,0,0,.52); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); display:flex; align-items:center; justify-content:center; padding:20px; }
@@ -716,18 +724,26 @@
     animation: cartIn .2s ease both;
     position: relative;
     touch-action: pan-y;
-    transition: transform .18s ease, opacity .18s ease, background-color .15s ease;
+    overflow: hidden;
+    background: var(--paper);
   }
-  .cart-row.swiping { transition: none; }
-  .cart-row.swipe-delete-ready { background: rgba(239,68,68,.10); }
+  .cart-row-content {
+    position: relative; z-index: 1; width:100%; box-sizing:border-box;
+    display:flex; align-items:center; min-height:68px;
+    background:var(--surface); border-radius:10px;
+    transition:transform .2s ease, box-shadow .2s ease;
+    will-change:transform;
+  }
+  .cart-row-content.swiping { transition:none; }
   .swipe-delete-bg {
-    position: absolute; inset: 0; border-radius: 10px;
-    display: flex; align-items: center; justify-content: flex-end;
-    padding-right: 14px; background: rgba(239,68,68,.12); color: var(--brick);
-    font-size: 11px; font-weight: 700; pointer-events: none; opacity: 0; z-index: 0;
+    position:absolute; top:5px; right:5px; bottom:5px; width:78px; border-radius:12px;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px;
+    background:rgba(190,55,48,.10); color:var(--brick);
+    font-size:10px; font-weight:700; pointer-events:none; opacity:1; z-index:0;
   }
-  .cart-row.swipe-delete-ready .swipe-delete-bg { opacity: 1; }
-  .cart-row > *:not(.swipe-delete-bg) { position: relative; z-index: 1; }
+  .swipe-delete-bg svg { width:19px; height:19px; }
+  .cart-row.swipe-delete-ready .swipe-delete-bg { background:rgba(190,55,48,.16); }
+  .cart-row.swipe-delete-ready .cart-row-content { box-shadow:-6px 0 18px rgba(190,55,48,.08); }
   .undo-toast { pointer-events:auto; display:flex; align-items:center; gap:10px; min-width:min(320px,calc(100vw - 32px)); max-width:calc(100vw - 32px); padding:11px 12px 11px 14px; border:1px solid var(--line); border-radius:16px; background:var(--surface); color:var(--ink); box-shadow:0 12px 30px rgba(0,0,0,.16), 0 2px 8px rgba(0,0,0,.08); font-size:12px; font-weight:600; animation:undoToastIn .22s ease-out; }
   .undo-toast button { margin-left:auto; border:1px solid var(--gold); background:var(--gold); color:#fff; border-radius:10px; font-size:11px; font-weight:700; padding:7px 11px; min-width:54px; }
   .undo-toast button:active { transform:scale(.96); opacity:.88; }
@@ -890,7 +906,7 @@
   .quick-cash-btn.clear{flex:0 0 auto;padding:9px 11px;background:var(--paper);color:var(--ink-soft);font-size:11px;font-weight:600}
 
 
-  /* v9.74 — receipt details display + settlement history replacement-on-receipt view */
+  /* v9.75 — receipt details display + report settlement summary + swipe refinements */
   .history-header-actions{flex-direction:row;align-items:center;gap:10px}
   .history-header-links{display:flex;flex-direction:column;gap:6px;align-items:flex-end}
   .notes-pen-btn{position:relative;width:36px;height:36px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--gold);display:inline-flex;align-items:center;justify-content:center;padding:0;-webkit-tap-highlight-color:transparent}
@@ -1278,7 +1294,7 @@
         <div class="momo-display-name" id="momo-display-name">Baaye Stephen</div>
         <div class="momo-display-message" id="momo-display-message">Please add charges</div>
       </div>
-      <div class="momo-display-footer"><button type="button" class="momo-display-share" id="momo-display-share">Tap to share</button></div>
+      <div class="momo-display-footer"><button type="button" class="momo-display-share" id="momo-display-share">Share MoMo details</button></div>
     </div>
   </div>
 
@@ -1564,7 +1580,7 @@ window.addEventListener("error", function(e) {
   ];
   defaultItems.forEach(function(i){ i.photo = null; });
 
-  var APP_VERSION = 'v9.74';
+  var APP_VERSION = 'v9.75';
   var PRICE_MIGRATION_VERSION_KEY = 'price-list-price-migration-version-v1';
   var items = loadItems();
 
@@ -2488,7 +2504,8 @@ window.addEventListener("error", function(e) {
         var unit = priceForMode(entry.item, entry.mode, entry.fraction);
         var subtotal = unit === null ? 0 : unit * entry.qty;
         return '<li class="row cart-row" data-cart-key="' + escapeHtml(entry.key) + '">' +
-          '<span class="swipe-delete-bg">Delete</span>' +
+          '<div class="swipe-delete-bg" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/><line x1="10" y1="10" x2="10" y2="17"/><line x1="14" y1="10" x2="14" y2="17"/></svg><span>Delete</span></div>' +
+          '<div class="cart-row-content">' +
           avatarHtml(entry.item.name, entry.item.photo, "sm") +
           '<div class="row-name-wrap"><div class="row-name">' + productNameHtml(entry.item.name) + '</div>' +
             '<span class="sale-mode ' + (entry.mode === "bulk" ? "bulk-mode" : "single-mode") + (entry.mode === "bulk" && entry.fraction !== 1 ? " fraction-mode" : "") + '">' +
@@ -2497,7 +2514,7 @@ window.addEventListener("error", function(e) {
           '<div><span class="row-price">¢' + formatCedis(subtotal) + '</span></div>' +
           '<button class="icon-btn minus-btn" data-minus="' + escapeHtml(entry.key) + '" aria-label="Remove one ' + escapeHtml(entry.item.name) + '">' +
           '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/></svg>' +
-          '</button></li>';
+          '</button></div></li>';
       }).join("");
     }
 
@@ -2783,7 +2800,7 @@ window.addEventListener("error", function(e) {
     closeStatusPopup();
     showToast(type==='debt' ? 'Debt marked as paid' : type==='momo' ? 'Momo entry cleared' : 'Change marked as collected');
   }
-  // v9.74 — receipt details payment card. These are display-only details and do not
+  // v9.75 — receipt details payment card. These are display-only details and do not
   // participate in receipt totals, settlements, reports, or backup data.
   var MOMO_DISPLAY_NAME = 'Baaye Stephen';
   var MOMO_DISPLAY_NUMBER = '054 854 8435';
@@ -2803,7 +2820,7 @@ window.addEventListener("error", function(e) {
     try{
       if(navigator.share){ await navigator.share({title:'Mobile Money',text:text}); return; }
     }catch(e){ if(e && e.name==='AbortError') return; }
-    copyTextWithFallback(text,'Mobile Money details copied','momo-details.txt');
+    copyTextWithFallback(text,'MoMo details copied','momo-details.txt');
   }
 
   function openReceiptActionMenu(receiptIndex) {
@@ -3264,24 +3281,34 @@ function renderHistory(){
     var fromEl=document.getElementById('report-from'), toEl=document.getElementById('report-to');
     if(fromEl) fromEl.value=customReportRange.from; if(toEl) toEl.value=customReportRange.to;
     var s = computeReportStats(reportPeriod);
-    if (!s.saleCount) { body.innerHTML = '<div class="reports-empty">No completed sales in this period.</div>'; return; }
+    var settlement = reportSettlementStats(s.filtered);
     var avg = s.saleCount ? (s.revenue / s.saleCount) : 0;
     var html = '';
-    html += '<div class="reports-stats">';
-    html += '<div class="reports-stat gold"><div class="rs-label">Revenue</div><div class="rs-value">\u00A2' + formatCedis(s.revenue) + '</div></div>';
-    html += '<div class="reports-stat"><div class="rs-label">Sales</div><div class="rs-value">' + s.saleCount + '</div></div>';
-    html += '<div class="reports-stat"><div class="rs-label">Discounts given</div><div class="rs-value">\u00A2' + formatCedis(s.discountTotal) + '</div></div>';
-    html += '<div class="reports-stat"><div class="rs-label">Avg. sale</div><div class="rs-value">\u00A2' + formatCedis(avg) + '</div></div>';
+    if (!s.saleCount) {
+      html += '<div class="reports-empty">No completed sales in this period.</div>';
+    } else {
+      html += '<div class="reports-stats">';
+      html += '<div class="reports-stat gold"><div class="rs-label">Revenue</div><div class="rs-value">\u00A2' + formatCedis(s.revenue) + '</div></div>';
+      html += '<div class="reports-stat"><div class="rs-label">Sales</div><div class="rs-value">' + s.saleCount + '</div></div>';
+      html += '<div class="reports-stat"><div class="rs-label">Discounts given</div><div class="rs-value">\u00A2' + formatCedis(s.discountTotal) + '</div></div>';
+      html += '<div class="reports-stat"><div class="rs-label">Avg. sale</div><div class="rs-value">\u00A2' + formatCedis(avg) + '</div></div>';
+      html += '</div>';
+      html += '<div class="reports-section-title">Bulk vs Singles</div>';
+      html += '<div class="reports-split">';
+      html += '<div class="reports-stat"><div class="rs-label">Bulk</div><div class="rs-value">\u00A2' + formatCedis(s.bulkRevenue) + '</div></div>';
+      html += '<div class="reports-stat"><div class="rs-label">Singles</div><div class="rs-value">\u00A2' + formatCedis(s.singleRevenue) + '</div></div>';
+      html += '</div>';
+      html += '<div class="reports-section-title">Top items</div>';
+      html += '<div class="reports-top-list">' + s.topItems.map(function (it) {
+        return '<div class="reports-top-row"><div><div class="rt-name">' + escapeHtml(it.name) + '</div><div class="rt-qty">' + it.qty + ' sold</div></div><div class="rt-revenue">\u00A2' + formatCedis(it.revenue) + '</div></div>';
+      }).join('') + '</div>';
+    }
+    html += '<div class="reports-section-title">Momo · Change · Debt</div>';
+    html += '<div class="reports-settlement-grid">';
+    html += '<div class="reports-settlement-card momo"><div class="rsc-label">Momo</div><div class="rsc-value">\u00A2' + formatCedis(settlement.momo) + '</div></div>';
+    html += '<div class="reports-settlement-card change"><div class="rsc-label">Change</div><div class="rsc-value">\u00A2' + formatCedis(settlement.change) + '</div></div>';
+    html += '<div class="reports-settlement-card debt"><div class="rsc-label">Debt</div><div class="rsc-value">\u00A2' + formatCedis(settlement.debt) + '</div></div>';
     html += '</div>';
-    html += '<div class="reports-section-title">Bulk vs Singles</div>';
-    html += '<div class="reports-split">';
-    html += '<div class="reports-stat"><div class="rs-label">Bulk</div><div class="rs-value">\u00A2' + formatCedis(s.bulkRevenue) + '</div></div>';
-    html += '<div class="reports-stat"><div class="rs-label">Singles</div><div class="rs-value">\u00A2' + formatCedis(s.singleRevenue) + '</div></div>';
-    html += '</div>';
-    html += '<div class="reports-section-title">Top items</div>';
-    html += '<div class="reports-top-list">' + s.topItems.map(function (it) {
-      return '<div class="reports-top-row"><div><div class="rt-name">' + escapeHtml(it.name) + '</div><div class="rt-qty">' + it.qty + ' sold</div></div><div class="rt-revenue">\u00A2' + formatCedis(it.revenue) + '</div></div>';
-    }).join('') + '</div>';
     if(reportPeriod==='custom'){
       html += '<div class="reports-actions"><button class="reports-action-btn primary" id="report-accounting-btn">Verify Receipts</button></div>';
       if(receiptVerificationRequested) html += accountingCheckHtml(s.filtered);
@@ -3501,8 +3528,9 @@ function renderHistory(){
   document.addEventListener('touchstart', function(e){
     var row=e.target.closest && e.target.closest('.cart-row');
     if(!row) return;
-    var t=e.touches[0];
-    swipeState={row:row,key:row.dataset.cartKey,startX:t.clientX,startY:t.clientY,lastX:t.clientX,moved:false};
+    var t=e.touches[0], content=row.querySelector('.cart-row-content');
+    if(!content) return;
+    swipeState={row:row,content:content,key:row.dataset.cartKey,startX:t.clientX,startY:t.clientY,lastX:t.clientX,moved:false};
   }, {passive:true});
   document.addEventListener('touchmove', function(e){
     if(!swipeState) return;
@@ -3511,20 +3539,23 @@ function renderHistory(){
     if(Math.abs(dx)<10 || Math.abs(dx)<Math.abs(dy)) return;
     swipeState.moved=true;
     if(dx<0){
-      var shift=Math.max(-110, dx);
-      swipeState.row.classList.add('swiping');
-      swipeState.row.style.transform='translateX('+shift+'px)';
-      swipeState.row.classList.toggle('swipe-delete-ready', Math.abs(dx)>=70);
+      var shift=Math.max(-96, dx);
+      swipeState.content.classList.add('swiping');
+      swipeState.content.style.transform='translateX('+shift+'px)';
+      swipeState.row.classList.toggle('swipe-delete-ready', Math.abs(dx)>=64);
     }
   }, {passive:true});
   document.addEventListener('touchend', function(){
     if(!swipeState) return;
     var s=swipeState; swipeState=null;
-    if(s.moved && s.startX-s.lastX>=70){
-      s.row.style.transform='translateX(-110%)';
-      setTimeout(function(){ deleteCartItemWithUndo(s.key); }, 140);
+    if(s.moved && s.startX-s.lastX>=80){
+      s.content.classList.remove('swiping');
+      s.content.style.transform='translateX(-104%)';
+      setTimeout(function(){ deleteCartItemWithUndo(s.key); }, 170);
     } else {
-      s.row.classList.remove('swiping','swipe-delete-ready'); s.row.style.transform='';
+      s.content.classList.remove('swiping');
+      s.content.style.transform='';
+      s.row.classList.remove('swipe-delete-ready');
     }
   }, {passive:true});
 
