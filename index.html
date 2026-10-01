@@ -15,7 +15,7 @@
 <link rel="preload" href="fonts/poppins-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/poppins-latin-800-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="apple-touch-icon" href="icon-180.png">
-<title>Price List · V9.75</title>
+<title>Price List · V9.76</title>
 <style>
 @font-face{font-family:"Poppins";font-style:normal;font-weight:400;font-display:swap;src:url(fonts/poppins-latin-400-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:500;font-display:swap;src:url(fonts/poppins-latin-500-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:600;font-display:swap;src:url(fonts/poppins-latin-600-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:700;font-display:swap;src:url(fonts/poppins-latin-700-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:700;font-display:swap;src:url(fonts/poppins-latin-800-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:700;font-display:swap;src:url(fonts/poppins-latin-900-normal.woff2) format("woff2");}
   :root {
@@ -401,7 +401,7 @@
   .receipt-summary-card.momo .rsc-value { color:var(--green); }
   .receipt-summary-card.total .rsc-value { color:var(--ink); }
 
-  /* v9.75 — receipt details / large Mobile Money display refinements */
+  /* v9.76 — portrait Mobile Money + deliberate swipe-to-delete refinements */
   .receipt-show-details-wrap{margin-top:4px;padding-top:4px;border-top:1px solid var(--line)}
   .receipt-show-details-btn{width:100%;border:0;background:transparent;color:var(--ink-soft);padding:10px 6px 2px;font-size:12px;font-weight:700;letter-spacing:.01em;text-align:center}
   .receipt-show-details-btn:active{transform:scale(.98);color:var(--ink)}
@@ -413,13 +413,14 @@
   .momo-display-close:active{transform:scale(.93)}
   .momo-display-kicker{margin-top:2px;font-size:13px;font-weight:800;letter-spacing:.16em;color:var(--ink-soft);text-transform:uppercase}
   .momo-display-main{margin:auto 0;display:flex;flex-direction:column;align-items:flex-end;text-align:right;padding:10px 2px 0}
-  .momo-display-number{font-size:clamp(48px,10vw,92px);font-weight:800;line-height:.98;letter-spacing:-.045em;font-variant-numeric:tabular-nums;white-space:nowrap}
-  .momo-display-name{margin-top:14px;font-size:clamp(22px,3.3vw,36px);font-weight:600;line-height:1.08;letter-spacing:-.02em;color:var(--ink)}
+  .momo-display-number{display:flex;align-items:baseline;justify-content:flex-end;gap:.18em;font-size:clamp(48px,10vw,92px);font-weight:800;line-height:.98;letter-spacing:-.055em;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .momo-display-number span{display:block}
+  .momo-display-name{margin-top:14px;font-size:clamp(24px,3.6vw,38px);font-weight:600;line-height:1.08;letter-spacing:-.02em;color:var(--ink)}
   .momo-display-message{margin-top:12px;font-size:clamp(13px,1.7vw,18px);font-weight:500;color:var(--ink-soft);line-height:1.35}
   .momo-display-footer{display:flex;justify-content:flex-end;align-items:center;margin-top:auto}
   .momo-display-share{border:0;border-radius:999px;background:var(--paper);color:var(--ink);padding:13px 22px;font-size:13px;font-weight:800;box-shadow:0 5px 18px rgba(0,0,0,.08)}
   .momo-display-share:active{transform:scale(.97)}
-  @media (max-width:600px){.momo-display-overlay{padding:9px}.momo-display-card{width:100%;height:calc(100dvh - 18px);min-height:0;padding:25px 22px 24px;border-radius:26px}.momo-display-close{top:13px;right:13px;width:44px;height:44px;font-size:28px}.momo-display-kicker{font-size:11px}.momo-display-main{width:100%;padding-top:18px}.momo-display-number{font-size:clamp(40px,11.5vw,70px);white-space:nowrap;letter-spacing:-.055em}.momo-display-name{margin-top:12px;font-size:clamp(21px,6vw,27px)}.momo-display-message{margin-top:10px;font-size:15px;align-self:flex-end}.momo-display-footer{margin-top:20px}.momo-display-share{padding:13px 20px;font-size:13px}}
+  @media (max-width:600px){.momo-display-overlay{padding:9px}.momo-display-card{width:100%;height:calc(100dvh - 18px);min-height:0;padding:25px 22px 24px;border-radius:26px}.momo-display-close{top:13px;right:13px;width:48px;height:48px;font-size:31px}.momo-display-kicker{font-size:12px}.momo-display-main{width:100%;padding-top:18px}.momo-display-number{flex-direction:column;align-items:flex-end;gap:0;font-size:clamp(64px,18vw,82px);line-height:.9;letter-spacing:-.065em}.momo-display-name{margin-top:16px;font-size:clamp(27px,7.8vw,33px);font-weight:600}.momo-display-message{margin-top:11px;font-size:16px;align-self:flex-end}.momo-display-footer{margin-top:20px}.momo-display-share{padding:14px 22px;font-size:14px}}
 
   /* Polished receipt action sheet */
   .receipt-action-panel { position:fixed; inset:0; z-index:130; background:rgba(0,0,0,.52); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); display:flex; align-items:center; justify-content:center; padding:20px; }
@@ -736,14 +737,16 @@
   }
   .cart-row-content.swiping { transition:none; }
   .swipe-delete-bg {
-    position:absolute; top:5px; right:5px; bottom:5px; width:78px; border-radius:12px;
-    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px;
-    background:rgba(190,55,48,.10); color:var(--brick);
-    font-size:10px; font-weight:700; pointer-events:none; opacity:1; z-index:0;
+    position:absolute; inset:0; width:100%; height:100%; border-radius:12px; box-sizing:border-box;
+    display:flex; flex-direction:column; align-items:flex-end; justify-content:center; gap:3px;
+    padding-right:22px;
+    background:rgba(190,55,48,.12); color:var(--brick);
+    font-size:10px; font-weight:700; pointer-events:none; opacity:0; z-index:0;
+    transition:opacity .12s ease, background .12s ease;
   }
-  .swipe-delete-bg svg { width:19px; height:19px; }
-  .cart-row.swipe-delete-ready .swipe-delete-bg { background:rgba(190,55,48,.16); }
-  .cart-row.swipe-delete-ready .cart-row-content { box-shadow:-6px 0 18px rgba(190,55,48,.08); }
+  .swipe-delete-bg svg { width:20px; height:20px; }
+  .cart-row.swipe-delete-ready .swipe-delete-bg { background:rgba(190,55,48,.18); }
+  .cart-row.swipe-delete-ready .cart-row-content { box-shadow:-8px 0 22px rgba(190,55,48,.10); }
   .undo-toast { pointer-events:auto; display:flex; align-items:center; gap:10px; min-width:min(320px,calc(100vw - 32px)); max-width:calc(100vw - 32px); padding:11px 12px 11px 14px; border:1px solid var(--line); border-radius:16px; background:var(--surface); color:var(--ink); box-shadow:0 12px 30px rgba(0,0,0,.16), 0 2px 8px rgba(0,0,0,.08); font-size:12px; font-weight:600; animation:undoToastIn .22s ease-out; }
   .undo-toast button { margin-left:auto; border:1px solid var(--gold); background:var(--gold); color:#fff; border-radius:10px; font-size:11px; font-weight:700; padding:7px 11px; min-width:54px; }
   .undo-toast button:active { transform:scale(.96); opacity:.88; }
@@ -906,7 +909,7 @@
   .quick-cash-btn.clear{flex:0 0 auto;padding:9px 11px;background:var(--paper);color:var(--ink-soft);font-size:11px;font-weight:600}
 
 
-  /* v9.75 — receipt details display + report settlement summary + swipe refinements */
+  /* v9.75 — receipt details display + report settlement summary */
   .history-header-actions{flex-direction:row;align-items:center;gap:10px}
   .history-header-links{display:flex;flex-direction:column;gap:6px;align-items:flex-end}
   .notes-pen-btn{position:relative;width:36px;height:36px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--gold);display:inline-flex;align-items:center;justify-content:center;padding:0;-webkit-tap-highlight-color:transparent}
@@ -1280,17 +1283,17 @@
         <button class="receipt-action-btn change" id="receipt-add-change-btn"><span class="action-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h13"/><polyline points="14 4 17 8 14 12"/><path d="M20 16H7"/><polyline points="10 12 7 16 10 20"/></svg></span><span>Add Change</span></button>
         <button class="receipt-action-btn momo" id="receipt-add-momo-btn"><span class="action-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="3"/><line x1="6" y1="9" x2="6" y2="9.01"/><line x1="18" y1="15" x2="18" y2="15.01"/></svg></span><span>Add Momo</span></button>
         <button class="receipt-action-btn restore" id="receipt-restore-btn"><span class="action-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><polyline points="3 3 3 6.5 6.5 6.5"/></svg></span><span>Restore to Cart</span></button>
-        <div class="receipt-show-details-wrap"><button type="button" class="receipt-show-details-btn" id="receipt-show-details-btn">Show details</button></div>
+        <div class="receipt-show-details-wrap"><button type="button" class="receipt-show-details-btn" id="receipt-show-details-btn">Show Momo Details</button></div>
       </div>
     </div>
   </div>
 
   <div class="momo-display-overlay" id="momo-display-overlay" hidden>
     <div class="momo-display-card" role="dialog" aria-modal="true" aria-labelledby="momo-display-kicker">
-      <button class="momo-display-close" id="momo-display-close" aria-label="Close details">×</button>
+      <button class="momo-display-close" id="momo-display-close" aria-label="Close MoMo details">×</button>
       <div class="momo-display-kicker" id="momo-display-kicker">MOBILE MONEY</div>
       <div class="momo-display-main">
-        <div class="momo-display-number" id="momo-display-number">054 854 8435</div>
+        <div class="momo-display-number" id="momo-display-number"><span>054 854</span><span>8435</span></div>
         <div class="momo-display-name" id="momo-display-name">Baaye Stephen</div>
         <div class="momo-display-message" id="momo-display-message">Please add charges</div>
       </div>
@@ -1580,7 +1583,7 @@ window.addEventListener("error", function(e) {
   ];
   defaultItems.forEach(function(i){ i.photo = null; });
 
-  var APP_VERSION = 'v9.75';
+  var APP_VERSION = 'v9.76';
   var PRICE_MIGRATION_VERSION_KEY = 'price-list-price-migration-version-v1';
   var items = loadItems();
 
@@ -2808,7 +2811,7 @@ window.addEventListener("error", function(e) {
   function openMomoDisplay(){
     var overlay=document.getElementById('momo-display-overlay'); if(!overlay) return;
     document.getElementById('momo-display-name').textContent=MOMO_DISPLAY_NAME;
-    document.getElementById('momo-display-number').textContent=MOMO_DISPLAY_NUMBER;
+    document.getElementById('momo-display-number').innerHTML='<span>'+escapeHtml(MOMO_DISPLAY_NUMBER.slice(0,7))+'</span><span>'+escapeHtml(MOMO_DISPLAY_NUMBER.slice(8))+'</span>';
     document.getElementById('momo-display-message').textContent=MOMO_DISPLAY_MESSAGE;
     overlay.hidden=false;
   }
@@ -3525,12 +3528,16 @@ function renderHistory(){
   }
 
   var swipeState = null;
+  var SWIPE_DELETE_REVEAL = 92;
+  var SWIPE_DELETE_COMMIT = 132;
+  var SWIPE_DELETE_MAX = 150;
   document.addEventListener('touchstart', function(e){
     var row=e.target.closest && e.target.closest('.cart-row');
     if(!row) return;
-    var t=e.touches[0], content=row.querySelector('.cart-row-content');
+    var t=e.touches[0], content=row.querySelector('.cart-row-content'), bg=row.querySelector('.swipe-delete-bg');
     if(!content) return;
-    swipeState={row:row,content:content,key:row.dataset.cartKey,startX:t.clientX,startY:t.clientY,lastX:t.clientX,moved:false};
+    if(bg) bg.style.opacity='0';
+    swipeState={row:row,content:content,bg:bg,key:row.dataset.cartKey,startX:t.clientX,startY:t.clientY,lastX:t.clientX,moved:false};
   }, {passive:true});
   document.addEventListener('touchmove', function(e){
     if(!swipeState) return;
@@ -3539,22 +3546,28 @@ function renderHistory(){
     if(Math.abs(dx)<10 || Math.abs(dx)<Math.abs(dy)) return;
     swipeState.moved=true;
     if(dx<0){
-      var shift=Math.max(-96, dx);
+      var distance=Math.min(SWIPE_DELETE_MAX, Math.abs(dx));
+      var shift=-distance;
+      var reveal=Math.min(1, Math.max(0,(distance-18)/(SWIPE_DELETE_REVEAL-18)));
       swipeState.content.classList.add('swiping');
       swipeState.content.style.transform='translateX('+shift+'px)';
-      swipeState.row.classList.toggle('swipe-delete-ready', Math.abs(dx)>=64);
+      if(swipeState.bg) swipeState.bg.style.opacity=String(.12 + reveal*.88);
+      swipeState.row.classList.toggle('swipe-delete-ready', distance>=SWIPE_DELETE_COMMIT);
     }
   }, {passive:true});
   document.addEventListener('touchend', function(){
     if(!swipeState) return;
     var s=swipeState; swipeState=null;
-    if(s.moved && s.startX-s.lastX>=80){
+    var distance=Math.max(0,s.startX-s.lastX);
+    if(s.moved && distance>=SWIPE_DELETE_COMMIT){
       s.content.classList.remove('swiping');
-      s.content.style.transform='translateX(-104%)';
+      s.content.style.transform='translateX(-100%)';
+      if(s.bg) s.bg.style.opacity='1';
       setTimeout(function(){ deleteCartItemWithUndo(s.key); }, 170);
     } else {
       s.content.classList.remove('swiping');
       s.content.style.transform='';
+      if(s.bg) s.bg.style.opacity='0';
       s.row.classList.remove('swipe-delete-ready');
     }
   }, {passive:true});
