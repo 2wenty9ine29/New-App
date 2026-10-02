@@ -454,7 +454,8 @@
   .receipt-history-item .rh-meta { color:var(--ink-soft); font-size:10px; margin-top:2px; }
   .receipt-history-item .rh-items { margin:7px 0 0; padding-left:16px; color:var(--ink-soft); font-size:10.5px; line-height:1.35; }
   .receipt-history-item .rh-items li { margin:0 0 6px; }
-  .receipt-item-pricing { display:block; margin-top:1px; font-size:9.5px; color:var(--ink-soft); font-variant-numeric:tabular-nums; }
+  .receipt-item-pricing { display:block; margin-top:1px; font-size:14px; line-height:1.25; color:var(--ink-soft); font-variant-numeric:tabular-nums; }
+  .receipt-history-item .receipt-item-pricing { font-size:19px; line-height:1.2; margin-top:1px; }
   .receipt-item-pricing strong { color:var(--ink); font-weight:600; }
   .cart-unit-price { display:block; margin-top:2px; font-size:9.5px; line-height:1.15; color:var(--ink-soft); font-weight:500; font-variant-numeric:tabular-nums; }
   .receipt-load-more { width:100%; margin-top:10px; border:1px solid var(--line); background:var(--surface); color:var(--ink); border-radius:12px; padding:10px 12px; font-size:11px; font-weight:700; }
@@ -2780,7 +2781,8 @@ window.addEventListener("error", function(e) {
       createdAt=new Date().toISOString();
     }
     var receipt={receiptId:(restoring && restoring.receiptId) || newReceiptId(),number:receiptNo,total:total,grossTotal:grossTotal,discount:discount,createdAt:createdAt,cartIndex:activeCartIndex,items:entries.map(function(e){
-      return {id:e.item.id,key:e.key,name:e.item.name,mode:e.mode,fraction:e.fraction,qty:e.qty,subtotal:(priceForMode(e.item,e.mode,e.fraction)||0)*e.qty};
+      var unitPrice=priceForMode(e.item,e.mode,e.fraction);
+      return {id:e.item.id,key:e.key,name:e.item.name,mode:e.mode,fraction:e.fraction,qty:e.qty,unitPrice:unitPrice,subtotal:(unitPrice||0)*e.qty};
     })};
     if (restoring) {
       var insertAt = Math.max(0, Math.min(isFinite(restoredIndex) ? restoredIndex : receipts.length, receipts.length));
@@ -3159,7 +3161,7 @@ window.addEventListener("error", function(e) {
         receiptId:r.receiptId || newReceiptId(),
         number:String(r.number), total:Number(r.total)||0, grossTotal:r.grossTotal==null?Number(r.total)||0:Number(r.grossTotal)||0,
         discount:Number(r.discount)||0, createdAt:String(r.createdAt), cartIndex:Number(r.cartIndex)||0,
-        items:r.items.map(function(i){ return {id:i.id==null?null:Number(i.id),key:i.key||'',name:String(i.name||''),mode:i.mode||'bulk',fraction:i.fraction==null?1:Number(i.fraction),qty:Number(i.qty)||0,subtotal:Number(i.subtotal)||0}; })
+        items:r.items.map(function(i){ return {id:i.id==null?null:Number(i.id),key:i.key||'',name:String(i.name||''),mode:i.mode||'bulk',fraction:i.fraction==null?1:Number(i.fraction),qty:Number(i.qty)||0,unitPrice:i.unitPrice==null?null:Number(i.unitPrice),subtotal:Number(i.subtotal)||0}; })
       };
     });
   }
@@ -3311,7 +3313,7 @@ function renderHistory(){
         var mode=i.mode==='bulk'?(i.fraction===0.5?'½ BULK':i.fraction===0.25?'¼ BULK':'Full BULK'):'SINGLE';
         var qty=Number(i.qty)||0;
         var subtotal=Number(i.subtotal)||0;
-        var unit=qty>0 ? subtotal/qty : 0;
+        var unit=i.unitPrice==null ? (qty>0 ? subtotal/qty : 0) : Number(i.unitPrice)||0;
         return '<li>'+escapeHtml(i.name)+' — '+mode+' × '+qty+'<span class="receipt-item-pricing">Unit ¢'+formatCedis(unit)+' · Total <strong>¢'+formatCedis(subtotal)+'</strong></span></li>';
       }).join('');
       return '<div class="history-card" data-history-index="'+idx+'" data-receipt-index="'+idx+'"><div class="history-top"><span class="history-receipt">'+escapeHtml(r.number)+'</span><span class="history-total">¢'+formatCedis(r.total)+'</span></div>'+receiptStatusChipsHtml(r)+'<div class="history-meta">'+when+'</div><ul class="history-items">'+itemsHtml+'</ul><button class="receipt-history-share" data-share-receipt="'+idx+'">Share receipt</button><button class="receipt-copy-btn" data-copy-receipt="'+idx+'">Copy</button></div>';
@@ -3544,7 +3546,7 @@ function renderHistory(){
         var mode=i.mode==='bulk'?(i.fraction===0.5?'½ BULK':i.fraction===0.25?'¼ BULK':'Full BULK'):'SINGLE';
         var qty=Number(i.qty)||0;
         var subtotal=Number(i.subtotal)||0;
-        var unit=qty>0 ? subtotal/qty : 0;
+        var unit=i.unitPrice==null ? (qty>0 ? subtotal/qty : 0) : Number(i.unitPrice)||0;
         return '<li>'+escapeHtml(i.name)+' — '+mode+' × '+qty+'<span class="receipt-item-pricing">Unit ¢'+formatCedis(unit)+' · Total <strong>¢'+formatCedis(subtotal)+'</strong></span></li>';
       }).join('');
       return '<div class="receipt-history-item expanded" data-receipt-index="'+idx+'"><div class="rh-top"><span class="rh-no">'+escapeHtml(r.number)+'</span><span class="rh-total">¢'+formatCedis(r.total)+'</span></div>'+receiptStatusChipsHtml(r)+'<div class="rh-meta">'+when+'</div><ul class="rh-items">'+itemsHtml+'</ul><button class="receipt-history-share" data-share-receipt="'+idx+'">Share as image</button><button class="receipt-copy-btn" data-copy-receipt="'+idx+'">Copy</button></div>';
