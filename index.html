@@ -14,7 +14,7 @@
 <link rel="preload" href="fonts/poppins-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/poppins-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="apple-touch-icon" href="icon-180.png">
-<title>Price List · V9.8.3</title>
+<title>Price List · V9.8.4</title>
 <style>
 @font-face{font-family:"Poppins";font-style:normal;font-weight:400;font-display:swap;src:url(fonts/poppins-latin-400-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:500;font-display:swap;src:url(fonts/poppins-latin-500-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:600;font-display:swap;src:url(fonts/poppins-latin-600-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:700;font-display:swap;src:url(fonts/poppins-latin-700-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:800;font-display:swap;src:url(fonts/poppins-latin-700-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:900;font-display:swap;src:url(fonts/poppins-latin-700-normal.woff2) format("woff2");}
   :root {
@@ -1161,10 +1161,13 @@
   /* v9.8.2 — keep printed price cells visible */
   @media print { #print-prices-root td, #print-prices-root th { opacity:1 !important; visibility:visible !important; color:#111 !important; display:table-cell !important; } }
 
-  /* v9.8.3 — History tab cards: Unit = item-name size (11px), item name x1.3 (14px) */
-  .history-card .history-items { font-size:14px; line-height:1.3; }
-  .history-card .receipt-item-pricing { font-size:11px; line-height:1.25; font-weight:500; }
-  .history-card .receipt-item-pricing strong { font-weight:700; }
+  /* v9.8.4 — Receipt display: item name reduced by 1.3px; show only Unit Price. */
+  .history-card .history-items,
+  .receipt-history-item .rh-items { font-size:12.7px; line-height:1.3; }
+  .history-card .receipt-item-pricing,
+  .receipt-history-item .receipt-item-pricing { font-size:11px; line-height:1.25; font-weight:500; }
+  .history-card .receipt-item-pricing strong,
+  .receipt-history-item .receipt-item-pricing strong { font-weight:700; }
   /* v9.8.3 — print: the app locks html/body (fixed + overflow hidden), which clips the printout to one page. Unlock it only while printing prices. */
   @media print {
     html, body.print-prices-mode { position:static !important; height:auto !important; overflow:visible !important; width:auto !important; }
@@ -1718,7 +1721,7 @@ window.addEventListener("error", function(e) {
   ];
   defaultItems.forEach(function(i){ i.photo = null; });
 
-  var APP_VERSION = 'v9.8.3';
+  var APP_VERSION = 'v9.8.4';
   var PRICE_MIGRATION_VERSION_KEY = 'price-list-price-migration-version-v1';
   var items = loadItems();
 
@@ -3344,7 +3347,7 @@ function renderHistory(){
         var qty=Number(i.qty)||0;
         var subtotal=Number(i.subtotal)||0;
         var unit=qty>0 ? subtotal/qty : 0;
-        return '<li>'+escapeHtml(i.name)+' — '+mode+' × '+qty+'<span class="receipt-item-pricing">Unit ¢'+formatCedis(unit)+' · Total <strong>¢'+formatCedis(subtotal)+'</strong></span></li>';
+        return '<li>'+escapeHtml(i.name)+' — '+mode+' × '+qty+'<span class="receipt-item-pricing">Unit Price - ¢'+formatCedis(unit)+'</span></li>';
       }).join('');
       return '<div class="history-card" data-history-index="'+idx+'" data-receipt-index="'+idx+'"><div class="history-top"><span class="history-receipt">'+escapeHtml(r.number)+'</span><span class="history-total">¢'+formatCedis(r.total)+'</span></div>'+receiptStatusChipsHtml(r)+'<div class="history-meta">'+when+'</div><ul class="history-items">'+itemsHtml+'</ul><button class="receipt-history-share" data-share-receipt="'+idx+'">Share receipt</button><button class="receipt-copy-btn" data-copy-receipt="'+idx+'">Copy</button></div>';
     }).join('');
@@ -3577,7 +3580,7 @@ function renderHistory(){
         var qty=Number(i.qty)||0;
         var subtotal=Number(i.subtotal)||0;
         var unit=qty>0 ? subtotal/qty : 0;
-        return '<li>'+escapeHtml(i.name)+' — '+mode+' × '+qty+'<span class="receipt-item-pricing">Unit ¢'+formatCedis(unit)+' · Total <strong>¢'+formatCedis(subtotal)+'</strong></span></li>';
+        return '<li>'+escapeHtml(i.name)+' — '+mode+' × '+qty+'<span class="receipt-item-pricing">Unit Price - ¢'+formatCedis(unit)+'</span></li>';
       }).join('');
       return '<div class="receipt-history-item expanded" data-receipt-index="'+idx+'"><div class="rh-top"><span class="rh-no">'+escapeHtml(r.number)+'</span><span class="rh-total">¢'+formatCedis(r.total)+'</span></div>'+receiptStatusChipsHtml(r)+'<div class="rh-meta">'+when+'</div><ul class="rh-items">'+itemsHtml+'</ul><button class="receipt-history-share" data-share-receipt="'+idx+'">Share as image</button><button class="receipt-copy-btn" data-copy-receipt="'+idx+'">Copy</button></div>';
     }).join('');
