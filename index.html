@@ -14,7 +14,7 @@
 <link rel="preload" href="fonts/poppins-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/poppins-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="apple-touch-icon" href="icon-180.png">
-<title>Price List · V9.8.4</title>
+<title>Price List · V9.8.4.29</title>
 <style>
 @font-face{font-family:"Poppins";font-style:normal;font-weight:400;font-display:swap;src:url(fonts/poppins-latin-400-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:500;font-display:swap;src:url(fonts/poppins-latin-500-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:600;font-display:swap;src:url(fonts/poppins-latin-600-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:700;font-display:swap;src:url(fonts/poppins-latin-700-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:800;font-display:swap;src:url(fonts/poppins-latin-700-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:900;font-display:swap;src:url(fonts/poppins-latin-700-normal.woff2) format("woff2");}
   :root {
@@ -1721,7 +1721,7 @@ window.addEventListener("error", function(e) {
   ];
   defaultItems.forEach(function(i){ i.photo = null; });
 
-  var APP_VERSION = 'v9.8.4';
+  var APP_VERSION = 'v9.8.4.29';
   var PRICE_MIGRATION_VERSION_KEY = 'price-list-price-migration-version-v1';
   var items = loadItems();
 
@@ -3222,9 +3222,9 @@ window.addEventListener("error", function(e) {
 
   async function shareReceipt(receiptIndex) {
     var r=receipts[receiptIndex]; if(!r) return;
-    // Receipts with more than 18 items are shared as two balanced images.
-    // Keep the large-print item font on both pages.
-    var many=(r.items||[]).length>18;
+    // Receipts are shared with a strict maximum of 8 items per image.
+    // Keep the large-print item font and all existing receipt formatting unchanged.
+    var many=(r.items||[]).length>8;
     var font=40;
     var smallFont=24;
     var lineGap=54;
@@ -3307,16 +3307,16 @@ window.addEventListener("error", function(e) {
       return canvas;
     }
 
-    // Keep a strict maximum of 18 items per receipt image. As soon as page 1
-    // reaches 18 items, the remaining items continue on page 2. If there are
-    // more than 36 items, page 3 (and further pages if ever needed) continues
-    // in the same 18-item chunks. The large-print font is kept on every page.
+    // Keep a strict maximum of 8 items per receipt image. As soon as page 1
+    // reaches 8 items, the remaining items continue on page 2. If there are
+    // more than 16 items, page 3 (and further pages if ever needed) continues
+    // in the same 8-item chunks. The large-print font is kept on every page.
     var allItems=r.items||[];
     var pages=[];
     if(!allItems.length) pages=[[]];
     else {
-      for(var start=0; start<allItems.length; start+=18){
-        pages.push(allItems.slice(start,start+18));
+      for(var start=0; start<allItems.length; start+=8){
+        pages.push(allItems.slice(start,start+8));
       }
     }
     var canvases=pages.map(function(list,idx){ return makePage(list,idx+1,pages.length); });
