@@ -14,7 +14,7 @@
 <link rel="preload" href="fonts/poppins-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/poppins-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="apple-touch-icon" href="icon-180.png">
-<title>Price List · V9.8.2</title>
+<title>Price List · V9.8.3</title>
 <style>
 @font-face{font-family:"Poppins";font-style:normal;font-weight:400;font-display:swap;src:url(fonts/poppins-latin-400-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:500;font-display:swap;src:url(fonts/poppins-latin-500-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:600;font-display:swap;src:url(fonts/poppins-latin-600-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:700;font-display:swap;src:url(fonts/poppins-latin-700-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:800;font-display:swap;src:url(fonts/poppins-latin-700-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:900;font-display:swap;src:url(fonts/poppins-latin-700-normal.woff2) format("woff2");}
   :root {
@@ -1160,6 +1160,18 @@
   .receipt-history-list { gap:6px; }
   /* v9.8.2 — keep printed price cells visible */
   @media print { #print-prices-root td, #print-prices-root th { opacity:1 !important; visibility:visible !important; color:#111 !important; display:table-cell !important; } }
+
+  /* v9.8.3 — History tab cards: Unit = item-name size (11px), item name x1.3 (14px) */
+  .history-card .history-items { font-size:14px; line-height:1.3; }
+  .history-card .receipt-item-pricing { font-size:11px; line-height:1.25; font-weight:500; }
+  .history-card .receipt-item-pricing strong { font-weight:700; }
+  /* v9.8.3 — print: the app locks html/body (fixed + overflow hidden), which clips the printout to one page. Unlock it only while printing prices. */
+  @media print {
+    html, body.print-prices-mode { position:static !important; height:auto !important; overflow:visible !important; width:auto !important; }
+    body.print-prices-mode #print-prices-root { position:static !important; height:auto !important; overflow:visible !important; }
+    #print-prices-root tr { page-break-inside:avoid; break-inside:avoid; }
+    #print-prices-root thead { display:table-header-group; }
+  }
 </style>
 </head>
 <body>
@@ -1706,7 +1718,7 @@ window.addEventListener("error", function(e) {
   ];
   defaultItems.forEach(function(i){ i.photo = null; });
 
-  var APP_VERSION = 'v9.8.2';
+  var APP_VERSION = 'v9.8.3';
   var PRICE_MIGRATION_VERSION_KEY = 'price-list-price-migration-version-v1';
   var items = loadItems();
 
@@ -3097,13 +3109,21 @@ window.addEventListener("error", function(e) {
     root.innerHTML='<h1>Current Price List</h1><div class="print-meta">Printed '+escapeHtml(new Date().toLocaleString())+' · '+rows.length+' items</div><table><thead><tr><th>Item</th><th>Bulk</th><th>Singles</th></tr></thead><tbody>'+body+'</tbody></table><div class="print-footer">Price List Sales Calculator · Current prices at time of printing</div>';
     document.body.classList.add('print-prices-mode');
     root.setAttribute('aria-hidden','false');
+    var cleaned=false;
     var cleanup=function(){
+      if(cleaned) return; cleaned=true;
       document.body.classList.remove('print-prices-mode');
       root.setAttribute('aria-hidden','true');
       root.innerHTML='';
-      window.removeEventListener('afterprint',cleanup);
+      window.removeEventListener('afterprint',onAfter);
+      document.removeEventListener('visibilitychange',onVis);
     };
-    window.addEventListener('afterprint',cleanup);
+    // iOS Safari fires afterprint as soon as the print sheet opens (before the
+    // preview/PDF is rendered), so never clean up on it straight away.
+    var onAfter=function(){ setTimeout(cleanup,60000); };
+    var onVis=function(){ if(document.visibilityState==='visible') setTimeout(cleanup,60000); };
+    window.addEventListener('afterprint',onAfter);
+    document.addEventListener('visibilitychange',onVis);
     setTimeout(function(){ window.print(); },80);
   }
 
@@ -3232,7 +3252,7 @@ window.addEventListener("error", function(e) {
         var label=(i.name||'')+sizeTag+'  × '+(Number(i.qty)||0);
         return {item:i,lines:wrapText(label,nameRight-pad,mctx)};
       });
-      var itemHeight=prepared.reduce(function(total,p){ return total + Math.max(1,p.lines.length)*lineGap + 34; },0);
+      var itemHeight=prepared.reduce(function(total,p){ return total + Math.max(1,p.lines.length)*lineGap + 68; },0);
       var footerHeight=(Number(r.discount)||0)>0 ? 220 : 165;
       var H=Math.max(520, 245 + itemHeight + footerHeight);
       var canvas=document.createElement('canvas'), ctx=canvas.getContext('2d');
@@ -3265,9 +3285,9 @@ window.addEventListener("error", function(e) {
         var qty=Number(p.item.qty)||0;
         var subtotal=Number(p.item.subtotal)||0;
         var unit=qty>0 ? subtotal/qty : 0;
-        ctx.font='500 '+smallFont+'px system-ui'; ctx.fillStyle='#666666';
-        ctx.fillText('Unit ¢'+formatCedis(unit),pad,y-2);
-        y+=34;
+        ctx.font='500 '+Math.round(smallFont*1.5)+'px system-ui'; ctx.fillStyle='#666666';
+        ctx.fillText('Unit ¢'+formatCedis(unit),pad,y+8);
+        y+=68;
       });
 
       y+=8; ctx.strokeStyle='#D8D8D8'; ctx.beginPath(); ctx.moveTo(pad,y); ctx.lineTo(W-pad,y); ctx.stroke(); y+=40;
