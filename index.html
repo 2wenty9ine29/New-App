@@ -13,11 +13,10 @@
 <link rel="preload" href="fonts/poppins-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/poppins-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/poppins-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="fonts/poppins-latin-800-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="apple-touch-icon" href="icon-180.png">
-<title>Price List · V9.7.7</title>
+<title>Price List · V9.7.8</title>
 <style>
-@font-face{font-family:"Poppins";font-style:normal;font-weight:400;font-display:swap;src:url(fonts/poppins-latin-400-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:500;font-display:swap;src:url(fonts/poppins-latin-500-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:600;font-display:swap;src:url(fonts/poppins-latin-600-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:700;font-display:swap;src:url(fonts/poppins-latin-700-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:700;font-display:swap;src:url(fonts/poppins-latin-800-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:700;font-display:swap;src:url(fonts/poppins-latin-900-normal.woff2) format("woff2");}
+@font-face{font-family:"Poppins";font-style:normal;font-weight:400;font-display:swap;src:url(fonts/poppins-latin-400-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:500;font-display:swap;src:url(fonts/poppins-latin-500-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:600;font-display:swap;src:url(fonts/poppins-latin-600-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:700;font-display:swap;src:url(fonts/poppins-latin-700-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:800;font-display:swap;src:url(fonts/poppins-latin-700-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:900;font-display:swap;src:url(fonts/poppins-latin-700-normal.woff2) format("woff2");}
   :root {
     color-scheme: light;
     --paper: #F6F5F0;
@@ -338,8 +337,9 @@
   .history-receipt-btn { border:1px solid var(--line); background:var(--surface); color:var(--ink); border-radius:999px; padding:7px 11px; font-size:11px; font-weight:600; display:inline-flex; align-items:center; gap:5px; }
   .history-receipt-btn:active { background:var(--gold-soft); transform:scale(.97); }
   .history-header { display:flex; align-items:center; justify-content:space-between; gap:10px; }
-  .history-theme-toggle { position:absolute; right:18px; bottom:calc(16px + env(safe-area-inset-bottom)); z-index:5; width:42px; height:42px; border-radius:50%; background:var(--surface); border:1px solid var(--line); box-shadow:0 6px 18px rgba(28,27,24,.12); color:var(--ink); display:flex; align-items:center; justify-content:center; font-size:19px; }
-  .history-theme-toggle:active { transform:scale(.94); }
+  .history-theme-toggle { position:absolute; right:14px; bottom:calc(14px + env(safe-area-inset-bottom)); z-index:5; min-width:106px; height:38px; padding:0 13px; border-radius:999px; background:var(--surface); border:1px solid var(--line); box-shadow:0 5px 16px rgba(28,27,24,.10); color:var(--ink); display:flex; align-items:center; justify-content:center; gap:7px; font-size:11px; font-weight:700; letter-spacing:.01em; }
+  .history-theme-toggle .theme-icon { width:17px; height:17px; display:block; }
+  .history-theme-toggle:active { transform:scale(.96); }
   .receipt-history-panel { position:fixed; inset:0; z-index:110; background:rgba(0,0,0,.45); display:flex; align-items:flex-end; justify-content:center; }
   .receipt-history-card { width:min(480px,100%); max-height:86dvh; overflow-y:auto; background:var(--surface); color:var(--ink); border-radius:24px 24px 0 0; padding:18px 18px calc(22px + env(safe-area-inset-bottom)); }
   .receipt-history-head { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:12px; }
@@ -554,7 +554,9 @@
 
   .toast { position:fixed; left:50%; bottom:calc(90px + env(safe-area-inset-bottom)); transform:translateX(-50%) translateY(10px); background:var(--ink); color:var(--paper); padding:9px 13px; border-radius:999px; font-size:12px; opacity:0; pointer-events:none; transition:.2s ease; z-index:120; }
   .toast.show { opacity:1; transform:translateX(-50%) translateY(0); pointer-events:auto; }
-  .qty-edit { width:48px; padding:3px 5px; border:1px solid var(--gold); border-radius:7px; background:var(--surface); color:var(--ink); font:inherit; text-align:center; }
+  .qty-edit { width:54px; height:28px; padding:2px 6px; border:1px solid var(--gold); border-radius:9px; background:var(--surface); color:var(--ink); font:inherit; font-size:12px; font-weight:700; text-align:center; outline:none; box-shadow:0 0 0 3px var(--gold-soft); }
+  .qty-tap { display:inline-flex; align-items:center; justify-content:center; min-width:24px; height:22px; padding:0 6px; margin-left:2px; border:1px solid var(--line); border-radius:7px; background:var(--surface); color:var(--ink); font-weight:700; font-variant-numeric:tabular-nums; vertical-align:middle; }
+  .qty-tap:active { background:var(--gold-soft); border-color:var(--gold); transform:scale(.95); }
 
   /* Tab bar */
   .tabbar {
@@ -957,41 +959,29 @@
   .notes-actions .receipt-tool-btn{flex:1}
 
   .cash-tray{display:block;margin:8px 0 4px}
-  .cash-bar{display:flex;align-items:center;justify-content:space-between;height:40px}
-  .cash-notes-wrap{display:grid;grid-template-rows:0fr;transition:grid-template-rows .38s ease}
-  .cash-tray.open .cash-notes-wrap{grid-template-rows:1fr}
-  .cash-notes-clip{overflow:hidden;min-height:0}
-  .cash-stack{flex:0 0 auto;display:inline-flex;align-items:center;gap:6px;height:40px;padding:0 12px 0 8px;border:1px solid var(--line);border-radius:12px;background:var(--gold-soft);color:var(--ink);font-size:12px;font-weight:700;-webkit-tap-highlight-color:transparent;position:relative;z-index:2;transition:transform .15s ease}
-  .cash-stack svg{width:28px;height:24px;color:var(--gold)}
-  .cash-stack svg rect{fill:var(--surface)}
-  .cash-stack:active{transform:scale(.95)}
-  .cash-stack[aria-expanded="true"]{background:var(--gold);border-color:var(--gold);color:#fff}
-  .cash-stack[aria-expanded="true"] svg{color:#fff}
-  .cash-stack[aria-expanded="true"] svg rect{fill:rgba(255,255,255,.18)}
-  .cash-notes{display:flex;gap:6px;padding:9px 2px 5px}
-  .cash-note{--n1:#e3efdc;--n2:#c4dcb8;--ni:#2f5f2a;flex:1 1 0;min-width:0;height:40px;position:relative;border:1px solid rgba(0,0,0,.14);border-radius:6px;padding:0;color:var(--ni);background:linear-gradient(135deg,var(--n1),var(--n2));box-shadow:0 2px 5px rgba(0,0,0,.14);font-variant-numeric:tabular-nums;-webkit-tap-highlight-color:transparent;overflow:hidden;
-    opacity:0;visibility:hidden;pointer-events:none;transform:translate(calc(-1 * var(--i) * (100% + 6px)),-34px) scale(.5) rotate(-6deg);
-    transition:transform .28s cubic-bezier(.5,0,.75,0) calc(var(--r) * 28ms),opacity .2s ease calc(var(--r) * 28ms),visibility 0s linear calc(.3s + var(--r) * 28ms)}
+  .cash-bar{display:flex;align-items:center;justify-content:space-between;height:28px;margin-bottom:5px}
+  .cash-label{font-size:10px;color:var(--ink-soft);font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+  .cash-clear{height:28px;padding:0 8px;border:0;background:none;color:var(--ink-soft);font-size:10px;font-weight:600}
+  .cash-clear:active{color:var(--brick);transform:scale(.96)}
+  .cash-notes{display:flex;gap:6px;padding:0 0 3px}
+  .cash-note{--n1:#e3efdc;--n2:#c4dcb8;--ni:#2f5f2a;flex:1 1 0;min-width:0;height:38px;position:relative;border:1px solid rgba(0,0,0,.14);border-radius:7px;padding:0;color:var(--ni);background:linear-gradient(135deg,var(--n1),var(--n2));box-shadow:0 2px 5px rgba(0,0,0,.12);font-variant-numeric:tabular-nums;-webkit-tap-highlight-color:transparent;overflow:hidden}
   .cash-note::before{content:"";position:absolute;inset:3px;border:1px solid currentColor;border-radius:4px;opacity:.28}
   .cash-note::after{content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent 35%,rgba(255,255,255,.45) 50%,transparent 65%);pointer-events:none}
-  .cash-note b{position:relative;z-index:1;font-size:16px;font-weight:800;letter-spacing:-.02em}
-  .cash-tray.open .cash-note{opacity:1;visibility:visible;pointer-events:auto;transform:none;
-    transition:transform .42s cubic-bezier(.2,.9,.3,1.25) calc(var(--i) * 55ms),opacity .2s ease calc(var(--i) * 55ms),visibility 0s}
-  .cash-note:active{transform:scale(.92) !important;filter:brightness(.94)}
+  .cash-note b{position:relative;z-index:1;font-size:14px;font-weight:800;letter-spacing:-.02em}
+  .cash-note:active{transform:scale(.94);filter:brightness(.94)}
+  .cash-note.n20{--n1:#e8ddf7;--n2:#cdb8e9;--ni:#603a8f}
   .cash-note.n50{--n1:#f8e3d0;--n2:#eebf98;--ni:#86440f}
   .cash-note.n100{--n1:#dbe8f7;--n2:#b3cdea;--ni:#1f4a78}
-  .cash-note.n200{--n1:#eadff3;--n2:#d0b9e3;--ni:#52306f}
-  .cash-note.n400{--n1:#f6dcdf;--n2:#e6b2b9;--ni:#7d2534}
-  body.dark .cash-note{border-color:rgba(255,255,255,.14);--n1:#2f4a2c;--n2:#26401f;--ni:#bfe6b4}
+  .cash-note.n200{--n1:#f3d5d4;--n2:#dfa3a1;--ni:#9d2f2b}
+  .cash-note.n400{--n1:#5a2430;--n2:#3b1620;--ni:#fff0f2}
+  body.dark .cash-note{border-color:rgba(255,255,255,.14)}
   body.dark .cash-note::after{background:linear-gradient(115deg,transparent 35%,rgba(255,255,255,.10) 50%,transparent 65%)}
+  body.dark .cash-note.n20{--n1:#49366a;--n2:#35264e;--ni:#dfc8ff}
   body.dark .cash-note.n50{--n1:#5a3a1f;--n2:#4a2f18;--ni:#f5c99a}
   body.dark .cash-note.n100{--n1:#243f5f;--n2:#1c3350;--ni:#a9cdf2}
-  body.dark .cash-note.n200{--n1:#41305a;--n2:#33254a;--ni:#d5bdf0}
-  body.dark .cash-note.n400{--n1:#5a2833;--n2:#4a1f29;--ni:#f2b4be}
-  .cash-clear{flex:0 0 auto;height:32px;padding:0 10px;border:0;background:none;color:var(--ink-soft);font-size:11px;font-weight:600;opacity:0;visibility:hidden;transition:opacity .2s ease .2s,visibility 0s linear .4s;-webkit-tap-highlight-color:transparent}
-  .cash-tray.open .cash-clear{opacity:1;visibility:visible;transition:opacity .2s ease .3s,visibility 0s}
-  .cash-clear:active{color:var(--brick)}
-  @media (prefers-reduced-motion:reduce){.cash-note,.cash-tray.open .cash-note{transition:opacity .15s ease,visibility 0s}}
+  body.dark .cash-note.n200{--n1:#6b2927;--n2:#4f1e1c;--ni:#ffd0ce}
+  body.dark .cash-note.n400{--n1:#4a1723;--n2:#2f0d15;--ni:#ffd6dc}
+  @media (max-width:390px){.cash-notes{gap:4px}.cash-note{height:36px}.cash-note b{font-size:13px}}
 
   .entry-overlay{position:fixed;inset:0;z-index:160;background:rgba(0,0,0,.52);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);display:flex;align-items:flex-start;justify-content:center;padding:calc(56px + env(safe-area-inset-top)) 20px 20px;overflow:hidden}
   .entry-card{width:min(400px,100%);box-sizing:border-box;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:24px;padding:18px 18px 16px;box-shadow:0 22px 60px rgba(0,0,0,.28)}
@@ -1215,7 +1205,7 @@
         </div>
       </div>
     </header>
-    <button class="theme-toggle history-theme-toggle" id="theme-toggle" aria-label="Switch light or dark mode">☾</button>
+    <button class="theme-toggle history-theme-toggle" id="theme-toggle" aria-label="Switch light or dark mode"><span class="theme-icon" aria-hidden="true"></span><span class="theme-label">Dark mode</span></button>
     <div class="scroll-area">
       <button class="cart-history-btn" id="cart-history-btn" aria-label="View and manage carts">
         <span class="big-cart-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="20" r="1"/><circle cx="19" cy="20" r="1"/><path d="M2 3h2l2.6 11.4a2 2 0 0 0 2 1.6h8.8a2 2 0 0 0 2-1.6L21 7H5"/></svg></span>
@@ -1228,20 +1218,14 @@
         <div class="change-line"><span>Money received</span><input id="money-received" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00"></div>
         <div class="change-line"><span>Change to give</span><strong class="change-result" id="change-due">¢0.00</strong></div>
         <div class="cash-tray" id="quick-cash" aria-label="Quick add money received">
-          <div class="cash-bar">
-          <button type="button" class="cash-stack" id="cash-stack" aria-expanded="false" aria-label="Show cash notes">
-            <svg viewBox="0 0 30 26" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" aria-hidden="true"><rect x="7" y="7" width="17" height="11" rx="2" transform="rotate(-16 15 22)"/><rect x="7" y="7" width="17" height="11" rx="2" transform="rotate(14 15 22)"/><rect x="6.5" y="8" width="17" height="11" rx="2" class="top"/><path d="M11 13.5h8" stroke-linecap="round"/></svg>
-            <span>Cash</span>
-          </button>
-          <button type="button" class="cash-clear" id="quick-cash-clear" aria-label="Clear money received" tabindex="-1">Clear</button>
+          <div class="cash-bar"><span class="cash-label">Cash received</span><button type="button" class="cash-clear" id="quick-cash-clear" aria-label="Clear money received">Clear</button></div>
+          <div class="cash-notes">
+            <button type="button" class="cash-note n20" data-cash-add="20"><b>20</b></button>
+            <button type="button" class="cash-note n50" data-cash-add="50"><b>50</b></button>
+            <button type="button" class="cash-note n100" data-cash-add="100"><b>100</b></button>
+            <button type="button" class="cash-note n200" data-cash-add="200"><b>200</b></button>
+            <button type="button" class="cash-note n400" data-cash-add="400"><b>400</b></button>
           </div>
-          <div class="cash-notes-wrap"><div class="cash-notes-clip"><div class="cash-notes">
-            <button type="button" class="cash-note n20" style="--i:0;--r:4" data-cash-add="20" tabindex="-1"><b>20</b></button>
-            <button type="button" class="cash-note n50" style="--i:1;--r:3" data-cash-add="50" tabindex="-1"><b>50</b></button>
-            <button type="button" class="cash-note n100" style="--i:2;--r:2" data-cash-add="100" tabindex="-1"><b>100</b></button>
-            <button type="button" class="cash-note n200" style="--i:3;--r:1" data-cash-add="200" tabindex="-1"><b>200</b></button>
-            <button type="button" class="cash-note n400" style="--i:4;--r:0" data-cash-add="400" tabindex="-1"><b>400</b></button>
-          </div></div></div>
         </div>
       </div>
     </div>
@@ -1384,9 +1368,9 @@
   <div id="quantity-sheet" hidden>
     <div class="fraction-handle"></div>
     <h2 id="quantity-title">Choose quantity</h2>
-    <p>Hold an item to open this selector.</p>
+    <p>Set the quantity before adding it to the cart.</p>
     <div class="quantity-control"><button id="quantity-minus" type="button">−</button><input id="quantity-value" type="number" min="1" step="1" value="1" inputmode="numeric"><button id="quantity-plus" type="button">+</button></div>
-    <div class="quantity-actions"><button id="quantity-cancel" type="button">Cancel</button><button id="quantity-add" type="button">Add quantity</button></div>
+    <div class="quantity-actions"><button id="quantity-cancel" type="button">Cancel</button><button id="quantity-add" type="button">Add to cart</button></div>
   </div>
 
   <div class="receipt-panel" id="receipt-panel" hidden>
@@ -3014,8 +2998,14 @@ window.addEventListener("error", function(e) {
   function applyTheme() {
     document.body.classList.toggle('dark', darkMode);
     var btn=document.getElementById('theme-toggle');
-    if(btn){ btn.textContent=darkMode?'☀':'☾'; btn.title=darkMode?'Switch to light mode':'Switch to dark mode'; }
-    document.getElementById('theme-color-meta').setAttribute('content', darkMode?'#0B1020':'#F6F5F0');
+    if(btn){
+      var icon=btn.querySelector('.theme-icon'), label=btn.querySelector('.theme-label');
+      if(icon) icon.innerHTML=darkMode ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>' : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3 6.7 6.7 0 0 0 21 12.8z"/></svg>';
+      if(label) label.textContent=darkMode?'Light mode':'Dark mode';
+      btn.title=darkMode?'Switch to light mode':'Switch to dark mode';
+      btn.setAttribute('aria-label',btn.title);
+    }
+    document.getElementById('theme-color-meta').setAttribute('content', darkMode?'#080808':'#F6F5F0');
     try { localStorage.setItem('price-list-dark-mode-v1', darkMode?'1':'0'); } catch(e){}
   }
   function receiptBackupText(receiptList) {
@@ -3275,15 +3265,22 @@ function renderHistory(){
     var revenue = 0, discountTotal = 0, bulkRevenue = 0, singleRevenue = 0;
     var itemTotals = {};
     filtered.forEach(function (r) {
-      revenue += Number(r.total) || 0;
-      discountTotal += Number(r.discount) || 0;
+      var receiptTotal = Number(r.total) || 0;
+      var receiptGross = Number(r.grossTotal);
+      if (!isFinite(receiptGross) || receiptGross < 0) {
+        receiptGross = (r.items || []).reduce(function(sum, e){ return sum + (Number(e.subtotal) || 0); }, 0);
+      }
+      var netFactor = receiptGross > 0 ? Math.max(0, Math.min(1, receiptTotal / receiptGross)) : 0;
+      revenue += receiptTotal;
+      discountTotal += Math.max(0, Number(r.discount) || Math.max(0, receiptGross - receiptTotal));
       (r.items || []).forEach(function (e) {
-        var sub = Number(e.subtotal) || 0;
-        if ((e.mode || 'bulk') === 'single') singleRevenue += sub; else bulkRevenue += sub;
+        var grossSub = Number(e.subtotal) || 0;
+        var netSub = grossSub * netFactor;
+        if ((e.mode || 'bulk') === 'single') singleRevenue += netSub; else bulkRevenue += netSub;
         var key = e.id != null ? e.id : e.name;
         if (!itemTotals[key]) itemTotals[key] = { name: e.name, qty: 0, revenue: 0 };
         itemTotals[key].qty += Number(e.qty) || 0;
-        itemTotals[key].revenue += sub;
+        itemTotals[key].revenue += netSub;
       });
     });
     var topItems = Object.keys(itemTotals).map(function (k) { return itemTotals[k]; })
@@ -3309,16 +3306,17 @@ function renderHistory(){
   }
   function accountingCheckForReceipts(scopeReceipts) {
     var scoped=Array.isArray(scopeReceipts)?scopeReceipts:[];
-    var known={}; scoped.forEach(function(r){ if(r.receiptId) known[r.receiptId]=true; });
-    if(pendingRestoredReceipt && pendingRestoredReceipt.receiptId && scoped.indexOf(pendingRestoredReceipt)!==-1) known[pendingRestoredReceipt.receiptId]=true;
+    var scopedKnown={}; scoped.forEach(function(r){ if(r.receiptId) scopedKnown[r.receiptId]=true; });
+    var allKnown={}; receipts.forEach(function(r){ if(r.receiptId) allKnown[r.receiptId]=true; });
+    if(pendingRestoredReceipt && pendingRestoredReceipt.receiptId) allKnown[pendingRestoredReceipt.receiptId]=true;
     var all=[].concat(unsettledDebts,changeOwed,momoPayments);
-    var scopedAll=all.filter(function(x){ return x.receiptId && known[x.receiptId]; });
-    var unmatched=all.filter(function(x){ return x.receiptId && known[x.receiptId] ? false : false; });
+    var scopedAll=all.filter(function(x){ return x.receiptId && scopedKnown[x.receiptId]; });
+    var orphaned=all.filter(function(x){ return !x.receiptId || !allKnown[x.receiptId]; });
     var missingScoped=[];
     scoped.forEach(function(r){
       if(!r.receiptId) missingScoped.push({receiptId:'', number:r.number||'Unknown receipt'});
     });
-    return {ok:missingScoped.length===0,totalReceipts:scoped.length,linkedSettlementRecords:scopedAll.length,missing:missingScoped};
+    return {ok:missingScoped.length===0 && orphaned.length===0,totalReceipts:scoped.length,linkedSettlementRecords:scopedAll.length,missing:missingScoped,unmatched:orphaned};
   }
   function accountingCheck() {
     var known={}; receipts.forEach(function(r){ if(r.receiptId) known[r.receiptId]=true; });
@@ -3329,7 +3327,9 @@ function renderHistory(){
   function accountingCheckHtml(scopeReceipts) {
     var c=accountingCheckForReceipts(scopeReceipts);
     if(c.ok) return '<div class="reports-check ok"><strong>✓ Receipts verified</strong>'+c.totalReceipts+' receipts checked · '+c.linkedSettlementRecords+' linked settlement records.</div>';
-    return '<div class="reports-check warn"><strong>⚠ Verification needs attention</strong>'+c.missing.length+' receipt'+(c.missing.length===1?' is':'s are')+' missing a permanent receipt ID.</div>';
+    var missingText=c.missing.length+' receipt'+(c.missing.length===1?' is':'s are')+' missing a permanent receipt ID';
+    var orphanText=c.unmatched.length ? ' · '+c.unmatched.length+' settlement record'+(c.unmatched.length===1?' is':'s are')+' not linked to a receipt' : '';
+    return '<div class="reports-check warn"><strong>⚠ Verification needs attention</strong>'+missingText+orphanText+'.</div>';
   }
   function reportSettlementStats(filteredReceipts) {
     var ids={}; (filteredReceipts||[]).forEach(function(r){ if(r.receiptId) ids[r.receiptId]=true; });
@@ -3875,14 +3875,6 @@ function renderHistory(){
 
   // v9.70 — quick cash chips add to "Money received" (tap several to add them up)
   document.getElementById('quick-cash').addEventListener('click', function(e){
-    var tray = document.getElementById('quick-cash');
-    if (e.target.closest('#cash-stack')) {
-      var open = !tray.classList.contains('open');
-      tray.classList.toggle('open', open);
-      document.getElementById('cash-stack').setAttribute('aria-expanded', open ? 'true' : 'false');
-      tray.querySelectorAll('.cash-note, .cash-clear').forEach(function(b){ b.tabIndex = open ? 0 : -1; });
-      return;
-    }
     var btn = e.target.closest('[data-cash-add]');
     var input = document.getElementById('money-received');
     if (btn) {
