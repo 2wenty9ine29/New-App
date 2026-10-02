@@ -1082,6 +1082,70 @@
     .swipe-delete-bg{left:0;right:0;top:0;bottom:0;padding-right:14px;}
   }
 
+
+  /* v9.8 — Sell visual polish only: preserve layout/behavior, reduce visual weight */
+  .search-wrap { padding-top:4px; padding-bottom:6px; }
+  #sell-search { height:36px; box-sizing:border-box; padding-top:6px; padding-bottom:6px; border-width:1px; box-shadow:0 2px 10px rgba(28,27,24,.035); }
+  #sell-search:focus { box-shadow:0 0 0 3px var(--gold-soft), 0 2px 10px rgba(28,27,24,.04); }
+  .catalog-wrap { padding-left:18px; padding-right:18px; padding-bottom:5px; }
+  .sale-columns { gap:10px; }
+  .sale-column { border:1px solid var(--line); border-radius:14px; background:var(--surface); overflow:hidden; }
+  .sale-column-heading { padding:8px 10px 6px; border-bottom:1px solid var(--line); background:linear-gradient(to bottom,var(--surface),var(--paper)); }
+  .sale-column-heading strong { font-size:12.5px; letter-spacing:.01em; }
+  .sale-column-heading small { font-size:9.5px; }
+  .sale-column .rows { padding:0 6px; }
+  .sale-column .row { min-height:40px; padding:5px 3px; border-bottom:1px solid rgba(28,27,24,.065); }
+  .sale-column .row:last-child { border-bottom:0; }
+  .sale-column .avatar { width:28px; height:28px; font-size:10px; }
+  .sale-column .row-name { font-size:13px; line-height:1.15; }
+  .sale-column .row-name-size { font-size:9.5px; margin-top:1px; }
+  .sale-column .row-price { font-size:13px; }
+  .sale-column .add-indicator { opacity:.78; }
+  .cart-switcher { padding:4px 18px 4px; gap:6px; background:var(--paper); border-bottom:1px solid var(--line); }
+  .cart-switch { min-height:30px; padding:5px 10px; border-radius:9px; font-size:10.5px; background:var(--surface); }
+  .cart-switch.small { padding:5px 10px; font-size:10.5px; }
+  .cart-switch.active { box-shadow:0 2px 7px rgba(28,27,24,.08); }
+  .discount-btn { min-height:30px; padding:5px 10px; border-radius:9px; display:inline-flex; align-items:center; justify-content:center; gap:5px; background:var(--ink); border-color:var(--ink); font-size:10.5px; letter-spacing:.01em; }
+  .discount-btn svg { width:13px; height:13px; fill:none; stroke:currentColor; stroke-width:1.7; stroke-linecap:round; }
+  .discount-btn.active { box-shadow:0 2px 8px rgba(0,0,0,.12); }
+  .broom-clear { width:30px; height:30px; border-radius:9px; margin-left:0; border-color:var(--line); background:var(--surface); color:var(--ink-soft); box-shadow:none; }
+  .broom-clear svg { width:16px; height:16px; fill:none; stroke:currentColor; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; }
+  .broom-clear:active { transform:scale(.94); background:var(--gold-soft); color:var(--gold); }
+  .cart-heading { padding:6px 18px 2px; font-size:10.5px; }
+  #screen-sell .cart-panel .scroll-area { padding:0 12px; }
+  .cart-row { border-bottom:1px solid rgba(28,27,24,.065); border-radius:0; }
+  .cart-row-content { gap:8px; min-height:43px; padding:5px 3px; border-radius:8px; }
+  .cart-row .avatar.sm { width:29px; height:29px; flex-basis:29px; font-size:11px; }
+  .cart-row .row-name { font-size:13px; line-height:1.15; }
+  .cart-row .row-name-size { font-size:9.5px; margin-top:1px; }
+  .cart-row .sale-mode { margin-top:1px; font-size:8px; letter-spacing:.03em; gap:4px; }
+  .cart-row .row-price { font-size:13px; }
+  .cart-row .minus-btn { width:27px; height:27px; }
+  .cart-row .minus-btn svg { width:17px; height:17px; }
+  .qty-tap { min-width:19px; height:18px; padding:0 5px; margin-left:1px; border-radius:6px; font-size:9px; border-color:rgba(28,27,24,.12); }
+  .cart-bar { padding:5px 18px; }
+  .cart-total-label { font-size:9.5px; }
+  .cart-total-amount { font-size:17px; }
+  .clear-btn { padding:5px 11px; border-radius:9px; font-size:10.5px; }
+  .complete-btn { padding:6px 12px; border-radius:9px; font-size:10.5px; }
+  .cart-actions { gap:6px; }
+  .empty-state { padding:24px 18px 12px; }
+  .empty-icon { width:46px; height:46px; margin-bottom:10px; }
+  .empty-icon svg { width:21px; height:21px; }
+  .empty-state p.title { font-size:13px; }
+  .empty-state p.body { font-size:11px; }
+
+  /* v9.8 — appearance belongs with backup/data tools in Manage */
+  .manage-appearance-row { margin-top:12px; padding:10px 11px; border:1px solid var(--line); border-radius:13px; background:var(--surface); display:flex; align-items:center; justify-content:space-between; gap:12px; }
+  .manage-appearance-copy { display:flex; flex-direction:column; min-width:0; }
+  .manage-appearance-title { font-size:11px; font-weight:700; color:var(--ink); }
+  .manage-appearance-value { margin-top:2px; font-size:9.5px; color:var(--ink-soft); font-weight:500; }
+  .manage-theme-toggle { min-width:72px; height:30px; padding:0 9px; border:1px solid var(--line); border-radius:9px; background:var(--paper); color:var(--ink); display:flex; align-items:center; justify-content:center; gap:5px; font:600 10px/1 inherit; }
+  .manage-theme-toggle .theme-icon { width:14px; height:14px; display:block; }
+  .manage-theme-toggle:active { transform:scale(.97); }
+  body.dark .manage-theme-toggle { border-color:#444; background:#242424; }
+  body.dark .sale-column-heading { background:linear-gradient(to bottom,var(--surface),var(--paper)); }
+
 </style>
 </head>
 <body>
@@ -1129,6 +1193,10 @@
         <button class="manage-copy-btn manage-undo-btn" id="backup-undo-btn" type="button" hidden>Undo last restore</button>
         <input type="file" id="backup-restore-input" accept="application/json,.json" hidden>
         <p class="photo-hint" id="backup-last-date" style="margin-top:8px;"></p>
+        <div class="manage-appearance-row" aria-label="Appearance">
+          <div class="manage-appearance-copy"><span class="manage-appearance-title">Appearance</span><span class="manage-appearance-value" id="manage-theme-value">Light</span></div>
+          <button class="manage-theme-toggle" id="theme-toggle" type="button" aria-label="Switch light or dark mode"><span class="theme-icon" aria-hidden="true"></span><span class="theme-label">Dark</span></button>
+        </div>
         <p class="manage-version-label" id="app-version-label"></p>
       </div>
     </div>
@@ -1164,8 +1232,8 @@
       <div class="cart-switcher" aria-label="Choose cart">
         <button class="cart-switch active" id="cart-1-btn" data-cart-switch="0">Cart 1</button>
         <button class="cart-switch small" id="cart-2-btn" data-cart-switch="1">Cart 2</button>
-        <button class="discount-btn" id="discount-btn">DISCOUNT</button>
-        <button class="broom-clear" id="broom-clear" aria-label="Clear search">🧹</button>
+        <button class="discount-btn" id="discount-btn" aria-label="Apply discount"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="7.5" cy="7.5" r="2.25"/><circle cx="16.5" cy="16.5" r="2.25"/><path d="M18.5 5.5 5.5 18.5"/></svg><span>Discount</span></button>
+        <button class="broom-clear" id="broom-clear" aria-label="Clear cart"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 18.5 5.5 21l2.2-2.2-2.5-2.5z"/><path d="m7 16 9.5-9.5 2.5 2.5L9.5 18.5z"/><path d="m15.5 6.5 2-2 2 2-2 2z"/><path d="M8.2 19.2 20 7.4"/></svg></button>
       </div>
       <div class="scroll-area">
         <ul class="rows" id="cart-list"></ul>
@@ -1205,7 +1273,6 @@
         </div>
       </div>
     </header>
-    <button class="theme-toggle history-theme-toggle" id="theme-toggle" aria-label="Switch light or dark mode"><span class="theme-icon" aria-hidden="true"></span><span class="theme-label">Dark mode</span></button>
     <div class="scroll-area">
       <button class="cart-history-btn" id="cart-history-btn" aria-label="View and manage carts">
         <span class="big-cart-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="20" r="1"/><circle cx="19" cy="20" r="1"/><path d="M2 3h2l2.6 11.4a2 2 0 0 0 2 1.6h8.8a2 2 0 0 0 2-1.6L21 7H5"/></svg></span>
@@ -2547,7 +2614,7 @@ window.addEventListener("error", function(e) {
           '<div class="row-name-wrap"><div class="row-name">' + productNameHtml(entry.item.name) + '</div>' +
             '<span class="sale-mode ' + (entry.mode === "bulk" ? "bulk-mode" : "single-mode") + (entry.mode === "bulk" && entry.fraction !== 1 ? " fraction-mode" : "") + '">' +
               (entry.mode === "bulk" ? (entry.fraction === 0.5 ? "½ BULK" : entry.fraction === 0.25 ? "¼ BULK" : "Full BULK") : "SINGLE") +
-              ' × <span class="qty-tap" data-qty="' + escapeHtml(entry.key) + '" title="Tap to edit quantity">' + entry.qty + '</span></span></div>' +
+              ' <span class="qty-tap" data-qty="' + escapeHtml(entry.key) + '" title="Tap to edit quantity">' + entry.qty + '</span></span></div>' +
           '<div><span class="row-price">¢' + formatCedis(subtotal) + '</span></div>' +
           '<button class="icon-btn minus-btn" data-minus="' + escapeHtml(entry.key) + '" aria-label="Remove one ' + escapeHtml(entry.item.name) + '">' +
           '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/></svg>' +
@@ -3001,7 +3068,9 @@ window.addEventListener("error", function(e) {
     if(btn){
       var icon=btn.querySelector('.theme-icon'), label=btn.querySelector('.theme-label');
       if(icon) icon.innerHTML=darkMode ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>' : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3 6.7 6.7 0 0 0 21 12.8z"/></svg>';
-      if(label) label.textContent=darkMode?'Light mode':'Dark mode';
+      if(label) label.textContent=darkMode?'Light':'Dark';
+      var themeValue=document.getElementById('manage-theme-value');
+      if(themeValue) themeValue.textContent=darkMode?'Dark':'Light';
       btn.title=darkMode?'Switch to light mode':'Switch to dark mode';
       btn.setAttribute('aria-label',btn.title);
     }
