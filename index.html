@@ -14,7 +14,7 @@
 <link rel="preload" href="fonts/poppins-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/poppins-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="apple-touch-icon" href="icon-180.png">
-<title>Price List · V9.7.8</title>
+<title>Price List · V9.8</title>
 <style>
 @font-face{font-family:"Poppins";font-style:normal;font-weight:400;font-display:swap;src:url(fonts/poppins-latin-400-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:500;font-display:swap;src:url(fonts/poppins-latin-500-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:600;font-display:swap;src:url(fonts/poppins-latin-600-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:700;font-display:swap;src:url(fonts/poppins-latin-700-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:800;font-display:swap;src:url(fonts/poppins-latin-700-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:900;font-display:swap;src:url(fonts/poppins-latin-700-normal.woff2) format("woff2");}
   :root {
@@ -453,6 +453,14 @@
   .receipt-history-item .rh-total { font-size:13px; font-weight:600; color:var(--gold); }
   .receipt-history-item .rh-meta { color:var(--ink-soft); font-size:10px; margin-top:2px; }
   .receipt-history-item .rh-items { margin:7px 0 0; padding-left:16px; color:var(--ink-soft); font-size:10.5px; line-height:1.35; }
+  .receipt-history-item .rh-items li { margin:0 0 6px; }
+  .receipt-item-pricing { display:block; margin-top:1px; font-size:9.5px; color:var(--ink-soft); font-variant-numeric:tabular-nums; }
+  .receipt-item-pricing strong { color:var(--ink); font-weight:600; }
+  .cart-unit-price { display:block; margin-top:2px; font-size:9.5px; line-height:1.15; color:var(--ink-soft); font-weight:500; font-variant-numeric:tabular-nums; }
+  .receipt-load-more { width:100%; margin-top:10px; border:1px solid var(--line); background:var(--surface); color:var(--ink); border-radius:12px; padding:10px 12px; font-size:11px; font-weight:700; }
+  .receipt-load-more:active { transform:scale(.985); }
+  .receipt-load-more small { color:var(--ink-soft); font-weight:500; }
+
   .receipt-number { color:var(--gold); font-weight:700; font-size:14px; }
   .receipt-number { color:var(--gold); font-weight:700; font-size:14px; }
   .receipt-summary { margin:14px 0 20px; display:grid; gap:7px; }
@@ -1083,21 +1091,23 @@
   }
 
 
-  /* Appearance control moved into Manage, directly below backup status. */
-  .manage-appearance {
+  /* v9.8 — compact Manage actions: print prices + theme toggle. */
+  .manage-action-row {
     display:flex;
     align-items:center;
-    justify-content:space-between;
-    gap:12px;
+    gap:8px;
     margin-top:12px;
     padding:10px 0 0;
     border-top:1px solid var(--line);
   }
-  .manage-appearance-label {
-    color:var(--ink-soft);
-    font-size:11px;
-    font-weight:600;
+  .manage-print-btn {
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:7px;
+    min-height:34px;
   }
+  .manage-print-btn svg { width:16px; height:16px; flex:0 0 16px; }
   .manage-theme-toggle {
     position:static !important;
     min-width:112px;
@@ -1118,6 +1128,24 @@
   }
   .manage-theme-toggle .theme-icon { width:16px; height:16px; display:block; }
   .manage-theme-toggle:active { transform:scale(.97); }
+
+  /* v9.8 — clean printable price list. The app itself is untouched by print styles. */
+  @media print {
+    body.print-prices-mode > *:not(#print-prices-root) { display:none !important; }
+    body.print-prices-mode { background:#fff !important; color:#111 !important; }
+    #print-prices-root { display:block !important; font-family:Arial,Helvetica,sans-serif; color:#111; background:#fff; padding:28px; }
+    #print-prices-root h1 { margin:0; font-size:24px; font-weight:700; }
+    #print-prices-root .print-meta { margin:5px 0 20px; font-size:11px; color:#666; }
+    #print-prices-root table { width:100%; border-collapse:collapse; table-layout:fixed; }
+    #print-prices-root th, #print-prices-root td { border:1px solid #d9d9d9; padding:9px 10px; text-align:left; vertical-align:middle; }
+    #print-prices-root th { background:#f2f2f2; font-size:11px; font-weight:700; }
+    #print-prices-root td { font-size:11px; }
+    #print-prices-root th:first-child, #print-prices-root td:first-child { width:60%; }
+    #print-prices-root th:nth-child(2), #print-prices-root th:nth-child(3), #print-prices-root td:nth-child(2), #print-prices-root td:nth-child(3) { width:20%; text-align:right; font-variant-numeric:tabular-nums; }
+    #print-prices-root .print-footer { margin-top:12px; font-size:9px; color:#777; }
+    @page { size:auto; margin:12mm; }
+  }
+  #print-prices-root { display:none; }
 
 </style>
 </head>
@@ -1166,8 +1194,11 @@
         <button class="manage-copy-btn manage-undo-btn" id="backup-undo-btn" type="button" hidden>Undo last restore</button>
         <input type="file" id="backup-restore-input" accept="application/json,.json" hidden>
         <p class="photo-hint" id="backup-last-date" style="margin-top:8px;"></p>
-        <div class="manage-appearance" aria-label="Appearance settings">
-          <div class="manage-appearance-label">Appearance</div>
+        <div class="manage-action-row">
+          <button class="manage-copy-btn manage-print-btn" id="print-prices-btn" type="button" aria-label="Print current prices" title="Print current prices">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9V3h12v6"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v7H6z"/><path d="M18 12h.01"/></svg>
+            <span>Print Prices</span>
+          </button>
           <button class="theme-toggle manage-theme-toggle" id="theme-toggle" aria-label="Switch light or dark mode">
             <span class="theme-icon" aria-hidden="true"></span>
             <span class="theme-label">Dark mode</span>
@@ -1277,7 +1308,7 @@
   <div class="receipt-history-panel" id="receipt-history-panel" hidden>
     <div class="receipt-history-card">
       <div class="receipt-history-head">
-        <div><h2>Recent receipts</h2><div style="font-size:10px;color:var(--ink-soft);margin-top:2px">Last 500 completed sales</div></div>
+        <div><h2>Recent receipts</h2><div style="font-size:10px;color:var(--ink-soft);margin-top:2px">Up to 2,000 completed sales</div></div>
         <button class="receipt-history-close" id="receipt-history-close" aria-label="Close receipts">×</button>
       </div>
       <div class="receipt-tools">
@@ -1439,7 +1470,7 @@
         <h2>Paste receipts</h2>
         <button class="receipt-history-close" id="receipt-import-close" aria-label="Close paste receipts">×</button>
       </div>
-      <p>Paste a receipt backup copied from this app. Receipts are merged and placed in time order, newest first. Up to 500 are kept.</p>
+      <p>Paste a receipt backup copied from this app. Receipts are merged and placed in time order, newest first. Up to 2,000 are kept.</p>
       <textarea id="receipt-import-text" placeholder="Paste the copied receipt text here..."></textarea>
       <div class="receipt-import-actions">
         <button id="receipt-clipboard-paste">Paste from clipboard</button>
@@ -1556,6 +1587,8 @@
   <button class="delete-link" id="sheet-delete-btn" hidden>Delete item</button>
 </div>
 
+
+<div id="print-prices-root" aria-hidden="true"></div>
 <script>
 window.addEventListener("error", function(e) {
   try {
@@ -1660,7 +1693,7 @@ window.addEventListener("error", function(e) {
   ];
   defaultItems.forEach(function(i){ i.photo = null; });
 
-  var APP_VERSION = 'v9.7.7';
+  var APP_VERSION = 'v9.8';
   var PRICE_MIGRATION_VERSION_KEY = 'price-list-price-migration-version-v1';
   var items = loadItems();
 
@@ -1856,13 +1889,13 @@ window.addEventListener("error", function(e) {
     renderCart();
     updateCartSwitcher();
   }
-  var receiptSearchEl=document.getElementById('receipt-search'); if(receiptSearchEl) receiptSearchEl.addEventListener('input',function(){ receiptSearchQuery=this.value; renderReceiptHistory(); });
-  var receiptSearchClear=document.getElementById('receipt-search-clear'); if(receiptSearchClear) receiptSearchClear.addEventListener('click',function(){ receiptSearchQuery=''; if(receiptSearchEl) receiptSearchEl.value=''; renderReceiptHistory(); if(receiptSearchEl) receiptSearchEl.focus(); });
+  var receiptSearchEl=document.getElementById('receipt-search'); if(receiptSearchEl) receiptSearchEl.addEventListener('input',function(){ receiptSearchQuery=this.value; receiptDisplayLimit=100; renderReceiptHistory(); });
+  var receiptSearchClear=document.getElementById('receipt-search-clear'); if(receiptSearchClear) receiptSearchClear.addEventListener('click',function(){ receiptSearchQuery=''; receiptDisplayLimit=100; if(receiptSearchEl) receiptSearchEl.value=''; renderReceiptHistory(); if(receiptSearchEl) receiptSearchEl.focus(); });
   var receiptDateEl=document.getElementById('receipt-date-filter');
   var receiptCalendarBtn=document.getElementById('receipt-calendar-btn');
-  if(receiptDateEl){ var onReceiptDate=function(){ receiptDateFilter=this.value||''; renderReceiptHistory(); }; receiptDateEl.addEventListener('change',onReceiptDate); receiptDateEl.addEventListener('input',onReceiptDate); }
+  if(receiptDateEl){ var onReceiptDate=function(){ receiptDateFilter=this.value||''; receiptDisplayLimit=100; renderReceiptHistory(); }; receiptDateEl.addEventListener('change',onReceiptDate); receiptDateEl.addEventListener('input',onReceiptDate); }
   var receiptDateClear=document.getElementById('receipt-date-clear');
-  if(receiptDateClear) receiptDateClear.addEventListener('click',function(){ receiptDateFilter=''; if(receiptDateEl) receiptDateEl.value=''; renderReceiptHistory(); });
+  if(receiptDateClear) receiptDateClear.addEventListener('click',function(){ receiptDateFilter=''; receiptDisplayLimit=100; if(receiptDateEl) receiptDateEl.value=''; renderReceiptHistory(); });
   function updateCartSwitcher() {
     document.querySelectorAll('.cart-switch').forEach(function(btn){
       btn.classList.toggle('active', Number(btn.dataset.cartSwitch) === activeCartIndex);
@@ -2253,7 +2286,7 @@ window.addEventListener("error", function(e) {
         });
         var merged = cur.concat(add);
         merged.sort(function (a, b) { return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(); });
-        merged = merged.slice(0, 500);
+        merged = merged.slice(0, 2000);
         var maxNo = Math.max(Number(localStorage.getItem('price-list-receipt-counter-v1')) || 0, Number(data['price-list-receipt-counter-v1']) || 0);
         merged.forEach(function (r) { var m = String(r.number || '').match(/(\d+)$/); if (m) maxNo = Math.max(maxNo, Number(m[1])); });
         localStorage.setItem('price-list-receipts-v1', JSON.stringify(merged));
@@ -2590,7 +2623,8 @@ window.addEventListener("error", function(e) {
           '<div class="row-name-wrap"><div class="row-name">' + productNameHtml(entry.item.name) + '</div>' +
             '<span class="sale-mode ' + (entry.mode === "bulk" ? "bulk-mode" : "single-mode") + (entry.mode === "bulk" && entry.fraction !== 1 ? " fraction-mode" : "") + '">' +
               (entry.mode === "bulk" ? (entry.fraction === 0.5 ? "½ BULK" : entry.fraction === 0.25 ? "¼ BULK" : "Full BULK") : "SINGLE") +
-              ' × <span class="qty-tap" data-qty="' + escapeHtml(entry.key) + '" title="Tap to edit quantity">' + entry.qty + '</span></span></div>' +
+              ' × <span class="qty-tap" data-qty="' + escapeHtml(entry.key) + '" title="Tap to edit quantity">' + entry.qty + '</span></span>' +
+              '<span class="cart-unit-price">Unit ¢' + formatCedis(unit === null ? 0 : unit) + '</span></div>' +
           '<div><span class="row-price">¢' + formatCedis(subtotal) + '</span></div>' +
           '<button class="icon-btn minus-btn" data-minus="' + escapeHtml(entry.key) + '" aria-label="Remove one ' + escapeHtml(entry.item.name) + '">' +
           '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/></svg>' +
@@ -2753,7 +2787,7 @@ window.addEventListener("error", function(e) {
     } else {
       receipts.unshift(receipt);
     }
-    receipts=receipts.slice(0,500); saveJson('price-list-receipts-v1',receipts);
+    receipts=receipts.slice(0,2000); saveJson('price-list-receipts-v1',receipts);
     pendingRestoredReceipt = null; saveJson(PENDING_RESTORE_KEY, null);
     document.getElementById('receipt-number').textContent=receiptNo;
     document.getElementById('receipt-gross').textContent='¢'+formatCedis(grossTotal);
@@ -3038,6 +3072,28 @@ window.addEventListener("error", function(e) {
     switchTab('sell');
   }
 
+  function printCurrentPrices() {
+    var rows = items.slice().sort(function(a,b){ return String(a.name||'').localeCompare(String(b.name||''), undefined, {numeric:true, sensitivity:'base'}); });
+    var root=document.getElementById('print-prices-root');
+    if(!root) return;
+    var body=rows.map(function(item){
+      var bulk=priceForMode(item,'bulk');
+      var single=priceForMode(item,'single');
+      return '<tr><td>'+escapeHtml(item.name)+'</td><td>'+(bulk===null?'—':'¢'+formatCedis(bulk))+'</td><td>'+(single===null?'—':'¢'+formatCedis(single))+'</td></tr>';
+    }).join('');
+    root.innerHTML='<h1>Current Price List</h1><div class="print-meta">Printed '+escapeHtml(new Date().toLocaleString())+' · '+rows.length+' items</div><table><thead><tr><th>Item</th><th>Bulk</th><th>Singles</th></tr></thead><tbody>'+body+'</tbody></table><div class="print-footer">Price List Sales Calculator · Current prices at time of printing</div>';
+    document.body.classList.add('print-prices-mode');
+    root.setAttribute('aria-hidden','false');
+    var cleanup=function(){
+      document.body.classList.remove('print-prices-mode');
+      root.setAttribute('aria-hidden','true');
+      root.innerHTML='';
+      window.removeEventListener('afterprint',cleanup);
+    };
+    window.addEventListener('afterprint',cleanup);
+    setTimeout(function(){ window.print(); },80);
+  }
+
   function applyTheme() {
     document.body.classList.toggle('dark', darkMode);
     var btn=document.getElementById('theme-toggle');
@@ -3119,7 +3175,7 @@ window.addEventListener("error", function(e) {
       var key=String(r.number)+'|'+String(r.createdAt); if(seen[key]) return false; seen[key]=true; return true;
     });
     merged.sort(function(a,b){ return new Date(b.createdAt).getTime()-new Date(a.createdAt).getTime(); });
-    receipts=merged.slice(0,500);
+    receipts=merged.slice(0,2000);
     var maxNo=receiptCounter;
     receipts.forEach(function(r){ var m=String(r.number||'').match(/(\d+)$/); if(m) maxNo=Math.max(maxNo,Number(m[1])); });
     receiptCounter=maxNo; localStorage.setItem('price-list-receipt-counter-v1',String(receiptCounter));
@@ -3450,6 +3506,7 @@ function renderHistory(){
     }
     return false;
   }
+  var receiptDisplayLimit = 100;
   function renderReceiptHistory(){
     updateReceiptCount();
     renderReceiptSummary();
@@ -3469,15 +3526,23 @@ function renderHistory(){
     }).sort(function(a,b){ return new Date(b.createdAt).getTime()-new Date(a.createdAt).getTime(); });
     var clearDate=document.getElementById('receipt-date-clear'); if(clearDate) clearDate.hidden=!dateFilter;
     if(!filtered.length){ list.innerHTML='<div class="history-empty">No receipts match your search.</div>'; return; }
-    list.innerHTML=filtered.map(function(r){
+    var visible=filtered.slice(0, receiptDisplayLimit);
+    var html=visible.map(function(r){
       var idx=receipts.indexOf(r);
       var d=new Date(r.createdAt); var when=isNaN(d.getTime())?'':d.toLocaleString([], {month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'});
       var itemsHtml=(r.items||[]).map(function(i){
         var mode=i.mode==='bulk'?(i.fraction===0.5?'½ BULK':i.fraction===0.25?'¼ BULK':'Full BULK'):'SINGLE';
-        return '<li>'+escapeHtml(i.name)+' — '+mode+' × '+(Number(i.qty)||0)+' — ¢'+formatCedis(i.subtotal)+'</li>';
+        var qty=Number(i.qty)||0;
+        var subtotal=Number(i.subtotal)||0;
+        var unit=qty>0 ? subtotal/qty : 0;
+        return '<li>'+escapeHtml(i.name)+' — '+mode+' × '+qty+'<span class="receipt-item-pricing">Unit ¢'+formatCedis(unit)+' · Total <strong>¢'+formatCedis(subtotal)+'</strong></span></li>';
       }).join('');
       return '<div class="receipt-history-item expanded" data-receipt-index="'+idx+'"><div class="rh-top"><span class="rh-no">'+escapeHtml(r.number)+'</span><span class="rh-total">¢'+formatCedis(r.total)+'</span></div>'+receiptStatusChipsHtml(r)+'<div class="rh-meta">'+when+'</div><ul class="rh-items">'+itemsHtml+'</ul><button class="receipt-history-share" data-share-receipt="'+idx+'">Share as image</button><button class="receipt-copy-btn" data-copy-receipt="'+idx+'">Copy</button></div>';
     }).join('');
+    if(filtered.length>visible.length){
+      html += '<button class="receipt-load-more" type="button" id="receipt-load-more">Load more <small>('+visible.length+' of '+filtered.length+')</small></button>';
+    }
+    list.innerHTML=html;
   }
   function updateChangeCalculator(){
     var liveTotal=receiptTotalFromSnapshot(cart);
@@ -3858,6 +3923,15 @@ function renderHistory(){
     this.classList.remove('visible'); renderManageList(); input.focus();
   });
   document.getElementById('manage-copy-btn').addEventListener('click', copyPriceList);
+  document.getElementById('print-prices-btn').addEventListener('click', printCurrentPrices);
+  document.getElementById('receipt-history-list').addEventListener('click', function(e){
+    var more=e.target.closest('#receipt-load-more');
+    if(!more) return;
+    e.preventDefault();
+    e.stopPropagation();
+    receiptDisplayLimit += 100;
+    renderReceiptHistory();
+  });
   document.getElementById('manage-paste-btn').addEventListener('click', openPriceImport);
   document.getElementById('backup-export-btn').addEventListener('click', exportAllData);
   document.getElementById('backup-restore-btn').addEventListener('click', function(){
