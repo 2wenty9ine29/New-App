@@ -14,7 +14,7 @@
 <link rel="preload" href="fonts/poppins-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/poppins-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="apple-touch-icon" href="icon-180.png">
-<title>Price List · V9.8.4.29</title>
+<title>Price List · V9.8.5</title>
 <style>
 @font-face{font-family:"Poppins";font-style:normal;font-weight:400;font-display:swap;src:url(fonts/poppins-latin-400-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:500;font-display:swap;src:url(fonts/poppins-latin-500-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:600;font-display:swap;src:url(fonts/poppins-latin-600-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:700;font-display:swap;src:url(fonts/poppins-latin-700-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:800;font-display:swap;src:url(fonts/poppins-latin-700-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:900;font-display:swap;src:url(fonts/poppins-latin-700-normal.woff2) format("woff2");}
   :root {
@@ -31,29 +31,29 @@
     --line: #E6E2D8;
   }
   body.dark {
-    --paper: #080808; --surface: #2D2D2D; --ink: #F4F4F4; --ink-soft: #A9A9A9;
-    --gold: #F5A000; --gold-bright: #F5A000; --gold-soft: #3A2B12; --green: #16B892;
-    --brick: #E84B43; --line: #414141;
-    --blue: #536875; --violet: #6F63A8; --cyan: #1597C7; --pink: #D95B92;
-    --orange: #F08A00; --lime: #86A84D; --sky: #5D8FA7; --fuchsia: #B45BC7;
-    --soft-white: #F4F4F4;
+    --paper: #0B0C0C; --surface: #191A18; --ink: #F2F0E8; --ink-soft: #B5B2AA;
+    --gold: #D9A441; --gold-bright: #D9A441; --gold-soft: #302817; --green: #5DBB9A;
+    --brick: #D9786C; --line: #30312E;
+    --blue: #617A84; --violet: #8178AF; --cyan: #4FA6C4; --pink: #C9789D;
+    --orange: #D69A4A; --lime: #91A965; --sky: #7098A8; --fuchsia: #A979B5;
+    --soft-white: #F2F0E8;
   }
-  body.dark .sale-column { background: #111111; }
-  body.dark .sale-column-heading { background: #2D2D2D; }
-  body.dark .minus-btn, body.dark .add-indicator { background: #3A4650; }
-  body.dark .row[data-edit]:active, body.dark .row[data-add]:active { background: #3A3A3A; }
-  body.dark .empty-icon { background: #394B56; }
-  body.dark #sell-search { box-shadow: 0 4px 14px rgba(0,0,0,.30); }
-  body.dark .clear-btn { background: #333333; border-color: #4A4A4A; color: var(--soft-white); }
-  body.dark .complete-btn { background: #4F6572; }
-  body.dark .theme-toggle { color: #F5A000; }
-  body.dark .tab-btn.active { color: #F5A000; background: rgba(245,160,0,.14); }
+  body.dark .sale-column { background: #101110; }
+  body.dark .sale-column-heading { background: #1F201E; }
+  body.dark .minus-btn, body.dark .add-indicator { background: #2B3633; }
+  body.dark .row[data-edit]:active, body.dark .row[data-add]:active { background: #232522; }
+  body.dark .empty-icon { background: #293A38; }
+  body.dark #sell-search { box-shadow: 0 4px 14px rgba(0,0,0,.28); }
+  body.dark .clear-btn { background: #222421; border-color: #3A3B37; color: var(--soft-white); }
+  body.dark .complete-btn { background: #315046; }
+  body.dark .theme-toggle { color: var(--gold); }
+  body.dark .tab-btn.active { color: var(--gold); background: rgba(217,164,65,.13); }
 
-  body.dark .bulk-dot { background: #16B892; box-shadow: 0 0 0 4px rgba(22,184,146,.13); }
-  body.dark .single-dot { background: #F5A000; box-shadow: 0 0 0 4px rgba(245,160,0,.14); }
-  body.dark .sale-column .catalog-status { color: #F5A000; }
-  body.dark .sale-column .add-indicator { color: #F5A000; }
-  body.dark .remove-btn, body.dark .delete-link { color: #E84B43; }
+  body.dark .bulk-dot { background: var(--green); box-shadow: 0 0 0 4px rgba(93,187,154,.12); }
+  body.dark .single-dot { background: var(--gold); box-shadow: 0 0 0 4px rgba(217,164,65,.12); }
+  body.dark .sale-column .catalog-status { color: var(--gold); }
+  body.dark .sale-column .add-indicator { color: var(--gold); }
+  body.dark .remove-btn, body.dark .delete-link { color: var(--brick); }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   html, body {
     margin: 0; padding: 0; height: 100%;
@@ -1161,13 +1161,15 @@
   /* v9.8.2 — keep printed price cells visible */
   @media print { #print-prices-root td, #print-prices-root th { opacity:1 !important; visibility:visible !important; color:#111 !important; display:table-cell !important; } }
 
-  /* v9.8.4 — Receipt display: item name reduced by 1.3px; show only Unit Price. */
+  /* v9.8.5 — Receipt display: item name reduced by 1.3px; show Total beside Unit Price only for qty > 1. */
   .history-card .history-items,
   .receipt-history-item .rh-items { font-size:12.7px; line-height:1.3; }
   .history-card .receipt-item-pricing,
-  .receipt-history-item .receipt-item-pricing { font-size:11px; line-height:1.25; font-weight:500; }
+  .receipt-history-item .receipt-item-pricing { display:flex; flex-wrap:wrap; align-items:center; column-gap:10px; font-size:11px; line-height:1.25; font-weight:500; font-variant-numeric:tabular-nums; }
   .history-card .receipt-item-pricing strong,
   .receipt-history-item .receipt-item-pricing strong { font-weight:700; }
+  .receipt-item-pricing .price-divider { color:var(--ink-soft); opacity:.65; }
+  .receipt-item-pricing .price-total { white-space:nowrap; }
   /* v9.8.3 — print: the app locks html/body (fixed + overflow hidden), which clips the printout to one page. Unlock it only while printing prices. */
   @media print {
     html, body.print-prices-mode { position:static !important; height:auto !important; overflow:visible !important; width:auto !important; }
@@ -1721,7 +1723,7 @@ window.addEventListener("error", function(e) {
   ];
   defaultItems.forEach(function(i){ i.photo = null; });
 
-  var APP_VERSION = 'v9.8.4.29';
+  var APP_VERSION = 'v9.8.5';
   var PRICE_MIGRATION_VERSION_KEY = 'price-list-price-migration-version-v1';
   var items = loadItems();
 
@@ -3347,7 +3349,7 @@ function renderHistory(){
         var qty=Number(i.qty)||0;
         var subtotal=Number(i.subtotal)||0;
         var unit=qty>0 ? subtotal/qty : 0;
-        return '<li>'+escapeHtml(i.name)+' — '+mode+' × '+qty+'<span class="receipt-item-pricing">Unit Price - ¢'+formatCedis(unit)+'</span></li>';
+        return '<li>'+escapeHtml(i.name)+' — '+mode+' × '+qty+'<span class="receipt-item-pricing">Unit Price - ¢'+formatCedis(unit)+(qty>1 ? '<span class="price-divider">||</span><span class="price-total">Total - ¢'+formatCedis(subtotal)+'</span>' : '')+'</span></li>';
       }).join('');
       return '<div class="history-card" data-history-index="'+idx+'" data-receipt-index="'+idx+'"><div class="history-top"><span class="history-receipt">'+escapeHtml(r.number)+'</span><span class="history-total">¢'+formatCedis(r.total)+'</span></div>'+receiptStatusChipsHtml(r)+'<div class="history-meta">'+when+'</div><ul class="history-items">'+itemsHtml+'</ul><button class="receipt-history-share" data-share-receipt="'+idx+'">Share receipt</button><button class="receipt-copy-btn" data-copy-receipt="'+idx+'">Copy</button></div>';
     }).join('');
@@ -3580,7 +3582,7 @@ function renderHistory(){
         var qty=Number(i.qty)||0;
         var subtotal=Number(i.subtotal)||0;
         var unit=qty>0 ? subtotal/qty : 0;
-        return '<li>'+escapeHtml(i.name)+' — '+mode+' × '+qty+'<span class="receipt-item-pricing">Unit Price - ¢'+formatCedis(unit)+'</span></li>';
+        return '<li>'+escapeHtml(i.name)+' — '+mode+' × '+qty+'<span class="receipt-item-pricing">Unit Price - ¢'+formatCedis(unit)+(qty>1 ? '<span class="price-divider">||</span><span class="price-total">Total - ¢'+formatCedis(subtotal)+'</span>' : '')+'</span></li>';
       }).join('');
       return '<div class="receipt-history-item expanded" data-receipt-index="'+idx+'"><div class="rh-top"><span class="rh-no">'+escapeHtml(r.number)+'</span><span class="rh-total">¢'+formatCedis(r.total)+'</span></div>'+receiptStatusChipsHtml(r)+'<div class="rh-meta">'+when+'</div><ul class="rh-items">'+itemsHtml+'</ul><button class="receipt-history-share" data-share-receipt="'+idx+'">Share as image</button><button class="receipt-copy-btn" data-copy-receipt="'+idx+'">Copy</button></div>';
     }).join('');
