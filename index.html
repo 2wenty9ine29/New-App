@@ -14,7 +14,7 @@
 <link rel="preload" href="fonts/poppins-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/poppins-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="apple-touch-icon" href="icon-180.png">
-<title>Price List · V9.8.5</title>
+<title>Price List · V9.8.5.29</title>
 <style>
 @font-face{font-family:"Poppins";font-style:normal;font-weight:400;font-display:swap;src:url(fonts/poppins-latin-400-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:500;font-display:swap;src:url(fonts/poppins-latin-500-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:600;font-display:swap;src:url(fonts/poppins-latin-600-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:700;font-display:swap;src:url(fonts/poppins-latin-700-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:800;font-display:swap;src:url(fonts/poppins-latin-700-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:900;font-display:swap;src:url(fonts/poppins-latin-700-normal.woff2) format("woff2");}
   :root {
@@ -1170,6 +1170,129 @@
   .receipt-history-item .receipt-item-pricing strong { font-weight:700; }
   .receipt-item-pricing .price-divider { color:var(--ink-soft); opacity:.65; }
   .receipt-item-pricing .price-total { white-space:nowrap; }
+
+  /* v9.8.5 polish — restrained spacing + softer borders across cards/panels.
+     Visual-only: no calculation, storage, navigation, or pricing logic changes. */
+  :root { --line: #EAE7DE; }
+  body.dark { --line: #292A28; }
+
+  .history-card { padding: 10px 12px; margin-bottom: 8px; }
+  .history-items { margin-top: 8px; line-height: 1.42; }
+  .history-items li { margin-bottom: 6px; }
+
+  .restore-list { gap: 7px; }
+  .restore-row { padding: 8px 10px; }
+
+  .receipt-history-item { padding: 10px 11px; }
+  .receipt-history-list { gap: 8px; }
+  .receipt-history-item .rh-items { margin-top: 7px; line-height: 1.35; }
+  .receipt-history-item .rh-items li { margin-bottom: 5px; }
+
+  .reports-stats { gap: 9px; }
+  .reports-stat { padding: 11px 12px; }
+  .reports-settlement-grid { gap: 8px; }
+  .reports-settlement-card { padding: 10px 10px; }
+  .reports-top-list { gap: 7px; }
+  .reports-top-row { padding: 9px 10px; }
+  .reports-custom { padding: 11px; }
+  .receipt-summary-grid { gap: 8px; }
+  .receipt-summary-card { padding: 10px 10px; }
+
+  .history-change { padding: 13px; }
+  .change-line input { padding: 9px 9px; }
+
+  .manage-copy-row { gap: 9px; }
+  .manage-copy-btn { padding: 9px 10px; }
+
+  /* Keep dense controls from becoming visually heavy while preserving their size. */
+  .manage-search-wrap .search-wrap, #receipt-search, .receipt-calendar-btn { border-color: var(--line); }
+  .utility-btn, .history-receipt-btn, .history-theme-toggle, .manage-theme-toggle,
+  .receipt-calendar-btn, .reports-action-btn, .reports-tab { border-color: var(--line); }
+
+  /* v9.8.5.29 — small visual polish only. No pricing, storage, navigation, or receipt-calculation changes. */
+  .manage-search-wrap .search-wrap:focus-within,
+  #screen-sell > .search-wrap:focus-within {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px var(--gold-soft);
+  }
+  .manage-search-wrap .search-wrap {
+    background: var(--surface);
+    transition: border-color .15s ease, box-shadow .15s ease;
+  }
+  #sell-search {
+    transition: border-color .15s ease, box-shadow .15s ease;
+  }
+
+  .manage-action-group + .manage-action-group { margin-top: 14px; }
+  .manage-action-label {
+    margin: 0 2px 6px;
+    color: var(--ink-soft);
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+  }
+  .manage-action-group .manage-undo-btn { margin-top: 7px; }
+
+  .cart-switch {
+    transition: background-color .15s ease, border-color .15s ease, color .15s ease, box-shadow .15s ease, transform .12s ease;
+  }
+  .cart-switch.active {
+    background: var(--gold-soft);
+    color: var(--ink);
+    border-color: var(--gold);
+    box-shadow: inset 0 0 0 1px rgba(184,132,26,.12);
+    font-weight: 700;
+  }
+  body.dark .cart-switch.active {
+    background: var(--gold-soft);
+    color: var(--ink);
+    border-color: var(--gold);
+  }
+
+  .sale-column .row {
+    padding: 8px 6px;
+    margin: 2px 0;
+    border-bottom: 0;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    background: var(--surface);
+    transition: background-color .15s ease, border-color .15s ease, transform .12s ease;
+  }
+  .sale-column .row:hover {
+    background: var(--gold-soft);
+    border-color: var(--line);
+    transform: translateY(-1px);
+  }
+  .sale-column .row:active { transform: scale(.985); }
+  .sale-column .row-name { line-height: 1.18; }
+  .sale-column .row-price { font-weight: 700; }
+
+  .receipt-history-item .rh-meta {
+    margin-top: 4px;
+    font-size: 9.5px;
+    opacity: .9;
+  }
+  .receipt-history-item .rh-total { font-weight: 700; }
+  .receipt-discount-row {
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 1px;
+    color: var(--ink-soft);
+    font-size: 10px;
+  }
+  .receipt-discount-row strong {
+    font-size: 11px;
+    color: var(--ink-soft);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+  .receipt-new-total {
+    margin-top: 2px;
+  }
+  /* Discount is intentionally shown only on the completed-sale receipt. */
+  .discount-line { display:none !important; }
+
   /* v9.8.3 — print: the app locks html/body (fixed + overflow hidden), which clips the printout to one page. Unlock it only while printing prices. */
   @media print {
     html, body.print-prices-mode { position:static !important; height:auto !important; overflow:visible !important; width:auto !important; }
@@ -1212,16 +1335,21 @@
         <p class="body">Add your first item to start building your price list.</p>
       </div>
       <div class="manage-copy-wrap">
-        <div class="manage-copy-row">
-          <button class="manage-copy-btn" id="manage-copy-btn">Copy price list</button>
-          <button class="manage-copy-btn" id="manage-paste-btn">Paste price list</button>
+        <div class="manage-action-group">
+          <p class="manage-action-label">Price list</p>
+          <div class="manage-copy-row">
+            <button class="manage-copy-btn" id="manage-copy-btn">Copy price list</button>
+            <button class="manage-copy-btn" id="manage-paste-btn">Paste price list</button>
+          </div>
         </div>
-        <p class="receipt-tools-title" style="margin-top:14px;">Full app backup</p>
-        <div class="manage-copy-row">
-          <button class="manage-copy-btn" id="backup-export-btn">Backup all data</button>
-          <button class="manage-copy-btn" id="backup-restore-btn">Restore all data</button>
+        <div class="manage-action-group">
+          <p class="manage-action-label">Full app backup</p>
+          <div class="manage-copy-row">
+            <button class="manage-copy-btn" id="backup-export-btn">Backup all data</button>
+            <button class="manage-copy-btn" id="backup-restore-btn">Restore all data</button>
+          </div>
+          <button class="manage-copy-btn manage-undo-btn" id="backup-undo-btn" type="button" hidden>Undo last restore</button>
         </div>
-        <button class="manage-copy-btn manage-undo-btn" id="backup-undo-btn" type="button" hidden>Undo last restore</button>
         <input type="file" id="backup-restore-input" accept="application/json,.json" hidden>
         <p class="photo-hint" id="backup-last-date" style="margin-top:8px;"></p>
         <div class="manage-action-row">
@@ -1320,7 +1448,7 @@
         <h2>Change calculator</h2>
         <div class="change-line"><span>Current total</span><strong id="change-total">¢0.00</strong></div>
         <div class="change-line"><span>Money received</span><input id="money-received" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00"></div>
-        <div class="change-line"><span>Change to give</span><strong class="change-result" id="change-due">¢0.00</strong></div>
+        <div class="change-line"><span>Change</span><strong class="change-result" id="change-due">¢0.00</strong></div>
         <div class="cash-tray" id="quick-cash" aria-label="Quick add money received">
           <div class="cash-bar"><span class="cash-label">Cash received</span><button type="button" class="cash-clear" id="quick-cash-clear" aria-label="Clear money received">Clear</button></div>
           <div class="cash-notes">
@@ -1483,8 +1611,8 @@
       <div class="receipt-number" id="receipt-number">Receipt #0001</div>
       <div class="receipt-summary" id="receipt-summary">
         <div class="receipt-summary-line"><span>TOTAL</span><strong id="receipt-gross">¢0.00</strong></div>
-        <div class="receipt-summary-line receipt-discount-row" id="receipt-discount-row" hidden><span>DISCOUNT</span><strong id="receipt-discount">-¢0.00</strong></div>
         <div class="receipt-summary-line receipt-new-total" id="receipt-new-total-row" hidden><span>NEW TOTAL</span><strong id="receipt-total">¢0.00</strong></div>
+        <div class="receipt-summary-line receipt-discount-row" id="receipt-discount-row" hidden><span>DISCOUNT</span><strong id="receipt-discount">-¢0.00</strong></div>
       </div>
       <div class="receipt-actions">
         <button class="primary" id="receipt-close-btn">Done</button>
@@ -1724,6 +1852,7 @@ window.addEventListener("error", function(e) {
   defaultItems.forEach(function(i){ i.photo = null; });
 
   var APP_VERSION = 'v9.8.5';
+  var BUILD_VERSION = 'v9.8.5.29';
   var PRICE_MIGRATION_VERSION_KEY = 'price-list-price-migration-version-v1';
   var items = loadItems();
 
@@ -2213,7 +2342,7 @@ window.addEventListener("error", function(e) {
   }
   function renderAppVersion() {
     var el = document.getElementById('app-version-label'); if (!el) return;
-    el.textContent = 'Price List · ' + APP_VERSION;
+    el.textContent = 'Price List · ' + BUILD_VERSION;
   }
   function exportAllData() {
     var data = {};
