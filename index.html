@@ -14,7 +14,7 @@
 <link rel="preload" href="fonts/poppins-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/poppins-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="apple-touch-icon" href="icon-180.png">
-<title>Price List · V9.8.5.29</title>
+<title>Price List · V9.8.6</title>
 <style>
 @font-face{font-family:"Poppins";font-style:normal;font-weight:400;font-display:swap;src:url(fonts/poppins-latin-400-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:500;font-display:swap;src:url(fonts/poppins-latin-500-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:600;font-display:swap;src:url(fonts/poppins-latin-600-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:700;font-display:swap;src:url(fonts/poppins-latin-700-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:800;font-display:swap;src:url(fonts/poppins-latin-700-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:900;font-display:swap;src:url(fonts/poppins-latin-700-normal.woff2) format("woff2");}
   :root {
@@ -1300,6 +1300,28 @@
     #print-prices-root tr { page-break-inside:avoid; break-inside:avoid; }
     #print-prices-root thead { display:table-header-group; }
   }
+
+  /* v9.8.6 — Add Name: a violet pill next to every Debt / Momo / Change chip.
+     Works in light + dark; no pricing, storage-key or receipt-calculation changes. */
+  :root { --name-ink:#5B3FD0; --name-bg:rgba(91,63,208,.10); --name-line:rgba(91,63,208,.38); }
+  body.dark { --name-ink:#BDAEFF; --name-bg:rgba(189,174,255,.14); --name-line:rgba(189,174,255,.40); }
+  .chip-group { display:inline-flex; align-items:center; gap:4px; max-width:100%; min-width:0; }
+  .name-btn { display:inline-flex; align-items:center; gap:4px; min-width:0; max-width:150px; box-sizing:border-box; border:1px dashed var(--name-line); border-radius:999px; padding:3px 10px; font:inherit; font-size:10px; font-weight:700; letter-spacing:.02em; line-height:1.5; color:var(--name-ink); background:var(--name-bg); -webkit-touch-callout:none; -webkit-user-select:none; user-select:none; }
+  .name-btn.has-name { border-style:solid; }
+  .name-btn .nb-text { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .name-btn:active { transform:scale(.96); }
+  .settlement-actions { display:flex; align-items:center; flex-wrap:wrap; gap:8px; margin-top:7px; }
+  .settlement-actions .settlement-action { margin-top:0; }
+  .settlement-actions .name-btn { padding:6px 12px; max-width:190px; }
+  .status-detail-label { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .status-popup-name { margin-top:6px; text-align:center; font-size:13px; font-weight:700; color:var(--name-ink); overflow-wrap:anywhere; }
+  .name-overlay { z-index:165; }
+  .name-amount { margin:14px 0 2px; padding:12px; border-radius:18px; background:var(--paper); border:1px solid var(--line); text-align:center; font-size:13px; font-weight:700; color:var(--ink-soft); font-variant-numeric:tabular-nums; }
+  .name-input { width:100%; box-sizing:border-box; padding:13px 14px; border:1.5px solid var(--line); border-radius:14px; background:var(--paper); color:var(--ink); font:inherit; font-size:16px; font-weight:600; outline:none; }
+  .name-input:focus { border-color:var(--name-ink); }
+  .name-input::placeholder { color:var(--ink-soft); opacity:.8; font-weight:500; }
+  .name-remove { display:block; margin:10px auto 0; border:0; background:none; color:var(--brick); font:inherit; font-size:12px; font-weight:700; padding:6px 10px; }
+  .name-remove[hidden] { display:none; }
 </style>
 </head>
 <body>
@@ -1582,6 +1604,7 @@
     <div class="status-popup">
       <div class="status-popup-head"><h3 id="status-popup-title">Change</h3><button class="status-popup-close" id="status-popup-close" aria-label="Close">×</button></div>
       <div class="status-popup-amount" id="status-popup-amount">¢0.00</div>
+      <div class="status-popup-name" id="status-popup-name" hidden></div>
       <button class="status-popup-settle" id="status-popup-settle">Settled</button>
     </div>
   </div>
@@ -1657,7 +1680,20 @@
       <label class="entry-label" id="entry-label" for="entry-input">Amount (¢)</label>
       <input class="entry-input" id="entry-input" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00" autocomplete="off">
       <div class="entry-error" id="entry-error" hidden>Enter a valid amount</div>
+      <label class="entry-label" for="entry-name">Name or description (optional)</label>
+      <input class="name-input" id="entry-name" type="text" maxlength="60" placeholder="e.g. Ama, kenkey order" autocomplete="off" enterkeyhint="done">
       <div class="entry-actions"><button type="button" class="entry-cancel" id="entry-cancel">Cancel</button><button type="button" class="entry-save" id="entry-save">Save</button></div>
+    </div>
+  </div>
+
+  <div class="entry-overlay name-overlay" id="name-overlay" hidden>
+    <div class="entry-card" role="dialog" aria-modal="true" aria-labelledby="name-type">
+      <div class="entry-head"><span class="entry-type" id="name-type">Debt</span><button type="button" class="entry-close" id="name-close" aria-label="Close">×</button></div>
+      <div class="name-amount" id="name-amount">¢0.00</div>
+      <label class="entry-label" for="name-input">Name or description</label>
+      <input class="name-input" id="name-input" type="text" maxlength="60" placeholder="e.g. Ama, kenkey order" autocomplete="off" enterkeyhint="done">
+      <button type="button" class="name-remove" id="name-remove" hidden>Remove name</button>
+      <div class="entry-actions"><button type="button" class="entry-cancel" id="name-cancel">Cancel</button><button type="button" class="entry-save" id="name-save">Save</button></div>
     </div>
   </div>
 
@@ -1852,7 +1888,7 @@ window.addEventListener("error", function(e) {
   defaultItems.forEach(function(i){ i.photo = null; });
 
   var APP_VERSION = 'v9.8.5';
-  var BUILD_VERSION = 'v9.8.5.29';
+  var BUILD_VERSION = 'v9.8.6';
   var PRICE_MIGRATION_VERSION_KEY = 'price-list-price-migration-version-v1';
   var items = loadItems();
 
@@ -3018,6 +3054,43 @@ window.addEventListener("error", function(e) {
     }
     return { debt: findLatest(unsettledDebts), change: findLatest(changeOwed), momo: findLatest(momoPayments) };
   }
+  // v9.8.6 — optional name/description on every Debt / Momo / Change record.
+  function recordName(rec) { return rec && rec.name ? String(rec.name) : ''; }
+  function nameBtnHtml(type, rec) {
+    var nm = recordName(rec);
+    return '<button type="button" class="name-btn'+(nm?' has-name':'')+'" data-name-type="'+type+'" data-name-id="'+escapeHtml(String(rec.id))+'" aria-label="'+(nm?'Edit name: '+escapeHtml(nm):'Add name')+'"><span aria-hidden="true">'+(nm?'✎':'+')+'</span><span class="nb-text">'+(nm?escapeHtml(nm):'Add Name')+'</span></button>';
+  }
+  function nameSuffix(rec) { var nm = recordName(rec); return nm ? ' · '+escapeHtml(nm) : ''; }
+  var nameState = null;
+  function openNameEditor(type, id) {
+    var rec = settlementArray(type).find(function(x){ return String(x.id)===String(id); });
+    if (!rec) return;
+    nameState = { type: type, id: id };
+    var pill = document.getElementById('name-type');
+    pill.textContent = type==='debt' ? 'Debt' : type==='momo' ? 'Momo' : 'Change';
+    pill.className = 'entry-type '+type;
+    document.getElementById('name-amount').textContent = (rec.receiptNumber||'Receipt')+' · ¢'+formatCedis(rec.amount);
+    var input = document.getElementById('name-input');
+    input.value = recordName(rec);
+    document.getElementById('name-remove').hidden = !recordName(rec);
+    document.getElementById('name-overlay').hidden = false;
+    input.focus();
+  }
+  function closeNameEditor() {
+    nameState = null;
+    document.getElementById('name-overlay').hidden = true;
+    document.getElementById('name-input').blur();
+  }
+  function saveNameEditor(removeIt) {
+    if (!nameState) return;
+    var rec = settlementArray(nameState.type).find(function(x){ return String(x.id)===String(nameState.id); });
+    var v = removeIt ? '' : document.getElementById('name-input').value.replace(/\s+/g,' ').trim().slice(0,60);
+    if (rec) { if (v) rec.name = v; else delete rec.name; saveSettlements(); }
+    closeNameEditor();
+    renderSettlementList();
+    renderHistory();
+    showToast(v ? 'Name saved' : 'Name removed');
+  }
   function chipAmount(amount) {
     var n = Number(amount) || 0;
     return '¢' + formatCedis(n).replace(/\.00$/, '');
@@ -3028,16 +3101,16 @@ window.addEventListener("error", function(e) {
     var chips = '<div class="receipt-status-row">';
     var details = '<div class="receipt-status-details">';
     if (s.change) {
-      chips += '<button type="button" class="status-chip change" data-status-chip="change" data-status-id="'+escapeHtml(String(s.change.id))+'">Change:<span class="chip-amt">'+chipAmount(s.change.amount)+'</span></button>';
-      details += '<div class="status-detail-row change"><span class="status-detail-label">Change owed</span><span class="status-detail-amount">¢'+formatCedis(s.change.amount)+'</span><button type="button" class="status-detail-settle" data-settle-chip="change" data-status-id="'+escapeHtml(String(s.change.id))+'">Settle</button></div>';
+      chips += '<span class="chip-group"><button type="button" class="status-chip change" data-status-chip="change" data-status-id="'+escapeHtml(String(s.change.id))+'">Change:<span class="chip-amt">'+chipAmount(s.change.amount)+'</span></button>'+nameBtnHtml('change', s.change)+'</span>';
+      details += '<div class="status-detail-row change"><span class="status-detail-label">Change owed'+nameSuffix(s.change)+'</span><span class="status-detail-amount">¢'+formatCedis(s.change.amount)+'</span><button type="button" class="status-detail-settle" data-settle-chip="change" data-status-id="'+escapeHtml(String(s.change.id))+'">Settle</button></div>';
     }
     if (s.debt) {
-      chips += '<button type="button" class="status-chip debt" data-status-chip="debt" data-status-id="'+escapeHtml(String(s.debt.id))+'">Debt:<span class="chip-amt">'+chipAmount(s.debt.amount)+'</span></button>';
-      details += '<div class="status-detail-row debt"><span class="status-detail-label">Debt owed</span><span class="status-detail-amount">¢'+formatCedis(s.debt.amount)+'</span><button type="button" class="status-detail-settle" data-settle-chip="debt" data-status-id="'+escapeHtml(String(s.debt.id))+'">Settle</button></div>';
+      chips += '<span class="chip-group"><button type="button" class="status-chip debt" data-status-chip="debt" data-status-id="'+escapeHtml(String(s.debt.id))+'">Debt:<span class="chip-amt">'+chipAmount(s.debt.amount)+'</span></button>'+nameBtnHtml('debt', s.debt)+'</span>';
+      details += '<div class="status-detail-row debt"><span class="status-detail-label">Debt owed'+nameSuffix(s.debt)+'</span><span class="status-detail-amount">¢'+formatCedis(s.debt.amount)+'</span><button type="button" class="status-detail-settle" data-settle-chip="debt" data-status-id="'+escapeHtml(String(s.debt.id))+'">Settle</button></div>';
     }
     if (s.momo) {
-      chips += '<button type="button" class="status-chip momo" data-status-chip="momo" data-status-id="'+escapeHtml(String(s.momo.id))+'">Momo:<span class="chip-amt">'+chipAmount(s.momo.amount)+'</span></button>';
-      details += '<div class="status-detail-row momo"><span class="status-detail-label">Paid via Momo</span><span class="status-detail-amount">¢'+formatCedis(s.momo.amount)+'</span><button type="button" class="status-detail-settle" data-settle-chip="momo" data-status-id="'+escapeHtml(String(s.momo.id))+'">Clear</button></div>';
+      chips += '<span class="chip-group"><button type="button" class="status-chip momo" data-status-chip="momo" data-status-id="'+escapeHtml(String(s.momo.id))+'">Momo:<span class="chip-amt">'+chipAmount(s.momo.amount)+'</span></button>'+nameBtnHtml('momo', s.momo)+'</span>';
+      details += '<div class="status-detail-row momo"><span class="status-detail-label">Paid via Momo'+nameSuffix(s.momo)+'</span><span class="status-detail-amount">¢'+formatCedis(s.momo.amount)+'</span><button type="button" class="status-detail-settle" data-settle-chip="momo" data-status-id="'+escapeHtml(String(s.momo.id))+'">Clear</button></div>';
     }
     chips += '</div>';
     details += '</div>';
@@ -3060,6 +3133,7 @@ window.addEventListener("error", function(e) {
     statusPopupType = type; statusPopupId = id;
     document.getElementById('status-popup-title').textContent = type==='debt' ? 'Debt' : type==='momo' ? 'Momo' : 'Change';
     document.getElementById('status-popup-amount').textContent = '¢'+formatCedis(rec.amount);
+    var spn = document.getElementById('status-popup-name'); spn.textContent = recordName(rec); spn.hidden = !recordName(rec);
     document.getElementById('status-popup-overlay').hidden = false;
   }
   function closeStatusPopup() {
@@ -3133,6 +3207,7 @@ window.addEventListener("error", function(e) {
     document.getElementById('entry-total').textContent='¢'+formatCedis(Number(r.total)||0);
     document.getElementById('entry-label').textContent=(type==='debt'?'Debt amount (¢)':type==='momo'?'Momo amount (¢)':'Change owed (¢)');
     var input=document.getElementById('entry-input'); input.value='';
+    document.getElementById('entry-name').value='';
     document.getElementById('entry-error').hidden=true;
     document.getElementById('entry-overlay').hidden=false;
     input.focus();
@@ -3148,6 +3223,8 @@ window.addEventListener("error", function(e) {
     var amount=Number(document.getElementById('entry-input').value);
     if(!isFinite(amount) || amount<=0){ document.getElementById('entry-error').hidden=false; document.getElementById('entry-input').focus(); return; }
     var record={id:Date.now()+Math.random(),receiptId:r.receiptId||'',receiptNumber:r.number||'Receipt',receiptCreatedAt:r.createdAt||new Date().toISOString(),amount:Number(amount.toFixed(2)),createdAt:new Date().toISOString(),items:(r.items||[]).map(function(i){return {name:String(i.name||''),qty:Number(i.qty)||0,mode:i.mode||'bulk',fraction:i.fraction==null?1:Number(i.fraction),subtotal:Number(i.subtotal)||0};})};
+    var entryNm=document.getElementById('entry-name').value.replace(/\s+/g,' ').trim().slice(0,60);
+    if(entryNm) record.name=entryNm;
     settlementArray(type).unshift(record);
     saveSettlements();
     closeSettlementEntry();
@@ -3176,7 +3253,7 @@ window.addEventListener("error", function(e) {
     var actionLabel = isDebt ? 'Mark as paid' : isMomo ? 'Clear' : 'Mark as collected';
     list.innerHTML=data.map(function(x,i){
       var d=new Date(x.createdAt), when=isNaN(d.getTime())?'':d.toLocaleString([], {month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
-      var sourceItems=Array.isArray(x.items)&&x.items.length?x.items:((receipts.find(function(r){return (x.receiptId && r.receiptId===x.receiptId) || (!x.receiptId && String(r.number||'')===String(x.receiptNumber||''));})||{}).items||[]); var itemsHtml=sourceItems.length?'<ul class="settlement-items">'+sourceItems.map(function(it){var tag=it.mode==='bulk'?(it.fraction===0.5?' (Half)':it.fraction===0.25?' (Quarter)':''):''; return '<li>'+escapeHtml(it.name+tag)+' × '+(Number(it.qty)||0)+'</li>';}).join('')+'</ul>':''; return '<div class="settlement-item"><div class="settlement-item-top"><strong>'+escapeHtml(x.receiptNumber)+'</strong><span class="settlement-amount">¢'+formatCedis(x.amount)+'</span></div>'+itemsHtml+'<div class="settlement-meta">Recorded '+escapeHtml(when)+'</div><button class="settlement-action" data-settlement-complete="'+i+'">'+actionLabel+'</button></div>';
+      var sourceItems=Array.isArray(x.items)&&x.items.length?x.items:((receipts.find(function(r){return (x.receiptId && r.receiptId===x.receiptId) || (!x.receiptId && String(r.number||'')===String(x.receiptNumber||''));})||{}).items||[]); var itemsHtml=sourceItems.length?'<ul class="settlement-items">'+sourceItems.map(function(it){var tag=it.mode==='bulk'?(it.fraction===0.5?' (Half)':it.fraction===0.25?' (Quarter)':''):''; return '<li>'+escapeHtml(it.name+tag)+' × '+(Number(it.qty)||0)+'</li>';}).join('')+'</ul>':''; return '<div class="settlement-item"><div class="settlement-item-top"><strong>'+escapeHtml(x.receiptNumber)+'</strong><span class="settlement-amount">¢'+formatCedis(x.amount)+'</span></div>'+itemsHtml+'<div class="settlement-meta">Recorded '+escapeHtml(when)+'</div><div class="settlement-actions">'+nameBtnHtml(type,x)+'<button class="settlement-action" data-settlement-complete="'+i+'">'+actionLabel+'</button></div></div>';
     }).join('');
   }
   function completeSettlement(index) {
@@ -4056,6 +4133,8 @@ function renderHistory(){
     if(e.target.closest('#quantity-plus')){ var q=(parseInt(document.getElementById('quantity-value').value,10)||1)+1; document.getElementById('quantity-value').value=q; return; }
     if(e.target.closest('#quantity-add')){ confirmQuantity(); return; }
     if (e.target.closest("#theme-toggle")) { darkMode=!darkMode; applyTheme(); return; }
+    var nameBtn=e.target.closest('[data-name-type]');
+    if (nameBtn) { openNameEditor(nameBtn.dataset.nameType, nameBtn.dataset.nameId); return; }
     var statusChip=e.target.closest('[data-status-chip]');
     if (statusChip) { openStatusPopup(statusChip.dataset.statusChip, statusChip.dataset.statusId); return; }
     if (e.target.closest("#status-popup-close") || e.target === document.getElementById('status-popup-overlay')) { closeStatusPopup(); return; }
@@ -4165,6 +4244,15 @@ function renderHistory(){
   document.getElementById('entry-overlay').addEventListener('click', function(e){ if (e.target === this) closeSettlementEntry(); });
   document.getElementById('entry-input').addEventListener('input', function(){ document.getElementById('entry-error').hidden = true; });
   document.getElementById('entry-input').addEventListener('keydown', function(e){ if (e.key === 'Enter') { e.preventDefault(); saveSettlementEntry(); } });
+
+  // v9.8.6 — name editor wiring
+  document.getElementById('name-save').addEventListener('click', function(){ saveNameEditor(false); });
+  document.getElementById('name-remove').addEventListener('click', function(){ saveNameEditor(true); });
+  document.getElementById('name-cancel').addEventListener('click', closeNameEditor);
+  document.getElementById('name-close').addEventListener('click', closeNameEditor);
+  document.getElementById('name-overlay').addEventListener('click', function(e){ if (e.target === this) closeNameEditor(); });
+  document.getElementById('name-input').addEventListener('keydown', function(e){ if (e.key === 'Enter') { e.preventDefault(); saveNameEditor(false); } });
+  document.getElementById('entry-name').addEventListener('keydown', function(e){ if (e.key === 'Enter') { e.preventDefault(); saveSettlementEntry(); } });
 
   // v9.70 — quick cash chips add to "Money received" (tap several to add them up)
   document.getElementById('quick-cash').addEventListener('click', function(e){
