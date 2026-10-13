@@ -14,7 +14,7 @@
 <link rel="preload" href="fonts/poppins-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/poppins-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="apple-touch-icon" href="icon-180.png">
-<title>Price List · V9.8.6</title>
+<title>Price List · V9.8.6.29</title>
 <style>
 @font-face{font-family:"Poppins";font-style:normal;font-weight:400;font-display:swap;src:url(fonts/poppins-latin-400-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:500;font-display:swap;src:url(fonts/poppins-latin-500-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:600;font-display:swap;src:url(fonts/poppins-latin-600-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:700;font-display:swap;src:url(fonts/poppins-latin-700-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:800;font-display:swap;src:url(fonts/poppins-latin-700-normal.woff2) format("woff2");}@font-face{font-family:"Poppins";font-style:normal;font-weight:900;font-display:swap;src:url(fonts/poppins-latin-700-normal.woff2) format("woff2");}
   :root {
@@ -476,6 +476,8 @@
   .receipt-share-btn { background:var(--gold-soft); color:var(--ink); }
   .receipt-history-share { margin-top:7px; border:0; background:var(--gold-soft); color:var(--ink); border-radius:999px; padding:6px 12px; font-size:10px; font-weight:600; }
   .receipt-copy-btn { margin-top:7px; margin-left:5px; border:0; background:var(--paper); color:var(--ink); border-radius:999px; padding:6px 12px; font-size:10px; font-weight:600; }
+  .receipt-discount-chip { display:inline-flex; align-items:center; margin-top:7px; margin-left:5px; border:1px solid rgba(180,83,9,.25); background:rgba(245,158,11,.14); color:#B45309; border-radius:999px; padding:6px 10px; font-size:10px; font-weight:700; line-height:1.2; font-variant-numeric:tabular-nums; white-space:nowrap; }
+  body.dark .receipt-discount-chip { color:#FBBF24; background:rgba(245,158,11,.15); border-color:rgba(251,191,36,.35); }
   .receipt-tools-title { margin:2px 0 5px; color:var(--ink-soft); font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; }
   .receipt-tools { display:flex; gap:7px; flex-wrap:wrap; margin-top:4px; }
   .receipt-tool-btn { border:1px solid var(--line); background:var(--paper); color:var(--ink); border-radius:9px; padding:6px 9px; font-size:10px; font-weight:600; transition:transform .12s ease, filter .12s ease, border-color .12s ease; }
@@ -1888,7 +1890,7 @@ window.addEventListener("error", function(e) {
   defaultItems.forEach(function(i){ i.photo = null; });
 
   var APP_VERSION = 'v9.8.5';
-  var BUILD_VERSION = 'v9.8.6';
+  var BUILD_VERSION = 'v9.8.6.29';
   var PRICE_MIGRATION_VERSION_KEY = 'price-list-price-migration-version-v1';
   var items = loadItems();
 
@@ -3095,6 +3097,11 @@ window.addEventListener("error", function(e) {
     var n = Number(amount) || 0;
     return '¢' + formatCedis(n).replace(/\.00$/, '');
   }
+  function receiptDiscountChipHtml(receiptRef) {
+    var amount = Math.max(0, Number(receiptRef && receiptRef.discount) || 0);
+    if (amount <= 0) return '';
+    return '<span class="receipt-discount-chip" aria-label="Discount given: ¢'+formatCedis(amount)+'">Discount · ¢'+formatCedis(amount)+'</span>';
+  }
   function receiptStatusChipsHtml(receiptRef) {
     var s = getReceiptSettlements(receiptRef);
     if (!s.change && !s.debt && !s.momo) return '';
@@ -3557,7 +3564,7 @@ function renderHistory(){
         var unit=qty>0 ? subtotal/qty : 0;
         return '<li>'+escapeHtml(i.name)+' — '+mode+' × '+qty+'<span class="receipt-item-pricing">Unit Price - ¢'+formatCedis(unit)+(qty>1 ? '<span class="price-divider">||</span><span class="price-total">Total - ¢'+formatCedis(subtotal)+'</span>' : '')+'</span></li>';
       }).join('');
-      return '<div class="history-card" data-history-index="'+idx+'" data-receipt-index="'+idx+'"><div class="history-top"><span class="history-receipt">'+escapeHtml(r.number)+'</span><span class="history-total">¢'+formatCedis(r.total)+'</span></div>'+receiptStatusChipsHtml(r)+'<div class="history-meta">'+when+'</div><ul class="history-items">'+itemsHtml+'</ul><button class="receipt-history-share" data-share-receipt="'+idx+'">Share receipt</button><button class="receipt-copy-btn" data-copy-receipt="'+idx+'">Copy</button></div>';
+      return '<div class="history-card" data-history-index="'+idx+'" data-receipt-index="'+idx+'"><div class="history-top"><span class="history-receipt">'+escapeHtml(r.number)+'</span><span class="history-total">¢'+formatCedis(r.total)+'</span></div>'+receiptStatusChipsHtml(r)+'<div class="history-meta">'+when+'</div><ul class="history-items">'+itemsHtml+'</ul><button class="receipt-history-share" data-share-receipt="'+idx+'">Share receipt</button><button class="receipt-copy-btn" data-copy-receipt="'+idx+'">Copy</button>'+receiptDiscountChipHtml(r)+'</div>';
     }).join('');
     updateReceiptCount();
     renderReceiptHistory();
@@ -3790,7 +3797,7 @@ function renderHistory(){
         var unit=qty>0 ? subtotal/qty : 0;
         return '<li>'+escapeHtml(i.name)+' — '+mode+' × '+qty+'<span class="receipt-item-pricing">Unit Price - ¢'+formatCedis(unit)+(qty>1 ? '<span class="price-divider">||</span><span class="price-total">Total - ¢'+formatCedis(subtotal)+'</span>' : '')+'</span></li>';
       }).join('');
-      return '<div class="receipt-history-item expanded" data-receipt-index="'+idx+'"><div class="rh-top"><span class="rh-no">'+escapeHtml(r.number)+'</span><span class="rh-total">¢'+formatCedis(r.total)+'</span></div>'+receiptStatusChipsHtml(r)+'<div class="rh-meta">'+when+'</div><ul class="rh-items">'+itemsHtml+'</ul><button class="receipt-history-share" data-share-receipt="'+idx+'">Share as image</button><button class="receipt-copy-btn" data-copy-receipt="'+idx+'">Copy</button></div>';
+      return '<div class="receipt-history-item expanded" data-receipt-index="'+idx+'"><div class="rh-top"><span class="rh-no">'+escapeHtml(r.number)+'</span><span class="rh-total">¢'+formatCedis(r.total)+'</span></div>'+receiptStatusChipsHtml(r)+'<div class="rh-meta">'+when+'</div><ul class="rh-items">'+itemsHtml+'</ul><button class="receipt-history-share" data-share-receipt="'+idx+'">Share as image</button><button class="receipt-copy-btn" data-copy-receipt="'+idx+'">Copy</button>'+receiptDiscountChipHtml(r)+'</div>';
     }).join('');
     if(filtered.length>visible.length){
       html += '<button class="receipt-load-more" type="button" id="receipt-load-more">Load more <small>('+visible.length+' of '+filtered.length+')</small></button>';
